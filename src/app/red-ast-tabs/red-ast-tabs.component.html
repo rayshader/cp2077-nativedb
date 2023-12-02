@@ -1,0 +1,23 @@
+<mat-tab-group style="width: 300px">
+  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'enum', nodes: enums$ | async}}"></ng-template>
+  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'bitfield', nodes: bitfields$ | async}}"></ng-template>
+  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'class', nodes: classes$ | async}}"></ng-template>
+  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'struct', nodes: structs$ | async}}"></ng-template>
+  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'function', nodes: functions$ | async}}"></ng-template>
+
+  <ng-template #nodeTab let-tab>
+    <mat-tab>
+      <ng-template mat-tab-label class="mat-tab-label">
+        <mat-icon [svgIcon]="tab.icon" class="badge-{{tab.icon}}"></mat-icon>
+        @if (tab.nodes) {
+          <span class="count">{{tab.nodes.length}}</span>
+        } @else {
+          <span class="count">0</span>
+        }
+      </ng-template>
+      @for (node of tab.nodes; track node.name) {
+        <a routerLink="/{{tab.icon[0]}}/{{node.id}}">{{node.name}}</a>
+      }
+    </mat-tab>
+  </ng-template>
+</mat-tab-group>

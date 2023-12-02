@@ -1,0 +1,31 @@
+@mixin tabs-theme($theme) {
+  .mat-mdc-tab-group {
+    height: 100%;
+
+    & .mat-mdc-tab-header {
+      & .mat-mdc-tab {
+        width: 60px;
+        min-width: auto;
+        padding: 0;
+
+        &:not(.mdc-tab--stacked) {
+          height: 60px!important;
+        }
+
+        & .mdc-tab__text-label {
+          flex-flow: column;
+        }
+      }
+    }
+
+    & .mat-mdc-tab-body {
+      & .mat-mdc-tab-body-content {
+        overflow-x: hidden;
+      }
+    }
+  }
+}
+
+@mixin tabs-color($theme) {
+
+}

@@ -1,0 +1,17 @@
+.count {
+  margin-top: 4px;
+}
+
+a {
+  display: block;
+  margin: 0;
+  padding: 8px 12px;
+
+  color: mediumseagreen; // TODO: use IDE theme color
+  text-decoration: none;
+
+  &:hover {
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.10);
+  }
+}

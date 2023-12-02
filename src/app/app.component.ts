@@ -2,6 +2,7 @@ import {Component, OnDestroy, OnInit, Renderer2} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterOutlet} from '@angular/router';
 import {MatToolbarModule} from "@angular/material/toolbar";
+import {RedAstTabsComponent} from "./red-ast-tabs/red-ast-tabs.component";
 import {IconsService} from "../shared/services/icons.service";
 import {HttpClientModule} from "@angular/common/http";
 import {Theme, ThemeService} from "../shared/services/theme.service";
@@ -10,7 +11,7 @@ import {Subscription} from "rxjs";
 @Component({
   selector: 'app',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, MatToolbarModule, HttpClientModule],
+  imports: [CommonModule, RouterOutlet, MatToolbarModule, RedAstTabsComponent, HttpClientModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
