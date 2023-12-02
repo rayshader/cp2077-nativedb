@@ -1,3 +1,6 @@
+import {RedNodeAst, RedNodeKind} from "./red-node.ast";
+import {cyrb53} from "../string";
+
 export interface RedEnumJson {
   // name
   readonly a: string;
@@ -11,7 +14,7 @@ interface RedEnumFieldJson {
   readonly [key: string]: number;
 }
 
-export interface RedEnumAst {
+export interface RedEnumAst extends RedNodeAst {
   readonly name: string;
   readonly fields: RedEnumFieldAst[];
 }
@@ -33,6 +36,8 @@ export class RedEnumAst {
       });
     }
     return {
+      id: cyrb53(json.a),
+      kind: RedNodeKind.enum,
       name: json.a,
       fields: fields
     };

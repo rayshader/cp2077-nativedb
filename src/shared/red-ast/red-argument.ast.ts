@@ -1,4 +1,6 @@
 import {RedTypeAst, RedTypeJson} from "./red-type.ast";
+import {cyrb53} from "../string";
+import {RedNodeAst, RedNodeKind} from "./red-node.ast";
 
 export interface RedArgumentJson {
   // flags
@@ -9,7 +11,7 @@ export interface RedArgumentJson {
   readonly e: RedTypeJson;
 }
 
-export interface RedArgumentAst {
+export interface RedArgumentAst extends RedNodeAst {
   readonly isOut: boolean;
   readonly isConst: boolean;
   readonly isOptional: boolean;
@@ -25,6 +27,8 @@ export class RedArgumentAst {
     const isOptional: boolean = ((flags >> 2) & 1) != 0;
 
     return {
+      id: cyrb53(json.a),
+      kind: RedNodeKind.argument,
       isOut: isOut,
       isConst: isConst,
       isOptional: isOptional,

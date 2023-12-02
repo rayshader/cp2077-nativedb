@@ -1,6 +1,8 @@
 import {RedTypeAst, RedTypeJson} from "./red-type.ast";
 import {RedArgumentAst, RedArgumentJson} from "./red-argument.ast";
 import {RedScopeDef} from "./red-definitions.ast";
+import {RedNodeAst, RedNodeKind} from "./red-node.ast";
+import {cyrb53} from "../string";
 
 export interface RedFunctionJson {
   // name
@@ -13,7 +15,7 @@ export interface RedFunctionJson {
   readonly j: RedTypeJson;
 }
 
-export interface RedFunctionAst {
+export interface RedFunctionAst extends RedNodeAst {
   readonly name: string;
   readonly scope: RedScopeDef;
   readonly isFinal: boolean;
@@ -38,6 +40,8 @@ export class RedFunctionAst {
     const isCallback: boolean = ((flags >> 7) & 1) != 0;
 
     return {
+      id: cyrb53(json.a),
+      kind: RedNodeKind.function,
       name: json.a,
       scope: scope,
       isFinal: isFinal,

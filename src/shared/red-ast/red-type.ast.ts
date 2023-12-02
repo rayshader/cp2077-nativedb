@@ -1,4 +1,6 @@
 import {RedPrimitiveDef, RedTemplateDef} from "./red-definitions.ast";
+import {RedNodeAst, RedNodeKind} from "./red-node.ast";
+import {cyrb53} from "../string";
 
 export interface RedTypeJson {
   // name
@@ -13,7 +15,7 @@ export interface RedTypeJson {
   readonly p?: RedTypeJson;
 }
 
-export interface RedTypeAst {
+export interface RedTypeAst extends RedNodeAst {
   readonly name: string;
   readonly primitive?: RedPrimitiveDef;
   readonly template?: RedTemplateDef;
@@ -33,6 +35,8 @@ export class RedTypeAst {
       name = json.a!;
     }
     return {
+      id: cyrb53(name),
+      kind: RedNodeKind.type,
       name: name,
       primitive: json.n,
       template: json.o,

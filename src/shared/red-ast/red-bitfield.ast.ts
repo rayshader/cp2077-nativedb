@@ -1,3 +1,6 @@
+import {RedNodeAst, RedNodeKind} from "./red-node.ast";
+import {cyrb53} from "../string";
+
 export interface RedBitfieldJson {
   // name
   readonly a: string;
@@ -11,7 +14,7 @@ interface RedBitfieldFieldJson {
   readonly [key: string]: number;
 }
 
-export interface RedBitfieldAst {
+export interface RedBitfieldAst extends RedNodeAst {
   readonly name: string;
   readonly fields: RedBitfieldFieldAst[];
 }
@@ -33,6 +36,8 @@ export class RedBitfieldAst {
       });
     }
     return {
+      id: cyrb53(json.a),
+      kind: RedNodeKind.bitfield,
       name: json.a,
       fields: fields
     };

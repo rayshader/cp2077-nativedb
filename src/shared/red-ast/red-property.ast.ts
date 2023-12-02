@@ -1,6 +1,8 @@
 import {RedTypeAst, RedTypeJson} from "./red-type.ast";
 import {RedAnnotationAst, RedAnnotationJson} from "./red-annotation.ast";
 import {RedScopeDef} from "./red-definitions.ast";
+import {RedNodeAst, RedNodeKind} from "./red-node.ast";
+import {cyrb53} from "../string";
 
 export interface RedPropertyJson {
   // annotations
@@ -16,7 +18,7 @@ export interface RedPropertyJson {
   readonly a: string;
 }
 
-export interface RedPropertyAst {
+export interface RedPropertyAst extends RedNodeAst {
   readonly annotations: RedAnnotationAst[];
   readonly scope: RedScopeDef;
   readonly isInline: boolean;
@@ -41,6 +43,8 @@ export class RedPropertyAst {
     const isConst: boolean = ((flags >> 7) & 1) != 0;
 
     return {
+      id: cyrb53(json.a),
+      kind: RedNodeKind.property,
       annotations: json.l?.map((item) => RedAnnotationAst.fromJson(item)) ?? [],
       scope: scope,
       isInline: isInline,

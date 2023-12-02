@@ -2,6 +2,8 @@ import {RedObjectAst} from "./red-object.ast";
 import {RedPropertyAst, RedPropertyJson} from "./red-property.ast";
 import {RedFunctionAst, RedFunctionJson} from "./red-function.ast";
 import {RedOriginDef, RedScopeDef} from "./red-definitions.ast";
+import {cyrb53} from "../string";
+import {RedNodeKind} from "./red-node.ast";
 
 export interface RedStructJson {
   // name
@@ -29,6 +31,8 @@ export class RedStructAst {
     const origin: RedOriginDef = (flags >> 2) & 3;
 
     return {
+      id: cyrb53(json.a),
+      kind: RedNodeKind.struct,
       name: json.a,
       scope: scope,
       origin: origin,
