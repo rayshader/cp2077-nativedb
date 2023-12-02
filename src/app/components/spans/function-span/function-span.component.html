@@ -1,0 +1,38 @@
+@if (node) {
+  <div class="badges">
+    <mat-icon class="stx-lang" svgIcon="scope" title="{{scope}}"></mat-icon>
+    @if (node.isFinal) {
+      <mat-icon class="stx-lang" svgIcon="final" title="final"></mat-icon>
+    }
+    @if (node.isStatic) {
+      <mat-icon class="stx-lang" svgIcon="static" title="static"></mat-icon>
+    }
+    @if (node.isNative) {
+      <mat-icon class="stx-lang" svgIcon="native" title="native"></mat-icon>
+    }
+    @if (node.isConst) {
+      <mat-icon class="stx-lang" svgIcon="const" title="const"></mat-icon>
+    }
+    @if (node.isQuest) {
+      <mat-icon class="stx-lang" svgIcon="quest" title="quest"></mat-icon>
+    }
+    @if (node.isCallback) {
+      <mat-icon class="stx-lang" svgIcon="callback" title="callback"></mat-icon>
+    }
+    <div style="width: {{align}}px"></div>
+  </div>
+
+  <div class="prototype">
+    <span class="stx-function">{{node.name}}</span>
+    <span class="stx-parenthesis">(</span>
+    @for (arg of node.arguments; track arg.id; let i = $index) {
+      <argument-span [node]="arg"></argument-span>
+      @if (i + 1 < node.arguments.length) {
+        <span class="stx-text">,&nbsp;</span>
+      }
+    }
+    <span class="stx-parenthesis">)</span>
+    <span class="stx-text">&nbsp;→&nbsp;</span>
+    <type-span [node]="node.returnType"></type-span>
+  </div>
+}

@@ -1,0 +1,13 @@
+:host {
+  display: flex;
+
+  & .badges {
+    display: flex;
+  }
+
+  & .prototype {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 3px;
+  }
+}
