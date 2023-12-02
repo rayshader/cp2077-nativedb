@@ -1,0 +1,15 @@
+@if (enum$ | async; as enum) {
+  <h1 class="stx-type">{{enum.name}}</h1>
+  <mat-icon class="badge-enum" svgIcon="enum"></mat-icon>
+
+  @for (field of enum.fields; track field.key) {
+    <p class="field">
+      <button mat-icon-button (click)="copyClipboard(enum, field.key)"><mat-icon>content_copy</mat-icon></button>
+      <span class="stx-text">{{field.key}}</span>
+      <span class="stx-text">&nbsp;=&nbsp;</span>
+      <span class="stx-number">{{field.value}}</span>
+    </p>
+  }
+} @else {
+  <h1>Loading...</h1>
+}

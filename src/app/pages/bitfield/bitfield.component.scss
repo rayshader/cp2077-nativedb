@@ -1,0 +1,15 @@
+:host {
+  display: flex;
+  flex-flow: column;
+}
+
+.field {
+  display: inline-flex;
+  align-items: center;
+
+  margin: 0;
+
+  & button {
+    margin-right: 12px;
+  }
+}

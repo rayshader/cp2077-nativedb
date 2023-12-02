@@ -4,6 +4,9 @@
 @use 'styles/mat/tabs' as *;
 @use 'styles/mat/icons' as *;
 
+// App components
+@use 'styles/page' as *;
+
 @mixin mat-component-themes($theme) {
   //@include mat.all-component-themes($theme);
   @include mat.core-theme($theme);
@@ -25,6 +28,7 @@
 @mixin rd-component-themes($theme) {
   @include tabs-theme($theme);
   @include icons-theme($theme);
+  @include page-theme($theme);
 }
 
 @mixin rd-component-colors($theme) {
