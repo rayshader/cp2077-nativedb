@@ -1,0 +1,17 @@
+@if (node) {
+  @if (node.template) {
+    <span class="stx-lang">{{node.name}}</span>
+    <span class="stx-type"><</span>
+    @if (node.child) {
+      <type-span [node]="node.child"></type-span>
+    }
+    @if (node.size != -1) {
+      <span class="stx-number">; {{node.size}}</span>
+    }
+    <span class="stx-type">></span>
+  } @else if (node.primitive) {
+    <span class="stx-primitive-type">{{node.name}}</span>
+  } @else {
+    <span class="stx-type redirect" (click)="onRedirect()">{{node.name}}</span>
+  }
+}
