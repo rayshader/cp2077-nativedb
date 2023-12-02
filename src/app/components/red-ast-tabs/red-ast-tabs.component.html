@@ -1,14 +1,14 @@
 <mat-tab-group style="width: 300px">
-  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'enum', nodes: enums$ | async}}"></ng-template>
-  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'bitfield', nodes: bitfields$ | async}}"></ng-template>
-  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'class', nodes: classes$ | async}}"></ng-template>
-  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'struct', nodes: structs$ | async}}"></ng-template>
-  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'function', nodes: functions$ | async}}"></ng-template>
+  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'enum', alt: 'Enums', nodes: enums$ | async}}"></ng-template>
+  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'bitfield', alt: 'Bitfields', nodes: bitfields$ | async}}"></ng-template>
+  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'class', alt: 'Classes', nodes: classes$ | async}}"></ng-template>
+  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'struct', alt: 'Structs', nodes: structs$ | async}}"></ng-template>
+  <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'function', alt: 'Global functions', nodes: functions$ | async}}"></ng-template>
 
   <ng-template #nodeTab let-tab>
     <mat-tab>
       <ng-template mat-tab-label class="mat-tab-label">
-        <mat-icon class="badge-{{tab.icon}}" [svgIcon]="tab.icon"></mat-icon>
+        <mat-icon class="badge-{{tab.icon}}" [svgIcon]="tab.icon" [title]="tab.alt"></mat-icon>
         @if (tab.nodes) {
           <span class="count">{{tab.nodes.length}}</span>
         } @else {
