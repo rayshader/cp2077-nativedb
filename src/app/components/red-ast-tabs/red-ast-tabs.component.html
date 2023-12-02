@@ -16,7 +16,7 @@
         }
       </ng-template>
       @for (node of tab.nodes; track node.name) {
-        <a routerLink="/{{tab.icon[0]}}/{{node.id}}">{{node.name}}</a>
+        <a class="stx-type" routerLink="/{{tab.icon[0]}}/{{node.id}}">{{node.name}}</a>
       }
     </mat-tab>
   </ng-template>
