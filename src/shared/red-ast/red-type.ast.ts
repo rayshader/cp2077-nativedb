@@ -27,9 +27,9 @@ export class RedTypeAst {
   static fromJson(json: RedTypeJson): RedTypeAst {
     let name: string;
 
-    if (json.n) {
+    if (typeof json.n === 'number') {
       name = RedPrimitiveDef[json.n];
-    } else if (json.o) {
+    } else if (typeof json.o === 'number') {
       name = RedTemplateDef[json.o];
     } else {
       name = json.a!;
