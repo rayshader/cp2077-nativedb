@@ -8,7 +8,7 @@
   <ng-template #nodeTab let-tab>
     <mat-tab>
       <ng-template mat-tab-label class="mat-tab-label">
-        <mat-icon [svgIcon]="tab.icon" class="badge-{{tab.icon}}"></mat-icon>
+        <mat-icon class="badge-{{tab.icon}}" [svgIcon]="tab.icon"></mat-icon>
         @if (tab.nodes) {
           <span class="count">{{tab.nodes.length}}</span>
         } @else {
