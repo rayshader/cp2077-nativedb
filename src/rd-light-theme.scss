@@ -1,0 +1,24 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+@use 'rd-mixins' as rd;
+@use 'rd-theme' as *;
+
+@include mat.core();
+
+$light-primary: mat.define-palette(mat.$blue-palette);
+$light-accent: mat.define-palette(mat.$orange-palette, A200, A100, A400);
+$light-warn: mat.define-palette(mat.$red-palette);
+$rd-light-theme: mat.define-light-theme((
+  color: (
+    primary: $light-primary,
+    accent: $light-accent,
+    warn: $light-warn,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+  badges: rd-badges(),
+));
+
+// Light theme
+@include rd.mat-component-themes($rd-light-theme);
+@include rd.rd-component-themes($rd-light-theme);

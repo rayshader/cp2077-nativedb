@@ -1,0 +1,15 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+/**
+ * Palette of colors for badges.
+ */
+@function rd-badges() {
+  @return (
+    enum: map.get(mat.$light-blue-palette, 500),
+    bitfield: map.get(mat.$light-blue-palette, A200),
+    class: map.get(mat.$green-palette, 500),
+    struct: map.get(mat.$green-palette, A200),
+    function: map.get(mat.$amber-palette, A200),
+  );
+}

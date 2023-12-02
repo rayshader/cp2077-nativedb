@@ -1,0 +1,33 @@
+@use 'sass:map';
+
+@mixin icons-theme($theme) {
+  $badges: map.get($theme, 'badges');
+
+  mat-icon {
+    &.badge- {
+      &enum {
+        color: map.get($badges, 'enum');
+      }
+
+      &bitfield {
+        color: map.get($badges, 'bitfield');
+      }
+
+      &class {
+        color: map.get($badges, 'class');
+      }
+
+      &struct {
+        color: map.get($badges, 'struct');
+      }
+
+      &function {
+        color: map.get($badges, 'function');
+      }
+    }
+  }
+}
+
+@mixin icons-color($theme) {
+
+}

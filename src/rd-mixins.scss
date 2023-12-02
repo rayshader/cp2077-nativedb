@@ -1,0 +1,26 @@
+@use '@angular/material' as mat;
+@use 'styles/mat/tabs' as *;
+@use 'styles/mat/icons' as *;
+
+@mixin mat-component-themes($theme) {
+  //@include mat.all-component-themes($theme);
+  @include mat.core-theme($theme);
+  @include mat.toolbar-theme($theme);
+  @include mat.tabs-theme($theme);
+}
+
+@mixin mat-component-colors($theme) {
+  //@include mat.all-component-colors($theme);
+  @include mat.core-color($theme);
+  @include mat.toolbar-color($theme);
+  @include mat.tabs-color($theme);
+}
+
+@mixin rd-component-themes($theme) {
+  @include tabs-theme($theme);
+  @include icons-theme($theme);
+}
+
+@mixin rd-component-colors($theme) {
+  @include icons-color($theme);
+}
