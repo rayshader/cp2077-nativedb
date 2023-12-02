@@ -1,11 +1,12 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {RedEnumAst} from "../red-ast/red-enum.ast";
-import {filter, map, mergeAll, Observable, shareReplay} from "rxjs";
+import {combineLatest, filter, map, mergeAll, Observable, shareReplay} from "rxjs";
 import {RedBitfieldAst} from "../red-ast/red-bitfield.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
 import {RedStructAst} from "../red-ast/red-struct.ast";
 import {RedFunctionAst} from "../red-ast/red-function.ast";
+import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
 
 @Injectable({
   providedIn: 'root'
@@ -37,6 +38,21 @@ export class RedDumpService {
     this.functions$ = this.http.get(`/assets/reddump/functions.json`).pipe(
       map((json: any) => json.map((item: any) => RedFunctionAst.fromJson(item))),
       shareReplay()
+    );
+  }
+
+  getTypeById(id: number): Observable<RedNodeKind | undefined> {
+    return combineLatest([
+      this.enums$,
+      this.bitfields$,
+      this.classes$,
+      this.structs$,
+      this.functions$
+    ]).pipe(
+      mergeAll(),
+      mergeAll(),
+      filter((node: RedNodeAst) => node.id == id),
+      map((node: RedNodeAst) => node.kind)
     );
   }
 
