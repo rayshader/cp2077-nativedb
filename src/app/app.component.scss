@@ -3,5 +3,12 @@
 }
 
 section {
+  display: flex;
   height: calc(100% - 64px);
+}
+
+.page {
+  flex: 1;
+
+  padding: 0px 24px;
 }
