@@ -32,13 +32,14 @@ export class FunctionSpanComponent {
   @Input()
   set badges(count: number) {
     // Compute remaining empty badges to align with.
+    count--;
     if (this.node?.isFinal) count--;
     if (this.node?.isStatic) count--;
     if (this.node?.isNative) count--;
     if (this.node?.isConst) count--;
     if (this.node?.isQuest) count--;
     if (this.node?.isCallback) count--;
-    count = Math.min(count, 0);
+    count = Math.max(count, 0);
     this.align = count * 24 + 12;
   }
 
