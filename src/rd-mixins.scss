@@ -1,8 +1,8 @@
 @use '@angular/material' as mat;
 
 // Material components
-@use 'styles/mat/tabs' as *;
-@use 'styles/mat/icons' as *;
+@use 'styles/mat/tab' as *;
+@use 'styles/mat/icon' as *;
 
 // App components
 @use 'styles/page' as *;
@@ -26,11 +26,11 @@
 }
 
 @mixin rd-component-themes($theme) {
-  @include tabs-theme($theme);
-  @include icons-theme($theme);
+  @include tab-theme($theme);
+  @include icon-theme($theme);
   @include page-theme($theme);
 }
 
 @mixin rd-component-colors($theme) {
-  @include icons-color($theme);
+  @include icon-color($theme);
 }

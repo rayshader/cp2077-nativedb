@@ -1,6 +1,6 @@
 @use 'sass:map';
 
-@mixin icons-theme($theme) {
+@mixin icon-theme($theme) {
   $badges: map.get($theme, 'badges');
 
   mat-icon {
@@ -28,6 +28,6 @@
   }
 }
 
-@mixin icons-color($theme) {
+@mixin icon-color($theme) {
 
 }
