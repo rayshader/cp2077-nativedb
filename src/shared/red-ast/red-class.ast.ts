@@ -23,7 +23,6 @@ export interface RedClassAst extends RedObjectAst {
   readonly isAbstract: boolean;
   readonly isFinal: boolean;
   readonly origin: RedOriginDef;
-  readonly parent?: string;
 }
 
 export class RedClassAst {

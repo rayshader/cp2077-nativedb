@@ -21,7 +21,6 @@ export interface RedStructJson {
 export interface RedStructAst extends RedObjectAst {
   readonly scope: RedScopeDef;
   readonly origin: RedOriginDef;
-  readonly parent?: string;
 }
 
 export class RedStructAst {

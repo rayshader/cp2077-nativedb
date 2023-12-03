@@ -6,4 +6,5 @@ export interface RedObjectAst extends RedNodeAst {
   readonly name: string;
   readonly properties: RedPropertyAst[];
   readonly functions: RedFunctionAst[];
+  readonly parent?: string;
 }
