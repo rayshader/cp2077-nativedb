@@ -1,12 +1,13 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {RedEnumAst} from "../red-ast/red-enum.ast";
-import {combineLatest, filter, map, mergeAll, Observable, OperatorFunction, pipe, shareReplay} from "rxjs";
+import {combineLatest, EMPTY, filter, map, mergeAll, Observable, OperatorFunction, pipe, shareReplay} from "rxjs";
 import {RedBitfieldAst} from "../red-ast/red-bitfield.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
 import {RedStructAst} from "../red-ast/red-struct.ast";
 import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
+import {RedObjectAst} from "../red-ast/red-object.ast";
 
 @Injectable({
   providedIn: 'root'
@@ -74,6 +75,54 @@ export class RedDumpService {
 
   getFunctionById(id: number): Observable<RedFunctionAst | undefined> {
     return this.functions$.pipe(this.getById(id));
+  }
+
+  getParentsByName<T extends RedObjectAst>(name: string,
+                                           kind: RedNodeKind.class | RedNodeKind.struct): Observable<T[]> {
+    let query$: Observable<RedObjectAst[]>;
+
+    if (kind === RedNodeKind.class) {
+      query$ = this.classes$;
+    } else if (kind === RedNodeKind.struct) {
+      query$ = this.structs$;
+    } else {
+      return EMPTY;
+    }
+    return query$.pipe(
+      map((objects) => {
+        const parents: T[] = [];
+        let parent = objects.find((object) => object.name === name);
+
+        if (parent) {
+          parents.push(parent as T);
+        }
+        while (parent && parent.parent) {
+          parent = objects.find((object) => object.name === parent!.parent);
+          if (parent) {
+            parents.push(parent as T);
+          }
+        }
+        return parents;
+      })
+    );
+  }
+
+  getChildrenByName<T extends RedObjectAst>(name: string,
+                                            kind: RedNodeKind.class | RedNodeKind.struct): Observable<T[]> {
+    let query$: Observable<RedObjectAst[]>;
+
+    if (kind === RedNodeKind.class) {
+      query$ = this.classes$;
+    } else if (kind === RedNodeKind.struct) {
+      query$ = this.structs$;
+    } else {
+      return EMPTY;
+    }
+    return query$.pipe(
+      map((objects) => {
+        return objects.filter((object) => object.parent === name) as T[];
+      })
+    );
   }
 
   private getById<T extends RedNodeAst>(id: number): OperatorFunction<T[], T | undefined> {
