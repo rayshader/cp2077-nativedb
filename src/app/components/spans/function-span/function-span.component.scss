@@ -4,6 +4,23 @@
 
   & .badges {
     display: flex;
+
+    & button[mat-icon-button] {
+      width: 32px;
+      height: 32px;
+      margin-top: -4px;
+      margin-right: 8px;
+      padding: 6px;
+
+      font-size: 20px;
+
+      & mat-icon {
+        width: 20px;
+        height: 20px;
+
+        font-size: 20px;
+      }
+    }
   }
 
   & .prototype {

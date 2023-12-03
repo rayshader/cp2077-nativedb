@@ -1,5 +1,8 @@
 @if (node) {
   <div class="badges">
+    @if (memberOf) {
+      <button mat-icon-button (click)="copyToClipboard()"><mat-icon>content_copy</mat-icon></button>
+    }
     <mat-icon class="stx-scope" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>
     @if (node.isFinal) {
       <mat-icon class="stx-lang" svgIcon="final" title="final"></mat-icon>

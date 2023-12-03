@@ -4,12 +4,15 @@ import {TypeSpanComponent} from "../type-span/type-span.component";
 import {RedFunctionAst} from "../../../../shared/red-ast/red-function.ast";
 import {MatIconModule} from "@angular/material/icon";
 import {RedScopeDef} from "../../../../shared/red-ast/red-definitions.ast";
+import {RedObjectAst} from "../../../../shared/red-ast/red-object.ast";
+import {MatButtonModule} from "@angular/material/button";
 
 @Component({
   selector: 'function-span',
   standalone: true,
   imports: [
     MatIconModule,
+    MatButtonModule,
     ArgumentSpanComponent,
     TypeSpanComponent
   ],
@@ -25,6 +28,12 @@ export class FunctionSpanComponent {
 
   @Input()
   node?: RedFunctionAst;
+
+  /**
+   * Optional, when this function is a member of a class or a struct.
+   */
+  @Input()
+  memberOf?: RedObjectAst;
 
   /**
    * Total number of badges to align with.
@@ -51,6 +60,20 @@ export class FunctionSpanComponent {
       return '';
     }
     return RedScopeDef[this.node.scope];
+  }
+
+  protected async copyToClipboard(): Promise<void> {
+    if (!this.node) {
+      return;
+    }
+    let data: string = '';
+
+    data += this.node.name;
+    data += '(';
+    data += this.node.arguments.map((argument) => argument.name).join(', ');
+    data += ')';
+
+    await navigator.clipboard.writeText(data);
   }
 
 }
