@@ -2,6 +2,10 @@
   height: 100%;
 }
 
+.home {
+  cursor: pointer;
+}
+
 section {
   display: flex;
   height: calc(100% - 64px);
