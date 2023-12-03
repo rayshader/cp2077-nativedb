@@ -51,7 +51,7 @@ export class RedDumpService {
     ]).pipe(
       mergeAll(),
       mergeAll(),
-      filter((node: RedNodeAst) => node.id == id),
+      filter((node: RedNodeAst) => node.id === id),
       map((node: RedNodeAst) => node.kind)
     );
   }
