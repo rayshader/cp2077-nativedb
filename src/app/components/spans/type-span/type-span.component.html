@@ -1,15 +1,13 @@
 @if (node) {
-  @if (node.template) {
+  @if (node.template !== undefined && node.child) {
     <span class="stx-lang">{{node.name}}</span>
     <span class="stx-type"><</span>
-    @if (node.child) {
-      <type-span [node]="node.child"></type-span>
-    }
+    <type-span [node]="node.child"></type-span>
     @if (node.size != -1) {
       <span class="stx-number">; {{node.size}}</span>
     }
     <span class="stx-type">></span>
-  } @else if (node.primitive) {
+  } @else if (node.primitive !== undefined) {
     <span class="stx-primitive-type">{{node.name}}</span>
   } @else {
     <span class="stx-type redirect" (click)="onRedirect()">{{node.name}}</span>
