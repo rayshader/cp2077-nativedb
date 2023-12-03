@@ -13,6 +13,7 @@ section {
 
 .page {
   flex: 1;
+  overflow-y: scroll;
 
   padding: 0 24px;
 }
