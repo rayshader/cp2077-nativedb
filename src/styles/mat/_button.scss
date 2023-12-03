@@ -1,0 +1,27 @@
+@mixin button-theme($theme) {
+  button {
+    &.badge {
+      width: 32px!important;
+      height: 32px!important;
+      margin-top: -4px!important;
+      padding: 6px!important;
+
+      font-size: 20px!important;
+
+      &:last-of-type {
+        margin-right: 8px;
+      }
+
+      & mat-icon {
+        width: 20px;
+        height: 20px;
+
+        font-size: 21px;
+      }
+    }
+  }
+}
+
+@mixin button-color($theme) {
+
+}

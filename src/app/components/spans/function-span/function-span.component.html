@@ -2,10 +2,12 @@
   <div class="badges">
     @if (canCopy) {
       <button mat-icon-button
+              class="badge"
               title="Copy to clipboard"
               (click)="copyToClipboard()"><mat-icon>content_copy</mat-icon></button>
     }
     <button mat-icon-button
+            class="badge"
             title="Documentation"
             [class.with-documentation]="!!documentation"><mat-icon>info_outline</mat-icon></button>
     <mat-icon class="stx-scope" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>

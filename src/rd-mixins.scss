@@ -3,6 +3,7 @@
 // Material components
 @use 'styles/mat/tab' as *;
 @use 'styles/mat/icon' as *;
+@use 'styles/mat/button' as *;
 
 // App components
 @use 'styles/page' as *;
@@ -28,9 +29,11 @@
 @mixin rd-component-themes($theme) {
   @include tab-theme($theme);
   @include icon-theme($theme);
+  @include button-theme($theme);
   @include page-theme($theme);
 }
 
 @mixin rd-component-colors($theme) {
   @include icon-color($theme);
+  @include button-color($theme);
 }
