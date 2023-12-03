@@ -29,6 +29,27 @@ export interface RedFunctionAst extends RedNodeAst {
 }
 
 export class RedFunctionAst {
+  static sort(a: RedFunctionAst, b: RedFunctionAst): number {
+    let delta: number = a.scope - b.scope;
+
+    if (delta != 0) {
+      return delta;
+    }
+    return a.name.localeCompare(b.name);
+  }
+
+  static computeBadges(func: RedFunctionAst): number {
+    let badges: number = 1;
+
+    if (func.isFinal) badges++;
+    if (func.isStatic) badges++;
+    if (func.isNative) badges++;
+    if (func.isConst) badges++;
+    if (func.isQuest) badges++;
+    if (func.isCallback) badges++;
+    return badges;
+  }
+
   static fromJson(json: RedFunctionJson): RedFunctionAst {
     const flags: number = json.d ?? 0;
     const scope: RedScopeDef = flags & 3;
