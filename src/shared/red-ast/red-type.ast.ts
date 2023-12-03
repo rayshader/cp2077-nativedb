@@ -24,6 +24,23 @@ export interface RedTypeAst extends RedNodeAst {
 }
 
 export class RedTypeAst {
+  static toString(type: RedTypeAst): string {
+    let str: string = '';
+
+    // TODO: ignore script_ref<T> when syntax is for Redscript / Lua ?
+    if (typeof type.template === 'number' && type.child) {
+      str += `${type.name}<`;
+      str += RedTypeAst.toString(type.child);
+      if (type.size !== -1) {
+        str += `; ${type.size}`;
+      }
+      str += '>';
+    } else {
+      str = type.name;
+    }
+    return str;
+  }
+
   static fromJson(json: RedTypeJson): RedTypeAst {
     let name: string;
 

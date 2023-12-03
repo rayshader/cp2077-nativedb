@@ -9,16 +9,23 @@
       width: 32px;
       height: 32px;
       margin-top: -4px;
-      margin-right: 8px;
       padding: 6px;
 
       font-size: 20px;
+
+      &:last-of-type {
+        margin-right: 8px;
+      }
 
       & mat-icon {
         width: 20px;
         height: 20px;
 
-        font-size: 20px;
+        font-size: 21px;
+      }
+
+      &.with-documentation {
+        color: forestgreen;
       }
     }
   }

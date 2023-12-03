@@ -1,8 +1,13 @@
 @if (node) {
   <div class="badges">
-    @if (memberOf) {
-      <button mat-icon-button (click)="copyToClipboard()"><mat-icon>content_copy</mat-icon></button>
+    @if (canCopy) {
+      <button mat-icon-button
+              title="Copy to clipboard"
+              (click)="copyToClipboard()"><mat-icon>content_copy</mat-icon></button>
     }
+    <button mat-icon-button
+            title="Documentation"
+            [class.with-documentation]="!!documentation"><mat-icon>info_outline</mat-icon></button>
     <mat-icon class="stx-scope" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>
     @if (node.isFinal) {
       <mat-icon class="stx-lang" svgIcon="final" title="final"></mat-icon>
