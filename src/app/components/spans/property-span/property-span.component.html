@@ -1,0 +1,35 @@
+@if (node) {
+  <div class="badges">
+    <div class="align-clipboard"></div>
+    <button mat-icon-button
+            class="badge"
+            title="Documentation"
+            [class.stx-doc]="!!documentation"><mat-icon>info_outline</mat-icon></button>
+    <mat-icon class="stx-scope" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>
+    @if (node.isInline) {
+      <mat-icon class="stx-lang" svgIcon="importonly" title="inline"></mat-icon>
+    }
+    @if (node.isEdit) {
+      <mat-icon class="stx-lang" svgIcon="enum" title="edit"></mat-icon>
+    }
+    @if (node.isNative) {
+      <mat-icon class="stx-lang" svgIcon="native" title="native"></mat-icon>
+    }
+    @if (node.isPersistent) {
+      <mat-icon class="stx-lang" svgIcon="scope" title="persistent"></mat-icon>
+    }
+    @if (node.isReplicated) {
+      <mat-icon class="stx-lang" svgIcon="replicated" title="replicated"></mat-icon>
+    }
+    @if (node.isConst) {
+      <mat-icon class="stx-lang" svgIcon="const" title="const"></mat-icon>
+    }
+    <div style="width: {{align}}px"></div>
+  </div>
+
+  <div class="prototype">
+    <span class="stx-text">{{node.name}}</span>
+    <span class="stx-text">:&nbsp;</span>
+    <type-span [node]="node.type"></type-span>
+  </div>
+}

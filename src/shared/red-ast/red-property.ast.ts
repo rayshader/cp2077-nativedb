@@ -32,6 +32,27 @@ export interface RedPropertyAst extends RedNodeAst {
 }
 
 export class RedPropertyAst {
+  static sort(a: RedPropertyAst, b: RedPropertyAst): number {
+    let delta: number = a.scope - b.scope;
+
+    if (delta != 0) {
+      return delta;
+    }
+    return a.name.localeCompare(b.name);
+  }
+
+  static computeBadges(func: RedPropertyAst): number {
+    let badges: number = 1;
+
+    if (func.isInline) badges++;
+    if (func.isEdit) badges++;
+    if (func.isNative) badges++;
+    if (func.isPersistent) badges++;
+    if (func.isReplicated) badges++;
+    if (func.isConst) badges++;
+    return badges;
+  }
+
   static fromJson(json: RedPropertyJson): RedPropertyAst {
     const flags: number = json.d ?? 0;
     const scope: RedScopeDef = flags & 3;
