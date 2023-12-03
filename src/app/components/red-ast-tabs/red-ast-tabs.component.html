@@ -1,4 +1,4 @@
-<mat-tab-group style="width: 300px">
+<mat-tab-group style="width: 300px" selectedIndex="2">
   <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'enum', alt: 'Enums', nodes: enums$ | async}}"></ng-template>
   <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'bitfield', alt: 'Bitfields', nodes: bitfields$ | async}}"></ng-template>
   <ng-template *ngTemplateOutlet="nodeTab; context: {$implicit: {icon: 'class', alt: 'Classes', nodes: classes$ | async}}"></ng-template>
