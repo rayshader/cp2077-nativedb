@@ -3,7 +3,7 @@
     <span class="stx-lang">{{node.name}}</span>
     <span class="stx-type"><</span>
     <type-span [node]="node.child"></type-span>
-    @if (node.size != -1) {
+    @if (node.size !== undefined) {
       <span class="stx-number">; {{node.size}}</span>
     }
     <span class="stx-type">></span>

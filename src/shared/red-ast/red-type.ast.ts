@@ -19,7 +19,7 @@ export interface RedTypeAst extends RedNodeAst {
   readonly name: string;
   readonly primitive?: RedPrimitiveDef;
   readonly template?: RedTemplateDef;
-  readonly size: number | -1;
+  readonly size?: number;
   readonly child?: RedTypeAst;
 }
 
@@ -31,7 +31,7 @@ export class RedTypeAst {
     if (typeof type.template === 'number' && type.child) {
       str += `${type.name}<`;
       str += RedTypeAst.toString(type.child);
-      if (type.size !== -1) {
+      if (type.size !== undefined) {
         str += `; ${type.size}`;
       }
       str += '>';
@@ -57,7 +57,7 @@ export class RedTypeAst {
       name: name,
       primitive: json.n,
       template: json.o,
-      size: json.m ?? -1,
+      size: json.m,
       child: (json.p) ? RedTypeAst.fromJson(json.p) : undefined,
     };
   }
