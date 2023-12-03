@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {RedEnumAst} from "../red-ast/red-enum.ast";
-import {combineLatest, filter, map, mergeAll, Observable, shareReplay} from "rxjs";
+import {combineLatest, filter, map, mergeAll, Observable, OperatorFunction, pipe, shareReplay} from "rxjs";
 import {RedBitfieldAst} from "../red-ast/red-bitfield.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
 import {RedStructAst} from "../red-ast/red-struct.ast";
@@ -57,37 +57,28 @@ export class RedDumpService {
   }
 
   getEnumById(id: number): Observable<RedEnumAst | undefined> {
-    return this.enums$.pipe(
-      mergeAll(),
-      filter((node) => node.id == id)
-    );
+    return this.enums$.pipe(this.getById(id));
   }
 
   getBitfieldById(id: number): Observable<RedBitfieldAst | undefined> {
-    return this.bitfields$.pipe(
-      mergeAll(),
-      filter((node) => node.id == id)
-    );
+    return this.bitfields$.pipe(this.getById(id));
   }
 
   getClassById(id: number): Observable<RedClassAst | undefined> {
-    return this.classes$.pipe(
-      mergeAll(),
-      filter((node) => node.id == id)
-    );
+    return this.classes$.pipe(this.getById(id));
   }
 
   getStructById(id: number): Observable<RedStructAst | undefined> {
-    return this.structs$.pipe(
-      mergeAll(),
-      filter((node) => node.id == id)
-    );
+    return this.structs$.pipe(this.getById(id));
   }
 
   getFunctionById(id: number): Observable<RedFunctionAst | undefined> {
-    return this.functions$.pipe(
-      mergeAll(),
-      filter((node) => node.id == id)
+    return this.functions$.pipe(this.getById(id));
+  }
+
+  private getById<T extends RedNodeAst>(id: number): OperatorFunction<T[], T | undefined> {
+    return pipe(
+      map((objects) => objects.find((object) => object.id === id))
     );
   }
 }
