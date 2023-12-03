@@ -1,6 +1,6 @@
 @if (node) {
   <div class="badges">
-    <mat-icon class="stx-lang" svgIcon="scope" title="{{scope}}"></mat-icon>
+    <mat-icon class="stx-scope" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>
     @if (node.isFinal) {
       <mat-icon class="stx-lang" svgIcon="final" title="final"></mat-icon>
     }
