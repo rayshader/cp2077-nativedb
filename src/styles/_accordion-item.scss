@@ -1,4 +1,6 @@
-@mixin accordion-theme($theme) {
+@use 'sass:map';
+
+@mixin accordion-item-theme($theme) {
   rd-accordion-item {
     & .header {
       cursor: pointer;

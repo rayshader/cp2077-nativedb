@@ -7,7 +7,7 @@
 
 // App components
 @use 'styles/page' as *;
-@use 'styles/accordion' as *;
+@use 'styles/accordion-item' as *;
 
 @mixin mat-component-themes($theme) {
   //@include mat.all-component-themes($theme);
@@ -34,10 +34,11 @@
   @include icon-theme($theme);
   @include button-theme($theme);
   @include page-theme($theme);
-  @include accordion-theme($theme);
+  @include accordion-item-theme($theme);
 }
 
 @mixin rd-component-colors($theme) {
   @include icon-color($theme);
   @include button-color($theme);
+  @include accordion-item-color($theme);
 }
