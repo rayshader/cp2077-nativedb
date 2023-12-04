@@ -15,6 +15,7 @@
   @include mat.tabs-theme($theme);
   @include mat.icon-theme($theme);
   @include mat.icon-button-theme($theme);
+  @include mat.divider-theme($theme);
 }
 
 @mixin mat-component-colors($theme) {
@@ -24,6 +25,7 @@
   @include mat.tabs-color($theme);
   @include mat.icon-color($theme);
   @include mat.icon-button-color($theme);
+  @include mat.divider-color($theme);
 }
 
 @mixin rd-component-themes($theme) {
