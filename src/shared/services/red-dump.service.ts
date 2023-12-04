@@ -1,13 +1,25 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {RedEnumAst} from "../red-ast/red-enum.ast";
-import {combineLatest, EMPTY, filter, map, mergeAll, Observable, OperatorFunction, pipe, shareReplay} from "rxjs";
+import {
+  combineLatest,
+  EMPTY,
+  filter,
+  map,
+  mergeAll,
+  Observable,
+  OperatorFunction,
+  pipe,
+  reduce,
+  shareReplay
+} from "rxjs";
 import {RedBitfieldAst} from "../red-ast/red-bitfield.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
 import {RedStructAst} from "../red-ast/red-struct.ast";
 import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
 import {RedObjectAst} from "../red-ast/red-object.ast";
+import {RedPropertyAst} from "../red-ast/red-property.ast";
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +30,8 @@ export class RedDumpService {
   readonly classes$: Observable<RedClassAst[]>;
   readonly structs$: Observable<RedStructAst[]>;
   readonly functions$: Observable<RedFunctionAst[]>;
+
+  readonly badges$: Observable<number>;
 
   constructor(private readonly http: HttpClient) {
     this.enums$ = this.http.get(`/assets/reddump/enums.json`).pipe(
@@ -39,6 +53,18 @@ export class RedDumpService {
     this.functions$ = this.http.get(`/assets/reddump/functions.json`).pipe(
       map((json: any) => json.map((item: any) => RedFunctionAst.fromJson(item))),
       shareReplay()
+    );
+    this.badges$ = combineLatest([this.classes$, this.structs$]).pipe(
+      mergeAll(),
+      mergeAll(),
+      map((object: RedObjectAst) => {
+        const props = object.properties.map(RedPropertyAst.computeBadges).reduce(this.getMax, 1);
+        const funcs = object.functions.map(RedFunctionAst.computeBadges).reduce(this.getMax, 1);
+
+        return Math.max(props, funcs);
+      }),
+      reduce(this.getMax),
+      shareReplay(),
     );
   }
 
@@ -129,5 +155,9 @@ export class RedDumpService {
     return pipe(
       map((objects) => objects.find((object) => object.id === id))
     );
+  }
+
+  private getMax(a: number, b: number): number {
+    return Math.max(a, b);
   }
 }
