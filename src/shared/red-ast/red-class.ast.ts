@@ -19,10 +19,8 @@ export interface RedClassJson {
 }
 
 export interface RedClassAst extends RedObjectAst {
-  readonly scope: RedScopeDef;
   readonly isAbstract: boolean;
   readonly isFinal: boolean;
-  readonly origin: RedOriginDef;
 }
 
 export class RedClassAst {
