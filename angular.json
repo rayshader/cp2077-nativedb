@@ -41,6 +41,11 @@
                 "input": "src/rd-dark-theme.scss",
                 "bundleName": "dark-theme",
                 "inject": false
+              },
+              {
+                "input": "src/rd-ide-theme.scss",
+                "bundleName": "ide-theme",
+                "inject": false
               }
             ],
 						"scripts": []

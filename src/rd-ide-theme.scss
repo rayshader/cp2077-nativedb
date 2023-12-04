@@ -1,0 +1,66 @@
+@mixin rd-ide-syntax-themes($theme) {
+  .stx {
+    font-family: Consolas, monospace; /*'JetBrains Mono', */
+  }
+
+  .stx-doc {
+    @extend .stx;
+    color: forestgreen;
+
+    & mat-icon {
+      color: forestgreen;
+    }
+  }
+
+  .stx-text {
+    @extend .stx;
+    color: lightgrey;
+  }
+
+  .stx-comma {
+    @extend .stx;
+    color: lightgrey;
+  }
+
+  .stx-parenthesis {
+    @extend .stx;
+    color: mediumpurple;
+  }
+
+  .stx-lang {
+    @extend .stx;
+    color: steelblue;
+  }
+
+  .stx-scope {
+    @extend .stx-lang;
+
+    &[data-scope="protected"] {
+      color: orange;
+    }
+
+    &[data-scope="private"] {
+      color: firebrick;
+    }
+  }
+
+  .stx-function {
+    @extend .stx;
+    color: lightseagreen;
+  }
+
+  .stx-number {
+    @extend .stx;
+    color: lightgoldenrodyellow;
+  }
+
+  .stx-type {
+    @extend .stx;
+    color: mediumseagreen;
+  }
+
+  .stx-primitive-type {
+    @extend .stx;
+    color: mediumseagreen;
+  }
+}
