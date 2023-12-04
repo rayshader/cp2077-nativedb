@@ -1,6 +1,8 @@
 @use 'sass:map';
 
 @mixin accordion-item-theme($theme) {
+  $fg: map.get($theme, foreground);
+
   rd-accordion-item {
     & .header {
       cursor: pointer;
@@ -17,10 +19,21 @@
       margin-bottom: 12px;
     }
 
-    &.disabled {
+    & .disabled {
       & .header {
         cursor: default;
+        color: map.get($fg, disabled);
       }
+    }
+  }
+}
+
+@mixin accordion-item-color($theme) {
+  $fg: map.get($theme, foreground);
+
+  & .disabled {
+    & .header {
+      color: map.get($fg, disabled);
     }
   }
 }
