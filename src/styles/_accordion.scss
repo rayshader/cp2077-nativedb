@@ -1,0 +1,24 @@
+@mixin accordion-theme($theme) {
+  rd-accordion-item {
+    & .header {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+
+      & button {
+        margin-right: 12px;
+      }
+    }
+
+    & .mat-divider {
+      margin-top: 8px;
+      margin-bottom: 12px;
+    }
+
+    &.disabled {
+      & .header {
+        cursor: default;
+      }
+    }
+  }
+}
