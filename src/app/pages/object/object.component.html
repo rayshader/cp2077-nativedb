@@ -1,0 +1,95 @@
+@if (data$ | async; as data) {
+  <h1 class="stx-type">{{data.object.name}}</h1>
+  <div class="prototype">
+    <mat-icon class="stx-scope" [attr.data-scope]="data.scope" svgIcon="scope" [title]="data.scope"></mat-icon>
+    @if (data.object.kind === classKind) {
+      @if (data.isAbstract) {
+        <mat-icon class="stx-lang" svgIcon="abstract" title="abstract"></mat-icon>
+      }
+      @if (data.isFinal) {
+        <mat-icon class="stx-lang" svgIcon="final" title="final"></mat-icon>
+      }
+      @if (data.object.origin === nativeOrigin) {
+        <mat-icon class="stx-lang" svgIcon="native" title="native"></mat-icon>
+      } @else if (data.object.origin === importOnlyOrigin) {
+        <mat-icon class="stx-lang" svgIcon="importonly" title="importonly"></mat-icon>
+      }
+      <mat-icon class="badge-class" svgIcon="class" title="class"></mat-icon>
+    } @else if (data.object.kind === structKind) {
+      <mat-icon class="badge-struct" svgIcon="struct" title="struct"></mat-icon>
+    }
+  </div>
+
+  <cdk-accordion multi="true">
+    <rd-accordion-item [expanded]="data.parents.length > 0"
+                       [disabled]="data.parents.length === 0">
+      <div header class="header">
+        <h3>Inherits</h3>
+        <mat-chip [highlighted]="data.parents.length > 0"
+                  [disabled]="data.parents.length === 0"
+                  [disableRipple]="true">{{data.parents.length}}</mat-chip>
+      </div>
+
+      @for (parent of data.parents; track parent.id) {
+        <div class="inheritance">
+          <div class="align" [style.width]="data.align"></div>
+          <mat-icon>subdirectory_arrow_right</mat-icon>
+          <type-span [node]="parent"></type-span>
+        </div>
+      }
+    </rd-accordion-item>
+
+    <rd-accordion-item [expanded]="data.children.length > 0"
+                       [disabled]="data.children.length === 0">
+      <div header class="header">
+        <h3>Inherited by</h3>
+        <mat-chip [highlighted]="data.children.length > 0"
+                  [disabled]="data.children.length === 0"
+                  [disableRipple]="true">{{data.children.length}}</mat-chip>
+      </div>
+
+      @for (child of data.children; track child.id) {
+        <div class="inheritance">
+          <div class="align" [style.width]="data.align"></div>
+          <mat-icon>subdirectory_arrow_left</mat-icon>
+          <type-span [node]="child"></type-span>
+        </div>
+      }
+    </rd-accordion-item>
+
+    <rd-accordion-item [expanded]="data.properties.length > 0"
+                       [disabled]="data.properties.length === 0">
+      <div header class="header">
+        <h3>Properties</h3>
+        <mat-chip [highlighted]="data.properties.length > 0"
+                  [disabled]="data.properties.length === 0"
+                  [disableRipple]="true">{{data.properties.length}}</mat-chip>
+      </div>
+
+      @for (prop of data.properties; track prop.id) {
+        <property-span [node]="prop" [badges]="data.badges"></property-span>
+      }
+    </rd-accordion-item>
+
+    <rd-accordion-item [expanded]="data.functions.length > 0"
+                       [disabled]="data.functions.length === 0">
+      <div header class="header">
+        <h3>Functions</h3>
+        <mat-chip [highlighted]="data.functions.length > 0"
+                  [disabled]="data.functions.length === 0"
+                  [disableRipple]="true">{{data.functions.length}}</mat-chip>
+      </div>
+
+      @for (func of data.functions; track func.id) {
+        <function-span [node]="func" [canCopy]="true" [memberOf]="data.object" [badges]="data.badges"></function-span>
+      }
+    </rd-accordion-item>
+  </cdk-accordion>
+} @else {
+  <h1 class="stx-type">Loading...</h1>
+  @if (kind === classKind) {
+    <mat-icon class="badge-class" svgIcon="class" title="class"></mat-icon>
+  } @else if (kind === structKind) {
+    <mat-icon class="badge-struct" svgIcon="struct" title="struct"></mat-icon>
+  }
+}

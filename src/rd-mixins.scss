@@ -17,6 +17,7 @@
   @include mat.icon-theme($theme);
   @include mat.icon-button-theme($theme);
   @include mat.divider-theme($theme);
+  @include mat.chips-theme($theme);
 }
 
 @mixin mat-component-colors($theme) {
@@ -27,6 +28,7 @@
   @include mat.icon-color($theme);
   @include mat.icon-button-color($theme);
   @include mat.divider-color($theme);
+  @include mat.chips-color($theme);
 }
 
 @mixin rd-component-themes($theme) {
