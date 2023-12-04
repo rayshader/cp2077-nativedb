@@ -41,15 +41,15 @@ export class RedPropertyAst {
     return a.name.localeCompare(b.name);
   }
 
-  static computeBadges(func: RedPropertyAst): number {
+  static computeBadges(prop: RedPropertyAst): number {
     let badges: number = 1;
 
-    if (func.isInline) badges++;
-    if (func.isEdit) badges++;
-    if (func.isNative) badges++;
-    if (func.isPersistent) badges++;
-    if (func.isReplicated) badges++;
-    if (func.isConst) badges++;
+    if (prop.isInline) badges++;
+    if (prop.isEdit) badges++;
+    if (prop.isNative) badges++;
+    if (prop.isPersistent) badges++;
+    if (prop.isReplicated) badges++;
+    if (prop.isConst) badges++;
     return badges;
   }
 
