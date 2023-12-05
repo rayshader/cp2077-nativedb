@@ -1,6 +1,5 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
-import {RedEnumAst} from "../red-ast/red-enum.ast";
 import {
   combineLatest,
   EMPTY,
@@ -13,12 +12,11 @@ import {
   reduce,
   shareReplay
 } from "rxjs";
+import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
+import {RedEnumAst} from "../red-ast/red-enum.ast";
 import {RedBitfieldAst} from "../red-ast/red-bitfield.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
-import {RedStructAst} from "../red-ast/red-struct.ast";
 import {RedFunctionAst} from "../red-ast/red-function.ast";
-import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
-import {RedObjectAst} from "../red-ast/red-object.ast";
 import {RedPropertyAst} from "../red-ast/red-property.ast";
 
 @Injectable({
@@ -28,7 +26,7 @@ export class RedDumpService {
   readonly enums$: Observable<RedEnumAst[]>;
   readonly bitfields$: Observable<RedBitfieldAst[]>;
   readonly classes$: Observable<RedClassAst[]>;
-  readonly structs$: Observable<RedStructAst[]>;
+  readonly structs$: Observable<RedClassAst[]>;
   readonly functions$: Observable<RedFunctionAst[]>;
 
   readonly badges$: Observable<number>;
@@ -42,22 +40,26 @@ export class RedDumpService {
       map((json: any) => json.map((item: any) => RedBitfieldAst.fromJson(item))),
       shareReplay()
     );
-    this.classes$ = this.http.get(`/assets/reddump/classes.json`).pipe(
-      map((json: any) => json.map((item: any) => RedClassAst.fromJson(item))),
+    const classes$ = this.http.get(`/assets/reddump/classes.json`).pipe(
+      map((json: any) => json.map((item: any) => RedClassAst.fromJson(item)))
+    );
+
+    this.classes$ = classes$.pipe(
+      map((json: any) => json.filter((item: RedClassAst) => !item.isStruct)),
       shareReplay()
     );
-    this.structs$ = this.http.get(`/assets/reddump/structs.json`).pipe(
-      map((json: any) => json.map((item: any) => RedStructAst.fromJson(item))),
+    this.structs$ = classes$.pipe(
+      map((json: any) => json.filter((item: RedClassAst) => item.isStruct)),
       shareReplay()
     );
-    this.functions$ = this.http.get(`/assets/reddump/functions.json`).pipe(
+    this.functions$ = this.http.get(`/assets/reddump/globals.json`).pipe(
       map((json: any) => json.map((item: any) => RedFunctionAst.fromJson(item))),
       shareReplay()
     );
     this.badges$ = combineLatest([this.classes$, this.structs$]).pipe(
       mergeAll(),
       mergeAll(),
-      map((object: RedObjectAst) => {
+      map((object: RedClassAst) => {
         const props = object.properties.map(RedPropertyAst.computeBadges).reduce(this.getMax, 1);
         const funcs = object.functions.map(RedFunctionAst.computeBadges).reduce(this.getMax, 1);
 
@@ -95,7 +97,7 @@ export class RedDumpService {
     return this.classes$.pipe(this.getById(id));
   }
 
-  getStructById(id: number): Observable<RedStructAst | undefined> {
+  getStructById(id: number): Observable<RedClassAst | undefined> {
     return this.structs$.pipe(this.getById(id));
   }
 
@@ -103,9 +105,9 @@ export class RedDumpService {
     return this.functions$.pipe(this.getById(id));
   }
 
-  getParentsByName<T extends RedObjectAst>(name: string,
-                                           kind: RedNodeKind.class | RedNodeKind.struct): Observable<T[]> {
-    let query$: Observable<RedObjectAst[]>;
+  getParentsByName(name: string,
+                   kind: RedNodeKind.class | RedNodeKind.struct): Observable<RedClassAst[]> {
+    let query$: Observable<RedClassAst[]>;
 
     if (kind === RedNodeKind.class) {
       query$ = this.classes$;
@@ -116,16 +118,16 @@ export class RedDumpService {
     }
     return query$.pipe(
       map((objects) => {
-        const parents: T[] = [];
+        const parents: RedClassAst[] = [];
         let parent = objects.find((object) => object.name === name);
 
         if (parent) {
-          parents.push(parent as T);
+          parents.push(parent);
         }
         while (parent && parent.parent) {
           parent = objects.find((object) => object.name === parent!.parent);
           if (parent) {
-            parents.push(parent as T);
+            parents.push(parent);
           }
         }
         return parents;
@@ -133,9 +135,9 @@ export class RedDumpService {
     );
   }
 
-  getChildrenByName<T extends RedObjectAst>(name: string,
-                                            kind: RedNodeKind.class | RedNodeKind.struct): Observable<T[]> {
-    let query$: Observable<RedObjectAst[]>;
+  getChildrenByName(name: string,
+                    kind: RedNodeKind.class | RedNodeKind.struct): Observable<RedClassAst[]> {
+    let query$: Observable<RedClassAst[]>;
 
     if (kind === RedNodeKind.class) {
       query$ = this.classes$;
@@ -146,7 +148,7 @@ export class RedDumpService {
     }
     return query$.pipe(
       map((objects) => {
-        return objects.filter((object) => object.parent === name) as T[];
+        return objects.filter((object) => object.parent === name);
       })
     );
   }

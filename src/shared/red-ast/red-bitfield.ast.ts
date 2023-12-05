@@ -1,45 +1,37 @@
 import {RedNodeAst, RedNodeKind} from "./red-node.ast";
 import {cyrb53} from "../string";
+import {RedEnumJson, RedEnumMemberAst} from "./red-enum.ast";
 
-export interface RedBitfieldJson {
-  // name
-  readonly a: string;
+export interface RedBitfieldJson extends RedEnumJson {
 
-  // fields
-  readonly i: RedBitfieldFieldJson[];
-}
-
-interface RedBitfieldFieldJson {
-  // key = value
-  readonly [key: string]: number;
 }
 
 export interface RedBitfieldAst extends RedNodeAst {
   readonly name: string;
-  readonly fields: RedBitfieldFieldAst[];
+  readonly members: RedBitfieldMemberAst[];
 }
 
-export interface RedBitfieldFieldAst {
-  readonly key: string;
-  readonly value: number;
+export interface RedBitfieldMemberAst extends RedEnumMemberAst {
 }
 
 export class RedBitfieldAst {
-  static fromJson(json: RedBitfieldJson): RedBitfieldAst {
-    const fields: RedBitfieldFieldAst[] = [];
+  static sort(a: RedBitfieldAst, b: RedBitfieldAst): number {
+    return a.name.localeCompare(b.name);
+  }
 
-    for (const key of Object.keys(json.i)) {
-      fields.push({
-        key: key,
-        // @ts-ignore
-        value: json.i[key]
-      });
-    }
+  static fromJson(json: RedBitfieldJson): RedBitfieldAst {
     return {
       id: cyrb53(json.a),
       kind: RedNodeKind.bitfield,
       name: json.a,
-      fields: fields
+      members: json.b.map((member) => {
+        const key: string = Object.keys(member)[0];
+
+        return {
+          key: key,
+          value: member[key]
+        };
+      })
     };
   }
 }

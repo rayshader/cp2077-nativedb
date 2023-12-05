@@ -1,15 +1,17 @@
 @if (node) {
-  @if (node.template !== undefined && node.child) {
+  @if (node.innerType) {
     <span class="stx-lang">{{node.name}}</span>
     <span class="stx-type"><</span>
-    <type-span [node]="node.child"></type-span>
+    <type-span [node]="node.innerType"></type-span>
     @if (node.size !== undefined) {
       <span class="stx-number">; {{node.size}}</span>
     }
     <span class="stx-type">></span>
-  } @else if (node.primitive !== undefined) {
+  } @else if (isPrimitive) {
     <span class="stx-primitive-type">{{node.name}}</span>
   } @else {
     <span class="stx-type redirect" (click)="onRedirect()">{{node.name}}</span>
   }
+} @else {
+  <span class="stx-primitive-type">Void</span>
 }

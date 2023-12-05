@@ -1,36 +1,38 @@
-import {RedTypeAst, RedTypeJson} from "./red-type.ast";
-import {RedArgumentAst, RedArgumentJson} from "./red-argument.ast";
-import {RedScopeDef} from "./red-definitions.ast";
-import {RedNodeAst, RedNodeKind} from "./red-node.ast";
+import {RedVisibilityDef} from "./red-definitions.ast";
 import {cyrb53} from "../string";
+import {RedNodeAst, RedNodeKind} from "./red-node.ast";
+import {RedPropertyJson} from "./red-property.ast";
+import {RedTypeAst, RedTypeJson} from "./red-type.ast";
+import {RedArgumentAst} from "./red-argument.ast";
 
 export interface RedFunctionJson {
-  // name
-  readonly a: string;
-  // flags
-  readonly d?: number;
-  // arguments
-  readonly k?: RedArgumentJson[];
-  // returnType
-  readonly j: RedTypeJson;
+  readonly a: string; // full name
+  readonly b?: string; // short name
+  readonly c?: RedTypeJson; // return type
+  readonly d: number; // flags
+  readonly e?: RedPropertyJson[]; // parameters
 }
 
 export interface RedFunctionAst extends RedNodeAst {
-  readonly name: string;
-  readonly scope: RedScopeDef;
-  readonly isFinal: boolean;
-  readonly isStatic: boolean;
+  readonly visibility: RedVisibilityDef;
   readonly isNative: boolean;
+  readonly isStatic: boolean;
+  readonly isFinal: boolean;
+  readonly isThreadSafe: boolean;
+  readonly isCallback: boolean;
   readonly isConst: boolean;
   readonly isQuest: boolean;
-  readonly isCallback: boolean;
+  readonly isTimer: boolean;
+
+  readonly name: string;
+  readonly fullName: string;
   readonly arguments: RedArgumentAst[];
-  readonly returnType: RedTypeAst;
+  readonly returnType?: RedTypeAst;
 }
 
 export class RedFunctionAst {
   static sort(a: RedFunctionAst, b: RedFunctionAst): number {
-    let delta: number = a.scope - b.scope;
+    let delta: number = a.visibility - b.visibility;
 
     if (delta != 0) {
       return delta;
@@ -41,38 +43,60 @@ export class RedFunctionAst {
   static computeBadges(func: RedFunctionAst): number {
     let badges: number = 1;
 
-    if (func.isFinal) badges++;
-    if (func.isStatic) badges++;
     if (func.isNative) badges++;
+    if (func.isStatic) badges++;
+    if (func.isFinal) badges++;
+    if (func.isCallback) badges++;
+    if (func.isTimer) badges++;
     if (func.isConst) badges++;
     if (func.isQuest) badges++;
-    if (func.isCallback) badges++;
+    if (func.isThreadSafe) badges++;
     return badges;
   }
 
   static fromJson(json: RedFunctionJson): RedFunctionAst {
-    const flags: number = json.d ?? 0;
-    const scope: RedScopeDef = flags & 3;
-    const isFinal: boolean = ((flags >> 2) & 1) != 0;
-    const isStatic: boolean = ((flags >> 3) & 1) != 0;
-    const isNative: boolean = ((flags >> 4) & 1) != 0;
-    const isConst: boolean = ((flags >> 5) & 1) != 0;
-    const isQuest: boolean = ((flags >> 6) & 1) != 0;
-    const isCallback: boolean = ((flags >> 7) & 1) != 0;
+    const flags: number = json.d;
+    const name: string = json.b ?? json.a;
 
     return {
-      id: cyrb53(json.a),
+      id: cyrb53(name),
       kind: RedNodeKind.function,
-      name: json.a,
-      scope: scope,
-      isFinal: isFinal,
-      isStatic: isStatic,
-      isNative: isNative,
-      isConst: isConst,
-      isQuest: isQuest,
-      isCallback: isCallback,
-      arguments: json.k?.map((item) => RedArgumentAst.fromJson(item)) ?? [],
-      returnType: RedTypeAst.fromJson(json.j)
+      visibility: getVisibilityFromFunctionFlags(flags),
+      isNative: ((flags >> RedFunctionFlags.isNative) & 1) !== 0,
+      isStatic: ((flags >> RedFunctionFlags.isStatic) & 1) !== 0,
+      isFinal: ((flags >> RedFunctionFlags.isFinal) & 1) !== 0,
+      isThreadSafe: ((flags >> RedFunctionFlags.isThreadSafe) & 1) !== 0,
+      isCallback: ((flags >> RedFunctionFlags.isEvent) & 1) !== 0,
+      isConst: ((flags >> RedFunctionFlags.isConst) & 1) !== 0,
+      isQuest: ((flags >> RedFunctionFlags.isQuest) & 1) !== 0,
+      isTimer: ((flags >> RedFunctionFlags.isTimer) & 1) !== 0,
+      name: name,
+      fullName: json.a,
+      arguments: json.e?.map(RedArgumentAst.fromJson) ?? [],
+      returnType: (json.c !== undefined) ? RedTypeAst.fromJson(json.c) : undefined
     };
+  }
+}
+
+enum RedFunctionFlags {
+  isPrivate,
+  isProtected,
+  isNative,
+  isStatic,
+  isFinal,
+  isThreadSafe,
+  isEvent,
+  isConst,
+  isQuest,
+  isTimer,
+}
+
+function getVisibilityFromFunctionFlags(flags: number): RedVisibilityDef {
+  if (((flags >> RedFunctionFlags.isPrivate) & 1) !== 0) {
+    return RedVisibilityDef.private;
+  } else if (((flags >> RedFunctionFlags.isProtected) & 1) !== 0) {
+    return RedVisibilityDef.protected;
+  } else {
+    return RedVisibilityDef.public;
   }
 }

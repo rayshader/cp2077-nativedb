@@ -1,10 +1,10 @@
 import {Component, Input} from '@angular/core';
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {EMPTY, Observable} from "rxjs";
-import {RedEnumAst} from "../../../shared/red-ast/red-enum.ast";
 import {AsyncPipe} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
+import {RedEnumAst} from "../../../shared/red-ast/red-enum.ast";
 
 @Component({
   selector: 'enum',

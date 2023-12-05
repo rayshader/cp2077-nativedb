@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {RedTypeAst} from "../../../../shared/red-ast/red-type.ast";
 import {RouterService} from "../../../../shared/services/router.service";
+import {RedTypeAst} from "../../../../shared/red-ast/red-type.ast";
 
 @Component({
   selector: 'type-span',
@@ -15,6 +15,13 @@ export class TypeSpanComponent {
   node?: RedTypeAst;
 
   constructor(private readonly routerService: RouterService) {
+  }
+
+  get isPrimitive(): boolean {
+    if (!this.node) {
+      return false;
+    }
+    return RedTypeAst.isPrimitive(this.node);
   }
 
   onRedirect(): void {

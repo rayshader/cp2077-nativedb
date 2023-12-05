@@ -1,36 +1,32 @@
-import {RedPrimitiveDef, RedTemplateDef} from "./red-definitions.ast";
 import {RedNodeAst, RedNodeKind} from "./red-node.ast";
 import {cyrb53} from "../string";
 
 export interface RedTypeJson {
-  // name
-  readonly a?: string;
-  // primitive
-  readonly n?: RedPrimitiveDef;
-  // template
-  readonly o?: RedTemplateDef;
-  // size
-  readonly m?: number;
-  // child
-  readonly p?: RedTypeJson;
+  readonly a: string; // name
+  readonly b?: RedTypeJson; // inner type
+  readonly c?: number; // array size
 }
 
 export interface RedTypeAst extends RedNodeAst {
   readonly name: string;
-  readonly primitive?: RedPrimitiveDef;
-  readonly template?: RedTemplateDef;
+  readonly innerType?: RedTypeAst;
   readonly size?: number;
-  readonly child?: RedTypeAst;
 }
 
 export class RedTypeAst {
+  static readonly PRIMITIVE_RULE = RegExp("Void|Bool|Int8|Uint8|Int16|Uint16|Int32|Uint32|Int64|Uint64|Float|Double|String|CName|ResRef|TweakDBID|Variant");
+
+  static isPrimitive(type: RedTypeAst): boolean {
+    return this.PRIMITIVE_RULE.test(type.name);
+  }
+
   static toString(type: RedTypeAst): string {
     let str: string = '';
 
     // TODO: ignore script_ref<T> when syntax is for Redscript / Lua ?
-    if (typeof type.template === 'number' && type.child) {
+    if (type.innerType !== undefined) {
       str += `${type.name}<`;
-      str += RedTypeAst.toString(type.child);
+      str += RedTypeAst.toString(type.innerType);
       if (type.size !== undefined) {
         str += `; ${type.size}`;
       }
@@ -42,23 +38,12 @@ export class RedTypeAst {
   }
 
   static fromJson(json: RedTypeJson): RedTypeAst {
-    let name: string;
-
-    if (typeof json.n === 'number') {
-      name = RedPrimitiveDef[json.n];
-    } else if (typeof json.o === 'number') {
-      name = RedTemplateDef[json.o];
-    } else {
-      name = json.a!;
-    }
     return {
-      id: cyrb53(name),
+      id: cyrb53(json.a),
       kind: RedNodeKind.type,
-      name: name,
-      primitive: json.n,
-      template: json.o,
-      size: json.m,
-      child: (json.p) ? RedTypeAst.fromJson(json.p) : undefined,
+      name: json.a,
+      innerType: (json.b !== undefined) ? RedTypeAst.fromJson(json.b) : undefined,
+      size: json.c,
     };
   }
 }

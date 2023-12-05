@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
-import {RedArgumentAst} from "../../../../shared/red-ast/red-argument.ast";
 import {TypeSpanComponent} from "../type-span/type-span.component";
+import {RedArgumentAst} from "../../../../shared/red-ast/red-argument.ast";
 
 @Component({
   selector: 'argument-span',

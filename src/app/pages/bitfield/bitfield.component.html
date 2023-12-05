@@ -2,16 +2,16 @@
   <h1 class="stx-type">{{bitfield.name}}</h1>
   <mat-icon class="badge-bitfield" svgIcon="bitfield"></mat-icon>
 
-  @for (field of bitfield.fields; track field.key) {
+  @for (member of bitfield.members; track member.key) {
     <p class="field">
       <button mat-icon-button
               class="badge"
-              (click)="copyClipboard(bitfield, field.key)"><mat-icon>content_copy</mat-icon></button>
-      <span class="stx-text">{{field.key}}</span>
+              (click)="copyClipboard(bitfield, member.key)"><mat-icon>content_copy</mat-icon></button>
+      <span class="stx-text">{{member.key}}</span>
       <span class="stx-text">&nbsp;=&nbsp;</span>
       <span class="stx-number">1</span>
       <span class="stx-text">&nbsp;<<&nbsp;</span>
-      <span class="stx-number">{{field.value}}</span>
+      <span class="stx-number">{{member.value}}</span>
     </p>
   }
 } @else {

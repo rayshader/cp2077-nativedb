@@ -1,39 +1,26 @@
 import {RedTypeAst, RedTypeJson} from "./red-type.ast";
-import {RedAnnotationAst, RedAnnotationJson} from "./red-annotation.ast";
-import {RedScopeDef} from "./red-definitions.ast";
-import {RedNodeAst, RedNodeKind} from "./red-node.ast";
-import {cyrb53} from "../string";
+import {RedVisibilityDef} from "./red-definitions.ast";
 
 export interface RedPropertyJson {
-  // annotations
-  readonly l?: RedAnnotationJson[];
-
-  // flags
-  readonly d?: number;
-
-  // type
-  readonly e: RedTypeJson;
-
-  // name;
-  readonly a: string;
+  readonly a: RedTypeJson; // type
+  readonly b?: string; // name
+  readonly c: number; // flags
 }
 
-export interface RedPropertyAst extends RedNodeAst {
-  readonly annotations: RedAnnotationAst[];
-  readonly scope: RedScopeDef;
-  readonly isInline: boolean;
-  readonly isEdit: boolean;
-  readonly isNative: boolean;
+export interface RedPropertyAst {
+  readonly visibility: RedVisibilityDef;
   readonly isPersistent: boolean;
-  readonly isReplicated: boolean;
-  readonly isConst: boolean;
-  readonly type: RedTypeAst;
+  //readonly isReplicated: boolean;
+  //readonly isInline: boolean;
+  //readonly isEdit: boolean;
+  //readonly isConst: boolean;
   readonly name: string;
+  readonly type: RedTypeAst;
 }
 
 export class RedPropertyAst {
   static sort(a: RedPropertyAst, b: RedPropertyAst): number {
-    let delta: number = a.scope - b.scope;
+    let delta: number = a.visibility - b.visibility;
 
     if (delta != 0) {
       return delta;
@@ -44,38 +31,44 @@ export class RedPropertyAst {
   static computeBadges(prop: RedPropertyAst): number {
     let badges: number = 1;
 
+    if (prop.isPersistent) badges++;
+    /*
+    if (prop.isReplicated) badges++;
     if (prop.isInline) badges++;
     if (prop.isEdit) badges++;
-    if (prop.isNative) badges++;
-    if (prop.isPersistent) badges++;
-    if (prop.isReplicated) badges++;
     if (prop.isConst) badges++;
+    */
     return badges;
   }
 
   static fromJson(json: RedPropertyJson): RedPropertyAst {
-    const flags: number = json.d ?? 0;
-    const scope: RedScopeDef = flags & 3;
-    const isInline: boolean = ((flags >> 2) & 1) != 0;
-    const isEdit: boolean = ((flags >> 3) & 1) != 0;
-    const isNative: boolean = ((flags >> 4) & 1) != 0;
-    const isPersistent: boolean = ((flags >> 5) & 1) != 0;
-    const isReplicated: boolean = ((flags >> 6) & 1) != 0;
-    const isConst: boolean = ((flags >> 7) & 1) != 0;
+    const flags: number = json.c;
 
     return {
-      id: cyrb53(json.a),
-      kind: RedNodeKind.property,
-      annotations: json.l?.map((item) => RedAnnotationAst.fromJson(item)) ?? [],
-      scope: scope,
-      isInline: isInline,
-      isEdit: isEdit,
-      isNative: isNative,
-      isPersistent: isPersistent,
-      isReplicated: isReplicated,
-      isConst: isConst,
-      type: RedTypeAst.fromJson(json.e),
-      name: json.a,
+      visibility: getVisibilityFromPropertyFlags(flags),
+      isPersistent: ((flags >> RedPropertyFlags.isPersistent) & 1) !== 0,
+      name: json.b ?? '',
+      type: RedTypeAst.fromJson(json.a)
     };
+  }
+}
+
+enum RedPropertyFlags {
+  isPrivate,
+  isProtected,
+  isPersistent,
+  isReplicated,
+  isInline,
+  isEdit,
+  isConst,
+}
+
+function getVisibilityFromPropertyFlags(flags: number): RedVisibilityDef {
+  if (((flags >> RedPropertyFlags.isPrivate) & 1) !== 0) {
+    return RedVisibilityDef.private;
+  } else if (((flags >> RedPropertyFlags.isProtected) & 1) !== 0) {
+    return RedVisibilityDef.protected;
+  } else {
+    return RedVisibilityDef.public;
   }
 }

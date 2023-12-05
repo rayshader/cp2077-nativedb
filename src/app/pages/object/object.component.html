@@ -2,20 +2,20 @@
   <h1 class="stx-type">{{data.object.name}}</h1>
   <div class="prototype">
     <mat-icon class="stx-scope" [attr.data-scope]="data.scope" svgIcon="scope" [title]="data.scope"></mat-icon>
-    @if (data.object.kind === classKind) {
-      @if (data.isAbstract) {
-        <mat-icon class="stx-lang" svgIcon="abstract" title="abstract"></mat-icon>
-      }
+    @if (data.isAbstract) {
+      <mat-icon class="stx-lang" svgIcon="abstract" title="abstract"></mat-icon>
+    }<!--
       @if (data.isFinal) {
         <mat-icon class="stx-lang" svgIcon="final" title="final"></mat-icon>
-      }
-      @if (data.object.origin === nativeOrigin) {
-        <mat-icon class="stx-lang" svgIcon="native" title="native"></mat-icon>
-      } @else if (data.object.origin === importOnlyOrigin) {
-        <mat-icon class="stx-lang" svgIcon="importonly" title="importonly"></mat-icon>
-      }
+      }-->
+    @if (data.object.origin === nativeOrigin) {
+      <mat-icon class="stx-lang" svgIcon="native" title="native"></mat-icon>
+    } @else if (data.object.origin === importOnlyOrigin) {
+      <mat-icon class="stx-lang" svgIcon="importonly" title="importonly"></mat-icon>
+    }
+    @if (!data.object.isStruct) {
       <mat-icon class="badge-class" svgIcon="class" title="class"></mat-icon>
-    } @else if (data.object.kind === structKind) {
+    } @else {
       <mat-icon class="badge-struct" svgIcon="struct" title="struct"></mat-icon>
     }
   </div>
@@ -66,7 +66,7 @@
                   [disableRipple]="true">{{data.properties.length}}</mat-chip>
       </div>
 
-      @for (prop of data.properties; track prop.id) {
+      @for (prop of data.properties; track prop.name) {
         <property-span [node]="prop" [badges]="data.badges"></property-span>
       }
     </rd-accordion-item>

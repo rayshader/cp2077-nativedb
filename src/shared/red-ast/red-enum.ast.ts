@@ -2,44 +2,42 @@ import {RedNodeAst, RedNodeKind} from "./red-node.ast";
 import {cyrb53} from "../string";
 
 export interface RedEnumJson {
-  // name
-  readonly a: string;
-
-  // fields
-  readonly i: RedEnumFieldJson[];
+  readonly a: string; // name
+  readonly b: RedEnumMemberJson[]; // members
 }
 
-interface RedEnumFieldJson {
-  // key = value
-  readonly [key: string]: number;
+export interface RedEnumMemberJson {
+  readonly [key: string]: number; // name: value OR name: bit
 }
 
 export interface RedEnumAst extends RedNodeAst {
   readonly name: string;
-  readonly fields: RedEnumFieldAst[];
+  readonly members: RedEnumMemberAst[];
 }
 
-export interface RedEnumFieldAst {
+export interface RedEnumMemberAst {
   readonly key: string;
   readonly value: number;
 }
 
 export class RedEnumAst {
-  static fromJson(json: RedEnumJson): RedEnumAst {
-    const fields: RedEnumFieldAst[] = [];
+  static sort(a: RedEnumAst, b: RedEnumAst): number {
+    return a.name.localeCompare(b.name);
+  }
 
-    for (const key of Object.keys(json.i)) {
-      fields.push({
-        key: key,
-        // @ts-ignore
-        value: json.i[key]
-      });
-    }
+  static fromJson(json: RedEnumJson): RedEnumAst {
     return {
       id: cyrb53(json.a),
       kind: RedNodeKind.enum,
       name: json.a,
-      fields: fields
+      members: json.b.map((member) => {
+        const key: string = Object.keys(member)[0];
+
+        return {
+          key: key,
+          value: member[key]
+        };
+      })
     };
   }
 }

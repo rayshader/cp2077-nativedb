@@ -1,9 +1,9 @@
 import {Component, Input} from '@angular/core';
 import {MatIconModule} from "@angular/material/icon";
 import {TypeSpanComponent} from "../type-span/type-span.component";
-import {RedPropertyAst} from "../../../../shared/red-ast/red-property.ast";
 import {MatButtonModule} from "@angular/material/button";
-import {RedScopeDef} from "../../../../shared/red-ast/red-definitions.ast";
+import {RedPropertyAst} from "../../../../shared/red-ast/red-property.ast";
+import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
 
 @Component({
   selector: 'property-span',
@@ -21,7 +21,7 @@ export class PropertySpanComponent {
   /**
    * Offset in pixels to add between badges and property's name, with at least 12px.
    */
-  align: number = 12;
+  align: string = '12px';
 
   @Input()
   node?: RedPropertyAst;
@@ -36,14 +36,15 @@ export class PropertySpanComponent {
   set badges(count: number) {
     // Compute remaining empty badges to align with.
     count--;
+    if (this.node?.isPersistent) count--;
+    /*
+    if (this.node?.isReplicated) count--;
     if (this.node?.isInline) count--;
     if (this.node?.isEdit) count--;
-    if (this.node?.isNative) count--;
-    if (this.node?.isPersistent) count--;
-    if (this.node?.isReplicated) count--;
     if (this.node?.isConst) count--;
+    */
     count = Math.max(count, 0);
-    this.align = count * 24 + 12;
+    this.align = `${count * 24 + 12}px`;
   }
 
   /**
@@ -53,7 +54,7 @@ export class PropertySpanComponent {
     if (!this.node) {
       return '';
     }
-    return RedScopeDef[this.node.scope];
+    return RedVisibilityDef[this.node.visibility];
   }
 
 }

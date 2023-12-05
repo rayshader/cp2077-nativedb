@@ -3,8 +3,8 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {EMPTY, Observable} from "rxjs";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
-import {RedBitfieldAst} from "../../../shared/red-ast/red-bitfield.ast";
 import {AsyncPipe} from "@angular/common";
+import {RedBitfieldAst} from "../../../shared/red-ast/red-bitfield.ast";
 
 @Component({
   selector: 'bitfield',

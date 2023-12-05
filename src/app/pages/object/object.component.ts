@@ -6,20 +6,19 @@ import {MatIconModule} from "@angular/material/icon";
 import {PropertySpanComponent} from "../../components/spans/property-span/property-span.component";
 import {RDAccordionItemComponent} from "../../components/rd-accordion-item/rd-accordion-item.component";
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
-import {RedTypeAst} from "../../../shared/red-ast/red-type.ast";
-import {RedPropertyAst} from "../../../shared/red-ast/red-property.ast";
-import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
-import {RedObjectAst} from "../../../shared/red-ast/red-object.ast";
 import {combineLatest, EMPTY, map, Observable, of, OperatorFunction, pipe, switchMap} from "rxjs";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {RedNodeKind} from "../../../shared/red-ast/red-node.ast";
 import {ActivatedRoute} from "@angular/router";
-import {RedClassAst} from "../../../shared/red-ast/red-class.ast";
-import {RedOriginDef, RedScopeDef} from "../../../shared/red-ast/red-definitions.ast";
 import {MatChipsModule} from "@angular/material/chips";
+import {RedClassAst} from "../../../shared/red-ast/red-class.ast";
+import {RedTypeAst} from "../../../shared/red-ast/red-type.ast";
+import {RedPropertyAst} from "../../../shared/red-ast/red-property.ast";
+import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
+import {RedOriginDef, RedVisibilityDef} from "../../../shared/red-ast/red-definitions.ast";
 
-interface ObjectData<T extends RedObjectAst> {
-  readonly object: T;
+interface ObjectData {
+  readonly object: RedClassAst;
   readonly scope: string;
   readonly isAbstract: boolean;
   readonly isFinal: boolean;
@@ -47,9 +46,9 @@ interface ObjectData<T extends RedObjectAst> {
   templateUrl: './object.component.html',
   styleUrl: './object.component.scss'
 })
-export class ObjectComponent<T extends RedObjectAst> {
+export class ObjectComponent {
 
-  data$: Observable<ObjectData<T> | undefined> = EMPTY;
+  data$: Observable<ObjectData | undefined> = EMPTY;
 
   protected readonly kind: RedNodeKind;
 
@@ -57,7 +56,7 @@ export class ObjectComponent<T extends RedObjectAst> {
   protected readonly structKind: RedNodeKind = RedNodeKind.struct;
 
   protected readonly nativeOrigin: RedOriginDef = RedOriginDef.native;
-  protected readonly importOnlyOrigin: RedOriginDef = RedOriginDef.importonly;
+  protected readonly importOnlyOrigin: RedOriginDef = RedOriginDef.importOnly;
 
   constructor(private readonly dumpService: RedDumpService,
               private readonly route: ActivatedRoute) {
@@ -75,7 +74,7 @@ export class ObjectComponent<T extends RedObjectAst> {
         }
         return EMPTY;
       }),
-      map((object) => object as T)
+      map((object) => object as RedClassAst)
     );
     const parents$ = object$.pipe(this.getParents());
     const children$ = object$.pipe(this.getChildren());
@@ -98,20 +97,10 @@ export class ObjectComponent<T extends RedObjectAst> {
              functions,
              badges,
            ]) => {
-        let isAbstract: boolean = false;
-        let isFinal: boolean = false;
-
-        if (object.kind === this.classKind) {
-          const node: RedClassAst = object as unknown as RedClassAst;
-
-          isAbstract = node.isAbstract;
-          isFinal = node.isFinal;
-        }
-        return <ObjectData<T>>{
+        return <ObjectData>{
           object: object,
-          scope: RedScopeDef[object.scope],
-          isAbstract: isAbstract,
-          isFinal: isFinal,
+          scope: RedVisibilityDef[object.visibility],
+          isAbstract: object.isAbstract,
           parents: parents,
           children: children,
           properties: properties,
@@ -123,15 +112,15 @@ export class ObjectComponent<T extends RedObjectAst> {
     );
   }
 
-  private getParents(): OperatorFunction<T | undefined, RedTypeAst[]> {
+  private getParents(): OperatorFunction<RedClassAst | undefined, RedTypeAst[]> {
     return pipe(
       switchMap((object) => {
         if (!object || !object.parent) {
           return of([]);
         }
-        return this.dumpService.getParentsByName<T>(object.parent, RedNodeKind.class);
+        return this.dumpService.getParentsByName(object.parent, RedNodeKind.class);
       }),
-      map((parents: T[]) => {
+      map((parents: RedClassAst[]) => {
         return parents.map((parent) => <RedTypeAst>{
           id: parent.id,
           kind: RedNodeKind.class,
@@ -142,15 +131,15 @@ export class ObjectComponent<T extends RedObjectAst> {
     );
   }
 
-  private getChildren(): OperatorFunction<T | undefined, RedTypeAst[]> {
+  private getChildren(): OperatorFunction<RedClassAst | undefined, RedTypeAst[]> {
     return pipe(
       switchMap((object) => {
         if (!object) {
           return of([]);
         }
-        return this.dumpService.getChildrenByName<T>(object.name, RedNodeKind.class);
+        return this.dumpService.getChildrenByName(object.name, RedNodeKind.class);
       }),
-      map((children: T[]) => {
+      map((children: RedClassAst[]) => {
         return children.map((child) => <RedTypeAst>{
           id: child.id,
           kind: RedNodeKind.class,
@@ -161,7 +150,7 @@ export class ObjectComponent<T extends RedObjectAst> {
     );
   }
 
-  private sortProperties(): OperatorFunction<T | undefined, RedPropertyAst[]> {
+  private sortProperties(): OperatorFunction<RedClassAst | undefined, RedPropertyAst[]> {
     return pipe(
       map((object) => object?.properties ?? []),
       map((properties) => {
@@ -171,7 +160,7 @@ export class ObjectComponent<T extends RedObjectAst> {
     );
   }
 
-  private sortFunctions(): OperatorFunction<T | undefined, RedFunctionAst[]> {
+  private sortFunctions(): OperatorFunction<RedClassAst | undefined, RedFunctionAst[]> {
     return pipe(
       map((object) => object?.functions ?? []),
       map((functions) => {

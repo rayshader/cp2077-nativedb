@@ -1,12 +1,10 @@
 export enum RedNodeKind {
-  annotation,
-  argument,
+  enum,
   bitfield,
   class,
-  enum,
-  function,
-  property,
   struct,
+  property,
+  function,
   type
 }
 

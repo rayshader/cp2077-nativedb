@@ -11,14 +11,20 @@
             title="Documentation"
             [class.stx-doc]="!!documentation"><mat-icon>info_outline</mat-icon></button>
     <mat-icon class="stx-scope" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>
-    @if (node.isFinal) {
-      <mat-icon class="stx-lang" svgIcon="final" title="final"></mat-icon>
+    @if (node.isNative) {
+      <mat-icon class="stx-lang" svgIcon="native" title="native"></mat-icon>
     }
     @if (node.isStatic) {
       <mat-icon class="stx-lang" svgIcon="static" title="static"></mat-icon>
     }
-    @if (node.isNative) {
-      <mat-icon class="stx-lang" svgIcon="native" title="native"></mat-icon>
+    @if (node.isFinal) {
+      <mat-icon class="stx-lang" svgIcon="final" title="final"></mat-icon>
+    }
+    @if (node.isThreadSafe) {
+      <mat-icon class="stx-lang" svgIcon="timer" title="threadsafe"></mat-icon>
+    }
+    @if (node.isCallback) {
+      <mat-icon class="stx-lang" svgIcon="callback" title="callback"></mat-icon>
     }
     @if (node.isConst) {
       <mat-icon class="stx-lang" svgIcon="const" title="const"></mat-icon>
@@ -26,16 +32,16 @@
     @if (node.isQuest) {
       <mat-icon class="stx-lang" svgIcon="quest" title="quest"></mat-icon>
     }
-    @if (node.isCallback) {
-      <mat-icon class="stx-lang" svgIcon="callback" title="callback"></mat-icon>
+    @if (node.isTimer) {
+      <mat-icon class="stx-lang" svgIcon="timer" title="timer"></mat-icon>
     }
-    <div style="width: {{align}}px"></div>
+    <div [style.width]="align"></div>
   </div>
 
   <div class="prototype">
     <span class="stx-function">{{node.name}}</span>
     <span class="stx-parenthesis">(</span>
-    @for (arg of node.arguments; track arg.id; let i = $index) {
+    @for (arg of node.arguments; track arg.name; let i = $index) {
       <argument-span [node]="arg"></argument-span>
       @if (i + 1 < node.arguments.length) {
         <span class="stx-text">,&nbsp;</span>
