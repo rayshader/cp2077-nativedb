@@ -8,7 +8,7 @@ export interface RedTypeJson {
 }
 
 export interface RedTypeAst extends RedNodeAst {
-  readonly name: string;
+  //readonly name: string;
   readonly innerType?: RedTypeAst;
   readonly size?: number;
 }

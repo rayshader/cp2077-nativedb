@@ -17,7 +17,7 @@ export interface RedClassAst extends RedNodeAst {
   readonly visibility: RedVisibilityDef;
   readonly isAbstract: boolean;
   readonly origin: RedOriginDef;
-  readonly name: string;
+  //readonly name: string;
   readonly isStruct: boolean;
   readonly parent?: string;
   readonly properties: RedPropertyAst[];

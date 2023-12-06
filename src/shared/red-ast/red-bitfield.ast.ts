@@ -7,7 +7,7 @@ export interface RedBitfieldJson extends RedEnumJson {
 }
 
 export interface RedBitfieldAst extends RedNodeAst {
-  readonly name: string;
+  //readonly name: string;
   readonly members: RedBitfieldMemberAst[];
 }
 

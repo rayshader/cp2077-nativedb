@@ -24,7 +24,7 @@ export interface RedFunctionAst extends RedNodeAst {
   readonly isQuest: boolean;
   readonly isTimer: boolean;
 
-  readonly name: string;
+  //readonly name: string;
   readonly fullName: string;
   readonly arguments: RedArgumentAst[];
   readonly returnType?: RedTypeAst;

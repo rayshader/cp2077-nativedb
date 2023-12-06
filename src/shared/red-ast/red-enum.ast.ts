@@ -11,7 +11,7 @@ export interface RedEnumMemberJson {
 }
 
 export interface RedEnumAst extends RedNodeAst {
-  readonly name: string;
+  //readonly name: string;
   readonly members: RedEnumMemberAst[];
 }
 
