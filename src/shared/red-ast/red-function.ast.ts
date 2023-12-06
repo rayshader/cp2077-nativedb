@@ -57,9 +57,14 @@ export class RedFunctionAst {
   static fromJson(json: RedFunctionJson): RedFunctionAst {
     const flags: number = json.d;
     const name: string = json.b ?? json.a;
+    const args: RedArgumentAst[] = json.e?.map(RedArgumentAst.fromJson) ?? [];
+    const returnType: RedTypeAst | undefined = (json.c !== undefined) ? RedTypeAst.fromJson(json.c) : undefined;
+    let signature: string = name;
 
+    signature += args.map((arg) => arg.name).join(',');
+    signature += returnType ? RedTypeAst.toString(returnType) : 'Void';
     return {
-      id: cyrb53(name),
+      id: cyrb53(signature),
       kind: RedNodeKind.function,
       visibility: getVisibilityFromFunctionFlags(flags),
       isNative: ((flags >> RedFunctionFlags.isNative) & 1) !== 0,
@@ -72,8 +77,8 @@ export class RedFunctionAst {
       isTimer: ((flags >> RedFunctionFlags.isTimer) & 1) !== 0,
       name: name,
       fullName: json.a,
-      arguments: json.e?.map(RedArgumentAst.fromJson) ?? [],
-      returnType: (json.c !== undefined) ? RedTypeAst.fromJson(json.c) : undefined
+      arguments: args,
+      returnType: returnType
     };
   }
 }
