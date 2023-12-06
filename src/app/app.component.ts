@@ -7,11 +7,12 @@ import {IconsService} from "../shared/services/icons.service";
 import {HttpClientModule} from "@angular/common/http";
 import {Theme, ThemeService} from "../shared/services/theme.service";
 import {Subscription} from "rxjs";
+import {RdSearchComponent} from "./components/rd-search/rd-search.component";
 
 @Component({
   selector: 'app',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, MatToolbarModule, RedAstTabsComponent, HttpClientModule, RouterLink],
+  imports: [CommonModule, RouterOutlet, MatToolbarModule, RedAstTabsComponent, HttpClientModule, RouterLink, RdSearchComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })

@@ -6,6 +6,20 @@
   cursor: pointer;
 }
 
+.space {
+  display: flex;
+  flex: 1;
+}
+
+.search {
+  display: flex;
+  flex: 4;
+
+  & rd-search {
+    width: 100%;
+  }
+}
+
 section {
   display: flex;
   height: calc(100% - 64px);

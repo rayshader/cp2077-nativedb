@@ -18,6 +18,8 @@
   @include mat.icon-button-theme($theme);
   @include mat.divider-theme($theme);
   @include mat.chips-theme($theme);
+  @include mat.input-theme($theme);
+  @include mat.form-field-theme($theme);
 }
 
 @mixin mat-component-colors($theme) {
@@ -29,6 +31,7 @@
   @include mat.icon-button-color($theme);
   @include mat.divider-color($theme);
   @include mat.chips-color($theme);
+  @include mat.form-field-theme($theme);
 }
 
 @mixin rd-component-themes($theme) {
