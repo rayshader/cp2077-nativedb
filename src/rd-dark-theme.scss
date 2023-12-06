@@ -2,7 +2,7 @@
 @use '@angular/material' as mat;
 @use 'rd-mixins' as rd;
 
-$dark-primary: mat.define-palette(mat.$blue-palette, 400, 300, 500);
+$dark-primary: mat.define-palette(mat.$blue-palette, 600, 700, 800);
 $dark-accent: mat.define-palette(mat.$orange-palette, A200, A100, A400);
 $dark-warn: mat.define-palette(mat.$red-palette);
 $rd-dark-theme: mat.define-dark-theme((
