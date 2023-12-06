@@ -1,4 +1,4 @@
-<mat-tab-group selectedIndex="2">
+<mat-tab-group>
   @for (tab of tabs | async; track tab.icon) {
     <mat-tab [disabled]="tab.nodes.length === 0">
       <ng-template mat-tab-label class="mat-tab-label">

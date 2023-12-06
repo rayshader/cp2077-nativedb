@@ -41,11 +41,11 @@ export class RedAstTabsComponent {
     ]).pipe(
       map(([enums, bitfields, classes, structs, functions]) => {
         return [
-          {uri: 'e', icon: 'enum', alt: 'Enums', nodes: enums},
-          {uri: 'b', icon: 'bitfield', alt: 'Bitfields', nodes: bitfields},
           {uri: 'c', icon: 'class', alt: 'Classes', nodes: classes},
           {uri: 's', icon: 'struct', alt: 'Structs', nodes: structs},
           {uri: 'f', icon: 'function', alt: 'Global functions', nodes: functions},
+          {uri: 'e', icon: 'enum', alt: 'Enums', nodes: enums},
+          {uri: 'b', icon: 'bitfield', alt: 'Bitfields', nodes: bitfields},
         ];
       })
     );
