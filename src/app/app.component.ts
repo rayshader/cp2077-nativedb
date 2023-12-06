@@ -7,6 +7,7 @@ import {IconsService} from "../shared/services/icons.service";
 import {HttpClientModule} from "@angular/common/http";
 import {RdSearchComponent} from "./components/rd-search/rd-search.component";
 import {RdThemeModeComponent} from "./components/rd-theme-mode/rd-theme-mode.component";
+import {MatChipsModule} from "@angular/material/chips";
 
 @Component({
   selector: 'app',
@@ -17,6 +18,7 @@ import {RdThemeModeComponent} from "./components/rd-theme-mode/rd-theme-mode.com
     RouterLink,
     HttpClientModule,
     MatToolbarModule,
+    MatChipsModule,
     RedAstTabsComponent,
     RdSearchComponent,
     RdThemeModeComponent
