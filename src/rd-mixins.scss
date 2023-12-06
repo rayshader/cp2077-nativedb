@@ -31,6 +31,7 @@
   @include mat.icon-button-color($theme);
   @include mat.divider-color($theme);
   @include mat.chips-color($theme);
+  @include mat.input-color($theme);
   @include mat.form-field-theme($theme);
 }
 
