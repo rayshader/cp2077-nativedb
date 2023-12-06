@@ -32,7 +32,7 @@
   @include mat.divider-color($theme);
   @include mat.chips-color($theme);
   @include mat.input-color($theme);
-  @include mat.form-field-theme($theme);
+  @include mat.form-field-color($theme);
 }
 
 @mixin rd-component-themes($theme) {
