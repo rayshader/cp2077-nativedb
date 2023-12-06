@@ -4,7 +4,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatIconModule} from "@angular/material/icon";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {debounceTime, Subscription} from "rxjs";
-import {SearchService} from "../../../shared/services/search-service";
+import {SearchService} from "../../../shared/services/search.service";
 
 @Component({
   selector: 'rd-search',

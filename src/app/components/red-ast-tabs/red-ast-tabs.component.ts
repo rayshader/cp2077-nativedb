@@ -4,7 +4,7 @@ import {combineLatest, map, Observable} from "rxjs";
 import {MatIconModule} from "@angular/material/icon";
 import {AsyncPipe, NgTemplateOutlet} from "@angular/common";
 import {RouterLink} from "@angular/router";
-import {SearchService} from "../../../shared/services/search-service";
+import {SearchService} from "../../../shared/services/search.service";
 import {RedNodeAst} from "../../../shared/red-ast/red-node.ast";
 
 interface TabItem {
