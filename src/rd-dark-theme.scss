@@ -3,7 +3,7 @@
 @use 'rd-mixins' as rd;
 
 $dark-primary: mat.define-palette(mat.$blue-palette, 600, 700, 800);
-$dark-accent: mat.define-palette(mat.$orange-palette, A200, A100, A400);
+$dark-accent: mat.define-palette(mat.$gray-palette, A200, A100, A400);
 $dark-warn: mat.define-palette(mat.$red-palette);
 $rd-dark-theme: mat.define-dark-theme((
   color: (
