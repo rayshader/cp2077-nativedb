@@ -16,7 +16,7 @@ export class RouterService {
   async navigateTo(id: number): Promise<void> {
     const kind: RedNodeKind | undefined = await firstValueFrom(this.dumpService.getTypeById(id));
 
-    if (!kind) {
+    if (kind === undefined) {
       console.error(`Could not find route for node ${id}`);
       return;
     }
