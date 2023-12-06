@@ -2,6 +2,8 @@
   .mat-mdc-tab-group {
     height: 100%;
 
+    border-right: 1px solid var(--mat-divider-color);
+
     & .mat-mdc-tab-header {
       & .mat-mdc-tab {
         width: 60px;
