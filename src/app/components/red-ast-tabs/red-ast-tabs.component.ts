@@ -3,12 +3,20 @@ import {MatTabsModule} from "@angular/material/tabs";
 import {Observable} from "rxjs";
 import {MatIconModule} from "@angular/material/icon";
 import {AsyncPipe, NgTemplateOutlet} from "@angular/common";
-import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {RouterLink} from "@angular/router";
-import {RedEnumAst} from "../../../shared/red-ast/red-enum.ast";
-import {RedBitfieldAst} from "../../../shared/red-ast/red-bitfield.ast";
-import {RedClassAst} from "../../../shared/red-ast/red-class.ast";
-import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
+import {SearchService} from "../../../shared/services/search-service";
+
+interface RedNode {
+  readonly id: number;
+  readonly name: string;
+}
+
+interface TabItem {
+  readonly uri: string;
+  readonly icon: string;
+  readonly alt: string;
+  readonly nodes$: Observable<RedNode[]>;
+}
 
 @Component({
   selector: 'red-ast-tabs',
@@ -24,17 +32,15 @@ import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
   styleUrl: './red-ast-tabs.component.scss'
 })
 export class RedAstTabsComponent {
-  readonly enums$: Observable<RedEnumAst[]>;
-  readonly bitfields$: Observable<RedBitfieldAst[]>;
-  readonly classes$: Observable<RedClassAst[]>;
-  readonly structs$: Observable<RedClassAst[]>;
-  readonly functions$: Observable<RedFunctionAst[]>;
+  readonly tabs: TabItem[];
 
-  constructor(private readonly dumpService: RedDumpService) {
-    this.enums$ = this.dumpService.enums$;
-    this.bitfields$ = this.dumpService.bitfields$;
-    this.classes$ = this.dumpService.classes$;
-    this.structs$ = this.dumpService.structs$;
-    this.functions$ = this.dumpService.functions$;
+  constructor(searchService: SearchService) {
+    this.tabs = [
+      {uri: 'e', icon: 'enum', alt: 'Enums', nodes$: searchService.enums$},
+      {uri: 'b', icon: 'bitfield', alt: 'Bitfields', nodes$: searchService.bitfields$},
+      {uri: 'c', icon: 'class', alt: 'Classes', nodes$: searchService.classes$},
+      {uri: 's', icon: 'struct', alt: 'Structs', nodes$: searchService.structs$},
+      {uri: 'f', icon: 'function', alt: 'Global functions', nodes$: searchService.functions$},
+    ];
   }
 }
