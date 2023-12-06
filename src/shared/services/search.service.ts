@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {RedDumpService} from "./red-dump.service";
 import {BehaviorSubject, combineLatest, map, Observable, OperatorFunction, pipe, shareReplay} from "rxjs";
 import {RedNodeAst} from "../red-ast/red-node.ast";
+import {RedFunctionAst} from "../red-ast/red-function.ast";
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +22,7 @@ export class SearchService {
     this.bitfields$ = combineLatest([dumpService.bitfields$.pipe(this.getTabData()), this.query$]).pipe(this.filterByQuery());
     this.classes$ = combineLatest([dumpService.classes$.pipe(this.getTabData()), this.query$]).pipe(this.filterByQuery());
     this.structs$ = combineLatest([dumpService.structs$.pipe(this.getTabData()), this.query$]).pipe(this.filterByQuery());
-    this.functions$ = combineLatest([dumpService.functions$.pipe(this.getTabData()), this.query$]).pipe(this.filterByQuery());
+    this.functions$ = combineLatest([dumpService.functions$.pipe(this.ignoreDuplicate(), this.getTabData()), this.query$]).pipe(this.filterByQuery());
   }
 
   search(query: string): void {
@@ -32,6 +33,17 @@ export class SearchService {
     return pipe(
       map((nodes) => nodes.map((node) => <RedNodeAst>{id: node.id, name: node.name})),
       shareReplay(),
+    );
+  }
+
+  private ignoreDuplicate(): OperatorFunction<RedFunctionAst[], RedFunctionAst[]> {
+    // TODO: use SettingsService to enable/disable this filtering.
+    return pipe(
+      map((funcs) => {
+        return funcs.filter((func) => {
+          return !func.name.startsWith('Operator') && !func.name.startsWith('Cast');
+        });
+      })
     );
   }
 
