@@ -5,17 +5,13 @@ import {MatIconModule} from "@angular/material/icon";
 import {AsyncPipe, NgTemplateOutlet} from "@angular/common";
 import {RouterLink} from "@angular/router";
 import {SearchService} from "../../../shared/services/search-service";
-
-interface RedNode {
-  readonly id: number;
-  readonly name: string;
-}
+import {RedNodeAst} from "../../../shared/red-ast/red-node.ast";
 
 interface TabItem {
   readonly uri: string;
   readonly icon: string;
   readonly alt: string;
-  readonly nodes: RedNode[];
+  readonly nodes: RedNodeAst[];
 }
 
 @Component({
