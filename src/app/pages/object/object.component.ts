@@ -78,25 +78,24 @@ export class ObjectComponent {
     );
     const parents$ = object$.pipe(this.getParents());
     const children$ = object$.pipe(this.getChildren());
-    const properties$ = object$.pipe(this.sortProperties());
-    const functions$ = object$.pipe(this.sortFunctions());
 
     this.data$ = combineLatest([
       object$,
       parents$,
       children$,
-      properties$,
-      functions$,
       this.dumpService.badges$
     ]).pipe(
       map(([
              object,
              parents,
              children,
-             properties,
-             functions,
              badges,
            ]) => {
+        const properties = object.properties;
+        const functions = object.functions;
+
+        properties.sort(RedPropertyAst.sort);
+        functions.sort(RedFunctionAst.sort);
         return <ObjectData>{
           object: object,
           scope: RedVisibilityDef[object.visibility],
@@ -146,26 +145,6 @@ export class ObjectComponent {
           name: child.name,
           size: -1
         })
-      })
-    );
-  }
-
-  private sortProperties(): OperatorFunction<RedClassAst | undefined, RedPropertyAst[]> {
-    return pipe(
-      map((object) => object?.properties ?? []),
-      map((properties) => {
-        properties.sort(RedPropertyAst.sort);
-        return properties;
-      })
-    );
-  }
-
-  private sortFunctions(): OperatorFunction<RedClassAst | undefined, RedFunctionAst[]> {
-    return pipe(
-      map((object) => object?.functions ?? []),
-      map((functions) => {
-        functions.sort(RedFunctionAst.sort);
-        return functions;
       })
     );
   }
