@@ -1,0 +1,146 @@
+<h1>NativeDB</h1>
+
+<mat-divider></mat-divider>
+
+<article>
+  <div class="title">
+    <mat-icon>waving_hand</mat-icon>
+    <h2>Introduction</h2>
+  </div>
+
+  <p>
+    This application contains all definitions of Cyberpunk 2077 as found with RTTI. You can search for enums, bitfields,
+    classes, structs and global functions. For each classes and structs, you will find a list of their properties and
+    functions. Furthermore, you can explore parent / child inheritance of classes and structs. Keep reading to learn
+    more about some features.
+  </p>
+</article>
+
+<mat-divider></mat-divider>
+
+<article>
+  <div class="title">
+    <mat-icon>search</mat-icon>
+    <h2>Search</h2>
+  </div>
+
+  <p>
+    You can search in this database to filter enums, bitfields, classes, structs and functions. The list on the left
+    will update itself as you type in. You can write multiple words to query content with an AND-like operation.
+  </p>
+
+  <p>
+    You can see items, in the left panel, with a <span class="stx-type disabled">darker color</span> to tell you
+    "there is nothing to see". Whether its a class or a struct, it means there is no properties nor functions. However,
+    it might still inherit from parents and/or be inherited by children.
+  </p>
+</article>
+
+<mat-divider></mat-divider>
+
+<article>
+  <div class="title">
+    <mat-icon>navigation</mat-icon>
+    <h2>Navigate</h2>
+  </div>
+
+  <p>
+    You can easily navigate between definitions by clicking on their <span class="stx-type">name</span>.
+  </p>
+
+  @if (getGameInstance$ | async; as func) {
+    <function-span [node]="func" [canCopy]="false"></function-span>
+  }
+
+  <p>
+    A badge is a letter within a circle like above. It conveys information regarding metadata for functions, classes,
+    etc. You can hover them to learn the exact meaning. Basically the letter is the letter of the first word with N for
+    native, A for abstract, etc. The visibility of a property / function will be shown using colors like below:
+  </p>
+
+  <p class="scope">
+    <mat-icon class="stx-scope" data-scope="public" svgIcon="scope" title="public"></mat-icon>
+    public
+  </p>
+
+  <p class="scope">
+    <mat-icon class="stx-scope" data-scope="protected" svgIcon="scope" title="protected"></mat-icon>
+    protected
+  </p>
+
+  <p class="scope">
+    <mat-icon class="stx-scope" data-scope="private" svgIcon="scope" title="private"></mat-icon>
+    private
+  </p>
+</article>
+
+<mat-divider></mat-divider>
+
+<article>
+  <div class="title">
+    <mat-icon>share</mat-icon>
+    <h2>Share</h2>
+  </div>
+
+  <p>
+    You can reference any part of this database using the URL in your browser. All URIs are unique and will always point
+    to the same content.
+  </p>
+</article>
+
+<mat-divider></mat-divider>
+
+<article>
+  <div class="title">
+    <mat-icon>code</mat-icon>
+    <h2>Grab code</h2>
+  </div>
+
+  <p>
+    You can copy content of this database to your clipboard when you see this icon <mat-icon>content_copy</mat-icon>. It
+    will copy the declaration you want to extract based on its type. But you might work with Redscript, Lua or C++...
+    Different languages means different syntax. You can configure the current language you wish to use in the settings.
+    You can change it whenever you wish. So, after defining Lua, every time you use the grab icon, it will copy content
+    to your clipboard using Lua syntax.
+  </p>
+</article>
+
+<!--
+<mat-divider></mat-divider>
+
+<article>
+  <div class="title">
+    <mat-icon>library_books</mat-icon>
+    <h2>Documentation</h2>
+  </div>
+
+  <p>
+    You can write your own documentation for all types. Your documentation is saved in your browser only. However, you
+    can export your documentation to a file on your device. And you can import it back from elsewhere.
+  </p>
+
+  <p>
+    The documentation's format is made in such a way that you can merge your documentation with files from others. A
+    tool will popup to let you select what you want to merge.
+  </p>
+</article>
+-->
+
+<mat-divider></mat-divider>
+
+<article>
+  <div class="title">
+    <mat-icon>format_paint</mat-icon>
+    <h2>Themes</h2>
+  </div>
+
+  <p>
+    You can manually switch the appearance of this application between light and dark mode. By default, it will follow
+    your system preferences. Finally, you can customize the appearance of the code using pre-defined themes. You can
+    find them in the settings, including IDE-like themes.
+  </p>
+</article>
+
+<button mat-raised-button
+        color="primary"
+        routerLink="/s/{{id}}">GOT IT</button>

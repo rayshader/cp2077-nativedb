@@ -1,0 +1,18 @@
+function-span {
+  min-height: auto;
+}
+
+.scope {
+  display: flex;
+  align-items: center;
+
+  & mat-icon {
+    margin-right: 12px;
+  }
+}
+
+button {
+  display: flex;
+
+  margin: 48px auto;
+}

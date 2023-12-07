@@ -7,6 +7,7 @@
 
 // App components
 @use 'styles/page' as *;
+@use 'styles/article' as *;
 @use 'styles/accordion-item' as *;
 
 @mixin mat-component-themes($theme) {
@@ -16,6 +17,7 @@
   @include mat.tabs-theme($theme);
   @include mat.icon-theme($theme);
   @include mat.icon-button-theme($theme);
+  @include mat.button-theme($theme);
   @include mat.divider-theme($theme);
   @include mat.chips-theme($theme);
   @include mat.input-theme($theme);
@@ -29,6 +31,7 @@
   @include mat.tabs-color($theme);
   @include mat.icon-color($theme);
   @include mat.icon-button-color($theme);
+  @include mat.button-color($theme);
   @include mat.divider-color($theme);
   @include mat.chips-color($theme);
   @include mat.input-color($theme);
@@ -40,11 +43,13 @@
   @include icon-theme($theme);
   @include button-theme($theme);
   @include page-theme($theme);
+  @include article-theme($theme);
   @include accordion-item-theme($theme);
 }
 
 @mixin rd-component-colors($theme) {
   @include icon-color($theme);
   @include button-color($theme);
+  @include article-color($theme);
   @include accordion-item-color($theme);
 }

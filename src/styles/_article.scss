@@ -1,0 +1,39 @@
+@use 'sass:map';
+
+@mixin article-theme($theme) {
+  $primary: map.get($theme, primary);
+
+  article {
+    & .title {
+       display: flex;
+       align-items: center;
+       margin-top: 24px;
+
+       & mat-icon {
+         margin-right: 18px;
+       }
+
+       & h2 {
+         margin: 0;
+
+         color: map.get($primary, 500);
+       }
+     }
+
+    p {
+      text-align: justify;
+    }
+  }
+}
+
+@mixin article-color($theme) {
+  $primary: map.get($theme, primary);
+
+  article {
+    & .title {
+      & h2 {
+        color: map.get($primary, 500);
+      }
+    }
+  }
+}
