@@ -14,7 +14,9 @@ export interface RedTypeAst extends RedNodeAst {
 }
 
 export class RedTypeAst {
-  static readonly PRIMITIVE_RULE = RegExp("Void|Bool|Int8|Uint8|Int16|Uint16|Int32|Uint32|Int64|Uint64|Float|Double|String|CName|ResRef|TweakDBID|Variant");
+  static readonly PRIMITIVE_RULE = RegExp(
+    "^(Void|Bool|Int8|Uint8|Int16|Uint16|Int32|Uint32|Int64|Uint64|Float|Double|String|LocalizationString|CName|ResRef|TweakDBID|Variant)$"
+  );
 
   static isPrimitive(type: RedTypeAst): boolean {
     return this.PRIMITIVE_RULE.test(type.name);
