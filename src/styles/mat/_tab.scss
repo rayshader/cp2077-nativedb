@@ -3,8 +3,11 @@
     height: 100%;
 
     border-right: 1px solid var(--mat-divider-color);
+    background-color: rgba(0, 0, 0, 0.05);
 
     & .mat-mdc-tab-header {
+      background-color: rgba(0, 0, 0, 0.05);
+
       & .mat-mdc-tab {
         width: 60px;
         min-width: auto;
