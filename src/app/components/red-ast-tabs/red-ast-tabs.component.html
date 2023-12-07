@@ -8,6 +8,7 @@
       @for (node of tab.nodes; track node.id) {
         <a class="stx-type"
            [class.disabled]="node.isEmpty"
+           [title]="node.name"
            routerLink="/{{tab.uri}}/{{node.id}}">
           {{node.name}}
         </a>
