@@ -16,6 +16,7 @@ import {RedTypeAst} from "../../../shared/red-ast/red-type.ast";
 import {RedPropertyAst} from "../../../shared/red-ast/red-property.ast";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {RedOriginDef, RedVisibilityDef} from "../../../shared/red-ast/red-definitions.ast";
+import {PageService} from "../../../shared/services/page.service";
 
 interface ObjectData {
   readonly object: RedClassAst;
@@ -59,12 +60,14 @@ export class ObjectComponent {
   protected readonly importOnlyOrigin: RedOriginDef = RedOriginDef.importOnly;
 
   constructor(private readonly dumpService: RedDumpService,
+              private readonly pageService: PageService,
               private readonly route: ActivatedRoute) {
     this.kind = (this.route.snapshot.data as any).kind;
   }
 
   @Input()
   set id(id: string) {
+    this.pageService.restoreScroll();
     const object$ = of(this.kind).pipe(
       switchMap((kind) => {
         if (kind === RedNodeKind.class) {

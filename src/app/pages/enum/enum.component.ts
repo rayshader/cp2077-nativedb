@@ -5,6 +5,7 @@ import {AsyncPipe} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {RedEnumAst} from "../../../shared/red-ast/red-enum.ast";
+import {PageService} from "../../../shared/services/page.service";
 
 @Component({
   selector: 'enum',
@@ -21,11 +22,13 @@ export class EnumComponent {
 
   enum$: Observable<RedEnumAst | undefined> = EMPTY;
 
-  constructor(private readonly dumpService: RedDumpService) {
+  constructor(private readonly dumpService: RedDumpService,
+              private readonly pageService: PageService) {
   }
 
   @Input()
   set id(id: string) {
+    this.pageService.restoreScroll();
     this.enum$ = this.dumpService.getEnumById(+id);
   }
 

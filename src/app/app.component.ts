@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {MatToolbarModule} from "@angular/material/toolbar";
@@ -8,6 +8,8 @@ import {HttpClientModule} from "@angular/common/http";
 import {RdSearchComponent} from "./components/rd-search/rd-search.component";
 import {RdThemeModeComponent} from "./components/rd-theme-mode/rd-theme-mode.component";
 import {MatChipsModule} from "@angular/material/chips";
+import {PageService} from "../shared/services/page.service";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app',
@@ -26,13 +28,27 @@ import {MatChipsModule} from "@angular/material/chips";
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
+  @ViewChild('page')
+  page?: ElementRef;
 
-  constructor(private readonly iconsService: IconsService) {
+  private scrollS?: Subscription;
+
+  constructor(private readonly iconsService: IconsService,
+              private readonly pageService: PageService) {
   }
 
   ngOnInit(): void {
     this.iconsService.load();
+    this.scrollS = this.pageService.scroll$.subscribe(this.scroll.bind(this));
+  }
+
+  ngOnDestroy(): void {
+    this.scrollS?.unsubscribe();
+  }
+
+  private scroll(): void {
+    this.page?.nativeElement.scrollTo({top: 0, behavior: 'smooth'});
   }
 
 }

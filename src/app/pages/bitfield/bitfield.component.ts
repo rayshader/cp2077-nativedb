@@ -5,6 +5,7 @@ import {EMPTY, Observable} from "rxjs";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {AsyncPipe} from "@angular/common";
 import {RedBitfieldAst} from "../../../shared/red-ast/red-bitfield.ast";
+import {PageService} from "../../../shared/services/page.service";
 
 @Component({
   selector: 'bitfield',
@@ -21,11 +22,13 @@ export class BitfieldComponent {
 
   bitfield$: Observable<RedBitfieldAst | undefined> = EMPTY;
 
-  constructor(private readonly dumpService: RedDumpService) {
+  constructor(private readonly dumpService: RedDumpService,
+              private readonly pageService: PageService) {
   }
 
   @Input()
   set id(id: string) {
+    this.pageService.restoreScroll();
     this.bitfield$ = this.dumpService.getBitfieldById(+id);
   }
 
