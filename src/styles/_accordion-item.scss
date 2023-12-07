@@ -26,14 +26,64 @@
       }
     }
   }
+
+  .skt-accordion-item {
+    & .skt-header {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+
+      & .skt-button {
+        width: 24px;
+        height: 24px;
+
+        margin: 12px 24px 12px 12px;
+
+        border-radius: 50%;
+        background-color: var(--mat-divider-color);
+      }
+
+      & .skt-title {
+        margin: 0;
+
+        font-weight: normal;
+        color: transparent;
+
+        border-radius: 4px;
+        background-color: var(--mat-divider-color);
+      }
+
+      & .skt-chip {
+        width: 32px;
+        height: 32px;
+        margin-left: 12px;
+
+        text-align: center;
+
+        border-radius: 50%;
+        background-color: var(--mat-divider-color);
+      }
+    }
+
+    & .skt-divider {
+      width: inherit;
+      height: 1px;
+      margin-top: 8px;
+      margin-bottom: 12px;
+
+      background-color: var(--mat-divider-color);
+    }
+  }
 }
 
 @mixin accordion-item-color($theme) {
   $fg: map.get($theme, foreground);
 
-  & .disabled {
-    & .header {
-      color: map.get($fg, disabled);
+  rd-accordion-item {
+    & .disabled {
+      & .header {
+        color: map.get($fg, disabled);
+      }
     }
   }
 }

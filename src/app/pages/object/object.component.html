@@ -87,9 +87,52 @@
   </cdk-accordion>
 } @else {
   <h1 class="stx-type">Loading...</h1>
-  @if (kind === classKind) {
-    <mat-icon class="badge-class" svgIcon="class" title="class"></mat-icon>
-  } @else if (kind === structKind) {
-    <mat-icon class="badge-struct" svgIcon="struct" title="struct"></mat-icon>
-  }
+  <div class="prototype">
+    <span class="skt-circle skt-scope"></span>
+    @if (kind === classKind) {
+      <span class="skt-circle skt-class"></span>
+    } @else if (kind === structKind) {
+      <span class="skt-circle skt-struct"></span>
+    }
+  </div>
+
+  <div class="skt-accordion-item">
+    <div class="skt-header">
+      <div class="skt-button"></div>
+      <h3 class="skt-title">Inherits</h3>
+      <div class="skt-chip"></div>
+    </div>
+
+    <div class="skt-divider"></div>
+  </div>
+
+  <div class="skt-accordion-item">
+    <div class="skt-header">
+      <div class="skt-button"></div>
+      <h3 class="skt-title">Inherited by</h3>
+      <div class="skt-chip"></div>
+    </div>
+
+    <div class="skt-divider"></div>
+  </div>
+
+  <div class="skt-accordion-item">
+    <div class="skt-header">
+      <div class="skt-button"></div>
+      <h3 class="skt-title">Properties</h3>
+      <div class="skt-chip"></div>
+    </div>
+
+    <div class="skt-divider"></div>
+  </div>
+
+  <div class="skt-accordion-item">
+    <div class="skt-header">
+      <div class="skt-button"></div>
+      <h3 class="skt-title">Functions</h3>
+      <div class="skt-chip"></div>
+    </div>
+
+    <div class="skt-divider"></div>
+  </div>
 }
