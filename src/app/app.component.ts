@@ -10,6 +10,8 @@ import {RdThemeModeComponent} from "./components/rd-theme-mode/rd-theme-mode.com
 import {MatChipsModule} from "@angular/material/chips";
 import {PageService} from "../shared/services/page.service";
 import {Subscription} from "rxjs";
+import {MatButtonModule} from "@angular/material/button";
+import {MatIconModule} from "@angular/material/icon";
 
 @Component({
   selector: 'app',
@@ -23,7 +25,9 @@ import {Subscription} from "rxjs";
     MatChipsModule,
     RedAstTabsComponent,
     RdSearchComponent,
-    RdThemeModeComponent
+    RdThemeModeComponent,
+    MatButtonModule,
+    MatIconModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
