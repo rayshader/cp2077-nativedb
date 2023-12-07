@@ -6,7 +6,11 @@
         <span class="count">{{tab.nodes.length}}</span>
       </ng-template>
       @for (node of tab.nodes; track node.id) {
-        <a class="stx-type" routerLink="/{{tab.uri}}/{{node.id}}">{{node.name}}</a>
+        <a class="stx-type"
+           [class.disabled]="node.isEmpty"
+           routerLink="/{{tab.uri}}/{{node.id}}">
+          {{node.name}}
+        </a>
       }
     </mat-tab>
   }

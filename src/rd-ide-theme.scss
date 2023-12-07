@@ -57,6 +57,10 @@
   .stx-type {
     @extend .stx;
     color: mediumseagreen;
+
+    &.disabled {
+      color: darken(mediumseagreen, 15%);
+    }
   }
 
   .stx-primitive-type {
