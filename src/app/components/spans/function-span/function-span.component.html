@@ -10,30 +10,30 @@
             class="badge"
             title="Documentation"
             [class.stx-doc]="!!documentation"><mat-icon>info_outline</mat-icon></button>
-    <mat-icon class="stx-scope" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>
+    <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>
     @if (node.isNative) {
-      <mat-icon class="stx-lang" svgIcon="native" title="native"></mat-icon>
+      <mat-icon class="badge" svgIcon="native" title="native"></mat-icon>
     }
     @if (node.isStatic) {
-      <mat-icon class="stx-lang" svgIcon="static" title="static"></mat-icon>
+      <mat-icon class="badge" svgIcon="static" title="static"></mat-icon>
     }
     @if (node.isFinal) {
-      <mat-icon class="stx-lang" svgIcon="final" title="final"></mat-icon>
+      <mat-icon class="badge" svgIcon="final" title="final"></mat-icon>
     }
     @if (node.isThreadSafe) {
-      <mat-icon class="stx-lang" svgIcon="timer" title="threadsafe"></mat-icon>
+      <mat-icon class="badge" svgIcon="timer" title="threadsafe"></mat-icon>
     }
     @if (node.isCallback) {
-      <mat-icon class="stx-lang" svgIcon="callback" title="callback"></mat-icon>
+      <mat-icon class="badge" svgIcon="callback" title="callback"></mat-icon>
     }
     @if (node.isConst) {
-      <mat-icon class="stx-lang" svgIcon="const" title="const"></mat-icon>
+      <mat-icon class="badge" svgIcon="const" title="const"></mat-icon>
     }
     @if (node.isQuest) {
-      <mat-icon class="stx-lang" svgIcon="quest" title="quest"></mat-icon>
+      <mat-icon class="badge" svgIcon="quest" title="quest"></mat-icon>
     }
     @if (node.isTimer) {
-      <mat-icon class="stx-lang" svgIcon="timer" title="timer"></mat-icon>
+      <mat-icon class="badge" svgIcon="timer" title="timer"></mat-icon>
     }
     <div [style.width]="align"></div>
   </div>

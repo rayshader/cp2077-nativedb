@@ -1,17 +1,17 @@
 @if (data$ | async; as data) {
   <h1 class="stx-type">{{data.object.name}}</h1>
   <div class="prototype">
-    <mat-icon class="stx-scope" [attr.data-scope]="data.scope" svgIcon="scope" [title]="data.scope"></mat-icon>
+    <mat-icon class="badge" [attr.data-scope]="data.scope" svgIcon="scope" [title]="data.scope"></mat-icon>
     @if (data.isAbstract) {
-      <mat-icon class="stx-lang" svgIcon="abstract" title="abstract"></mat-icon>
+      <mat-icon class="badge" svgIcon="abstract" title="abstract"></mat-icon>
     }<!--
       @if (data.isFinal) {
-        <mat-icon class="stx-lang" svgIcon="final" title="final"></mat-icon>
+        <mat-icon class="badge" svgIcon="final" title="final"></mat-icon>
       }-->
     @if (data.object.origin === nativeOrigin) {
-      <mat-icon class="stx-lang" svgIcon="native" title="native"></mat-icon>
+      <mat-icon class="badge" svgIcon="native" title="native"></mat-icon>
     } @else if (data.object.origin === importOnlyOrigin) {
-      <mat-icon class="stx-lang" svgIcon="importonly" title="importonly"></mat-icon>
+      <mat-icon class="badge" svgIcon="importonly" title="importonly"></mat-icon>
     }
     @if (!data.object.isStruct) {
       <mat-icon class="badge-class" svgIcon="class" title="class"></mat-icon>

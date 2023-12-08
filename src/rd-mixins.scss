@@ -9,6 +9,7 @@
 @use 'styles/page' as *;
 @use 'styles/article' as *;
 @use 'styles/accordion-item' as *;
+@use 'styles/badge' as *;
 
 @mixin mat-component-themes($theme) {
   //@include mat.all-component-themes($theme);
@@ -47,6 +48,7 @@
   @include page-theme($theme);
   @include article-theme($theme);
   @include accordion-item-theme($theme);
+  @include badge-theme($theme);
 }
 
 @mixin rd-component-colors($theme) {
@@ -54,4 +56,5 @@
   @include button-color($theme);
   @include article-color($theme);
   @include accordion-item-color($theme);
+  @include badge-color($theme);
 }

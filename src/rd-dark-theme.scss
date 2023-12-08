@@ -1,6 +1,7 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
 @use 'rd-mixins' as rd;
+@use 'rd-theme' as *;
 
 $dark-primary: mat.define-palette(mat.$blue-palette, 600, 700, 800);
 $dark-accent: mat.define-palette(mat.$gray-palette, A200, A100, A400);
@@ -10,7 +11,8 @@ $rd-dark-theme: mat.define-dark-theme((
     primary: $dark-primary,
     accent: $dark-accent,
     warn: $dark-warn,
-  )
+  ),
+  badges: rd-badges($dark-primary),
 ));
 
 .dark-theme {

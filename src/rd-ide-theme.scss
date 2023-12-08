@@ -1,8 +1,4 @@
-@use 'sass:map';
-
 @mixin rd-ide-syntax-themes($theme) {
-  $badges: map.get($theme, badges);
-
   .stx {
     font-family: Consolas, monospace; /*'JetBrains Mono', */
   }
@@ -36,18 +32,6 @@
     color: steelblue;
   }
 
-  .stx-scope {
-    @extend .stx-lang;
-
-    &[data-scope="protected"] {
-      color: orange;
-    }
-
-    &[data-scope="private"] {
-      color: firebrick;
-    }
-  }
-
   .stx-function {
     @extend .stx;
     color: lightseagreen;
@@ -70,38 +54,5 @@
   .stx-primitive-type {
     @extend .stx;
     color: mediumseagreen;
-  }
-
-  .skt-circle {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    margin: 2px;
-
-    border-radius: 50%;
-  }
-
-  .skt-scope {
-    background-color: steelblue;
-  }
-
-  .skt-enum {
-    background-color: map.get($badges, enum);
-  }
-
-  .skt-bitfield {
-    background-color: map.get($badges, bitfield);
-  }
-
-  .skt-class {
-    background-color: map.get($badges, class);
-  }
-
-  .skt-struct {
-    background-color: map.get($badges, struct);
-  }
-
-  .skt-function {
-    background-color: map.get($badges, function);
   }
 }

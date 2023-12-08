@@ -4,8 +4,13 @@
 /**
  * Palette of colors for badges.
  */
-@function rd-badges() {
+@function rd-badges($primary-palette) {
   @return (
+    primary: map.get($primary-palette, default),
+
+    protected: map.get(mat.$amber-palette, 500),
+    private: map.get(mat.$red-palette, 500),
+
     enum: map.get(mat.$light-blue-palette, 500),
     bitfield: map.get(mat.$light-blue-palette, A200),
     class: map.get(mat.$green-palette, 500),

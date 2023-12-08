@@ -1,0 +1,54 @@
+@use 'sass:map';
+
+@mixin badge-theme($theme) {
+  $badges: map.get($theme, badges);
+
+  .badge {
+    color: map.get($badges, primary);
+
+    &[data-scope="protected"] {
+      color: map.get($badges, protected);
+    }
+
+    &[data-scope="private"] {
+      color: map.get($badges, private);
+    }
+  }
+
+  .skt-circle {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin: 2px;
+
+    border-radius: 50%;
+  }
+
+  .skt-scope {
+    background-color: map.get($badges, primary);
+  }
+
+  .skt-enum {
+    background-color: map.get($badges, enum);
+  }
+
+  .skt-bitfield {
+    background-color: map.get($badges, bitfield);
+  }
+
+  .skt-class {
+    background-color: map.get($badges, class);
+  }
+
+  .skt-struct {
+    background-color: map.get($badges, struct);
+  }
+
+  .skt-function {
+    background-color: map.get($badges, function);
+  }
+}
+
+@mixin badge-color($theme) {
+
+}
