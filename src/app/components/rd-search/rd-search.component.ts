@@ -1,10 +1,11 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, DestroyRef, OnInit} from '@angular/core';
 import {MatInputModule} from "@angular/material/input";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatIconModule} from "@angular/material/icon";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
-import {debounceTime, Subscription} from "rxjs";
+import {debounceTime} from "rxjs";
 import {SearchService} from "../../../shared/services/search.service";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'rd-search',
@@ -18,27 +19,25 @@ import {SearchService} from "../../../shared/services/search.service";
   templateUrl: './rd-search.component.html',
   styleUrl: './rd-search.component.scss'
 })
-export class RdSearchComponent implements OnInit, OnDestroy {
+export class RdSearchComponent implements OnInit {
 
   query: FormControl<string | null> = new FormControl('');
 
-  private queryS?: Subscription;
-
-  constructor(private readonly searchService: SearchService) {
+  constructor(private readonly searchService: SearchService,
+              private readonly dr: DestroyRef) {
   }
 
   ngOnInit(): void {
-    this.queryS = this.query.valueChanges
-      .pipe(debounceTime(300))
+    this.query.valueChanges
+      .pipe(
+        debounceTime(300),
+        takeUntilDestroyed(this.dr)
+      )
       .subscribe((query) => {
         query ??= '';
         query = query.trim();
         this.searchService.search(query);
       });
-  }
-
-  ngOnDestroy(): void {
-    this.queryS?.unsubscribe();
   }
 
 }

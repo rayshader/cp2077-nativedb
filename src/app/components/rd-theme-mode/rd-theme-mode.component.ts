@@ -1,8 +1,8 @@
-import {Component, OnDestroy, OnInit, Renderer2} from '@angular/core';
+import {Component, DestroyRef, OnInit, Renderer2} from '@angular/core';
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {Theme, ThemeService} from "../../../shared/services/theme.service";
-import {Subscription} from "rxjs";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'rd-theme-mode',
@@ -14,14 +14,13 @@ import {Subscription} from "rxjs";
   templateUrl: './rd-theme-mode.component.html',
   styleUrl: './rd-theme-mode.component.scss'
 })
-export class RdThemeModeComponent implements OnInit, OnDestroy {
+export class RdThemeModeComponent implements OnInit {
 
-  private readonly themeS: Subscription;
   private theme: Theme = 'light-theme';
 
   constructor(private readonly themeService: ThemeService,
-              private readonly renderer: Renderer2) {
-    this.themeS = this.themeService.onThemeChanged.subscribe(this.onThemeChanged.bind(this));
+              private readonly renderer: Renderer2,
+              private readonly dr: DestroyRef) {
   }
 
   get themeModeIcon(): string {
@@ -33,11 +32,8 @@ export class RdThemeModeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.themeService.onThemeChanged.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onThemeChanged.bind(this));
     this.themeService.load();
-  }
-
-  ngOnDestroy(): void {
-    this.themeS.unsubscribe();
   }
 
   toggleTheme(): void {

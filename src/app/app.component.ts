@@ -1,4 +1,4 @@
-import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, DestroyRef, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {MatToolbarModule} from "@angular/material/toolbar";
@@ -9,9 +9,9 @@ import {RdSearchComponent} from "./components/rd-search/rd-search.component";
 import {RdThemeModeComponent} from "./components/rd-theme-mode/rd-theme-mode.component";
 import {MatChipsModule} from "@angular/material/chips";
 import {PageService} from "../shared/services/page.service";
-import {Subscription} from "rxjs";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'app',
@@ -32,23 +32,18 @@ import {MatIconModule} from "@angular/material/icon";
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit, OnDestroy {
+export class AppComponent implements OnInit {
   @ViewChild('page')
   page?: ElementRef;
 
-  private scrollS?: Subscription;
-
   constructor(private readonly iconsService: IconsService,
-              private readonly pageService: PageService) {
+              private readonly pageService: PageService,
+              private readonly dr: DestroyRef) {
   }
 
   ngOnInit(): void {
     this.iconsService.load();
-    this.scrollS = this.pageService.scroll$.subscribe(this.scroll.bind(this));
-  }
-
-  ngOnDestroy(): void {
-    this.scrollS?.unsubscribe();
+    this.pageService.scroll$.pipe(takeUntilDestroyed(this.dr)).subscribe(this.scroll.bind(this));
   }
 
   private scroll(): void {
