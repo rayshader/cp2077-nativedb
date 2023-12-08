@@ -8,7 +8,7 @@ import {SearchService} from "../../../shared/services/search.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 @Component({
-  selector: 'rd-search',
+  selector: 'ndb-search',
   standalone: true,
   imports: [
     MatInputModule,
@@ -16,10 +16,10 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
     MatIconModule,
     ReactiveFormsModule
   ],
-  templateUrl: './rd-search.component.html',
-  styleUrl: './rd-search.component.scss'
+  templateUrl: './ndb-search.component.html',
+  styleUrl: './ndb-search.component.scss'
 })
-export class RdSearchComponent implements OnInit {
+export class NDBSearchComponent implements OnInit {
 
   query: FormControl<string | null> = new FormControl('');
 

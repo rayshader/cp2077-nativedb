@@ -20,7 +20,7 @@ interface TabItem {
 }
 
 @Component({
-  selector: 'red-ast-tabs',
+  selector: 'ndb-tabs',
   standalone: true,
   imports: [
     MatTabsModule,
@@ -29,10 +29,10 @@ interface TabItem {
     AsyncPipe,
     RouterLink
   ],
-  templateUrl: './red-ast-tabs.component.html',
-  styleUrl: './red-ast-tabs.component.scss'
+  templateUrl: './ndb-tabs.component.html',
+  styleUrl: './ndb-tabs.component.scss'
 })
-export class RedAstTabsComponent {
+export class NDBTabsComponent {
 
   readonly tabs: Observable<TabItem[]>;
 

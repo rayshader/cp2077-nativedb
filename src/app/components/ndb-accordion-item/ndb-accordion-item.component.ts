@@ -5,7 +5,7 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatDividerModule} from "@angular/material/divider";
 
 @Component({
-  selector: 'rd-accordion-item',
+  selector: 'ndb-accordion-item',
   standalone: true,
   imports: [
     CdkAccordionModule,
@@ -13,10 +13,10 @@ import {MatDividerModule} from "@angular/material/divider";
     MatButtonModule,
     MatDividerModule
   ],
-  templateUrl: './rd-accordion-item.component.html',
-  styleUrl: './rd-accordion-item.component.scss'
+  templateUrl: './ndb-accordion-item.component.html',
+  styleUrl: './ndb-accordion-item.component.scss'
 })
-export class RDAccordionItemComponent {
+export class NDBAccordionItemComponent {
 
   @Input({transform: booleanAttribute})
   expanded: boolean = false;

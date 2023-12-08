@@ -4,7 +4,7 @@ import {CdkAccordionModule} from "@angular/cdk/accordion";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
 import {MatIconModule} from "@angular/material/icon";
 import {PropertySpanComponent} from "../../components/spans/property-span/property-span.component";
-import {RDAccordionItemComponent} from "../../components/rd-accordion-item/rd-accordion-item.component";
+import {NDBAccordionItemComponent} from "../../components/ndb-accordion-item/ndb-accordion-item.component";
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
 import {combineLatest, EMPTY, map, Observable, of, OperatorFunction, pipe, switchMap} from "rxjs";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
@@ -41,7 +41,7 @@ interface ObjectData {
     MatChipsModule,
     FunctionSpanComponent,
     PropertySpanComponent,
-    RDAccordionItemComponent,
+    NDBAccordionItemComponent,
     TypeSpanComponent
   ],
   templateUrl: './object.component.html',

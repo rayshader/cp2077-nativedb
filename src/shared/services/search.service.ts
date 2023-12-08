@@ -3,7 +3,7 @@ import {RedDumpService} from "./red-dump.service";
 import {BehaviorSubject, combineLatest, map, Observable, OperatorFunction, pipe, shareReplay} from "rxjs";
 import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
 import {RedFunctionAst} from "../red-ast/red-function.ast";
-import {TabItemNode} from "../../app/components/red-ast-tabs/red-ast-tabs.component";
+import {TabItemNode} from "../../app/components/ndb-tabs/ndb-tabs.component";
 import {RedClassAst} from "../red-ast/red-class.ast";
 
 @Injectable({

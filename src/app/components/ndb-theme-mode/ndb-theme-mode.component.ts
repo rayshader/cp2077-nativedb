@@ -5,16 +5,16 @@ import {Theme, ThemeService} from "../../../shared/services/theme.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 @Component({
-  selector: 'rd-theme-mode',
+  selector: 'ndb-theme-mode',
   standalone: true,
   imports: [
     MatIconModule,
     MatButtonModule
   ],
-  templateUrl: './rd-theme-mode.component.html',
-  styleUrl: './rd-theme-mode.component.scss'
+  templateUrl: './ndb-theme-mode.component.html',
+  styleUrl: './ndb-theme-mode.component.scss'
 })
-export class RdThemeModeComponent implements OnInit {
+export class NDBThemeModeComponent implements OnInit {
 
   private theme: Theme = 'light-theme';
 

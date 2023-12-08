@@ -21,7 +21,7 @@
   </div>
 
   <cdk-accordion multi="true">
-    <rd-accordion-item [expanded]="data.parents.length > 0"
+    <ndb-accordion-item [expanded]="data.parents.length > 0"
                        [disabled]="data.parents.length === 0">
       <div header class="header">
         <h3>Inherits</h3>
@@ -37,9 +37,9 @@
           <type-span [node]="parent"></type-span>
         </div>
       }
-    </rd-accordion-item>
+    </ndb-accordion-item>
 
-    <rd-accordion-item [expanded]="data.children.length > 0"
+    <ndb-accordion-item [expanded]="data.children.length > 0"
                        [disabled]="data.children.length === 0">
       <div header class="header">
         <h3>Inherited by</h3>
@@ -55,9 +55,9 @@
           <type-span [node]="child"></type-span>
         </div>
       }
-    </rd-accordion-item>
+    </ndb-accordion-item>
 
-    <rd-accordion-item [expanded]="data.properties.length > 0"
+    <ndb-accordion-item [expanded]="data.properties.length > 0"
                        [disabled]="data.properties.length === 0">
       <div header class="header">
         <h3>Properties</h3>
@@ -69,9 +69,9 @@
       @for (prop of data.properties; track prop.name) {
         <property-span [node]="prop" [badges]="data.badges"></property-span>
       }
-    </rd-accordion-item>
+    </ndb-accordion-item>
 
-    <rd-accordion-item [expanded]="data.functions.length > 0"
+    <ndb-accordion-item [expanded]="data.functions.length > 0"
                        [disabled]="data.functions.length === 0">
       <div header class="header">
         <h3>Functions</h3>
@@ -83,7 +83,7 @@
       @for (func of data.functions; track func.id) {
         <function-span [node]="func" [canCopy]="true" [memberOf]="data.object" [badges]="data.badges"></function-span>
       }
-    </rd-accordion-item>
+    </ndb-accordion-item>
   </cdk-accordion>
 } @else {
   <h1 class="stx-type">Loading...</h1>

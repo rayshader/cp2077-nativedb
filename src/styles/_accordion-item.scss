@@ -3,7 +3,7 @@
 @mixin accordion-item-theme($theme) {
   $fg: map.get($theme, foreground);
 
-  rd-accordion-item {
+  ndb-accordion-item {
     & .header {
       cursor: pointer;
       display: flex;
@@ -79,7 +79,7 @@
 @mixin accordion-item-color($theme) {
   $fg: map.get($theme, foreground);
 
-  rd-accordion-item {
+  ndb-accordion-item {
     & .disabled {
       & .header {
         color: map.get($fg, disabled);

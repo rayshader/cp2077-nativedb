@@ -2,11 +2,11 @@ import {Component, DestroyRef, ElementRef, OnInit, ViewChild} from '@angular/cor
 import {CommonModule} from '@angular/common';
 import {RouterLink, RouterOutlet} from '@angular/router';
 import {MatToolbarModule} from "@angular/material/toolbar";
-import {RedAstTabsComponent} from "./components/red-ast-tabs/red-ast-tabs.component";
+import {NDBTabsComponent} from "./components/ndb-tabs/ndb-tabs.component";
 import {IconsService} from "../shared/services/icons.service";
 import {HttpClientModule} from "@angular/common/http";
-import {RdSearchComponent} from "./components/rd-search/rd-search.component";
-import {RdThemeModeComponent} from "./components/rd-theme-mode/rd-theme-mode.component";
+import {NDBSearchComponent} from "./components/ndb-search/ndb-search.component";
+import {NDBThemeModeComponent} from "./components/ndb-theme-mode/ndb-theme-mode.component";
 import {MatChipsModule} from "@angular/material/chips";
 import {PageService} from "../shared/services/page.service";
 import {MatButtonModule} from "@angular/material/button";
@@ -30,9 +30,9 @@ interface AppData {
     HttpClientModule,
     MatToolbarModule,
     MatChipsModule,
-    RedAstTabsComponent,
-    RdSearchComponent,
-    RdThemeModeComponent,
+    NDBTabsComponent,
+    NDBSearchComponent,
+    NDBThemeModeComponent,
     MatButtonModule,
     MatIconModule
   ],
