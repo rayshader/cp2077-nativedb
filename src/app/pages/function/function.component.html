@@ -1,8 +1,8 @@
-@if (function$ | async; as function) {
-  <h1 class="stx-type">{{function.name}}</h1>
+@if (function$ | async; as func) {
+  <h1 class="stx-type">{{func.name}}</h1>
   <mat-icon class="badge-function" svgIcon="function" title="Global function"></mat-icon>
 
-  <function-span [node]="function" [canCopy]="true"></function-span>
+  <function-span [node]="func" [canCopy]="true"></function-span>
 } @else {
   <h1 class="stx-type">Loading...</h1>
   <div class="prototype">
