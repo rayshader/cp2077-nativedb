@@ -41,7 +41,8 @@ export class RedDumpService {
       shareReplay()
     );
     const classes$ = this.http.get(`/assets/reddump/classes.json`).pipe(
-      map((json: any) => json.map((item: any) => RedClassAst.fromJson(item)))
+      map((json: any) => json.map((item: any) => RedClassAst.fromJson(item))),
+      shareReplay()
     );
 
     this.classes$ = classes$.pipe(
