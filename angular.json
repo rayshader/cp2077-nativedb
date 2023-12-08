@@ -3,7 +3,7 @@
 	"version": 1,
 	"newProjectRoot": "projects",
 	"projects": {
-		"cp2077-red-doc": {
+		"cp2077-nativedb": {
 			"projectType": "application",
 			"schematics": {
 				"@schematics/angular:component": {
@@ -81,10 +81,10 @@
 					"builder": "@angular-devkit/build-angular:dev-server",
 					"configurations": {
 						"production": {
-							"buildTarget": "cp2077-red-doc:build:production"
+							"buildTarget": "cp2077-nativedb:build:production"
 						},
 						"development": {
-							"buildTarget": "cp2077-red-doc:build:development"
+							"buildTarget": "cp2077-nativedb:build:development"
 						}
 					},
 					"defaultConfiguration": "development"
@@ -92,7 +92,7 @@
 				"extract-i18n": {
 					"builder": "@angular-devkit/build-angular:extract-i18n",
 					"options": {
-						"buildTarget": "cp2077-red-doc:build"
+						"buildTarget": "cp2077-nativedb:build"
 					}
 				},
 				"test": {

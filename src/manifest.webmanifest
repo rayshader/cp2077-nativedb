@@ -1,6 +1,6 @@
 {
-  "name": "Red Database Documentation",
-  "short_name": "R2D",
+  "name": "NativeDB",
+  "short_name": "NativeDB",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",
