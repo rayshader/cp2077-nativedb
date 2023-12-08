@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "postbuild": "gulp -f gulp.mjs compress-gzip",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
@@ -30,6 +31,9 @@
     "@angular/cli": "^17.0.6",
     "@angular/compiler-cli": "^17.0.6",
     "@types/jasmine": "~5.1.0",
+    "gulp": "^4.0.2",
+    "gulp-brotli": "^3.0.0",
+    "gulp-gzip": "^1.4.2",
     "jasmine-core": "~5.1.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
