@@ -6,7 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "postbuild": "gulp -f gulp.mjs compress-gzip",
-    "prod": "npx http-server ./dist/cp2077-red-doc/browser/ --port 4400 --gzip --brotli -c-1",
+    "prod": "npx http-server ./dist/browser/ --port 4400 --gzip --brotli -c-1",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
