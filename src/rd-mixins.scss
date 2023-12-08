@@ -22,6 +22,7 @@
   @include mat.chips-theme($theme);
   @include mat.input-theme($theme);
   @include mat.form-field-theme($theme);
+  @include mat.dialog-theme($theme);
 }
 
 @mixin mat-component-colors($theme) {
@@ -36,6 +37,7 @@
   @include mat.chips-color($theme);
   @include mat.input-color($theme);
   @include mat.form-field-color($theme);
+  @include mat.dialog-color($theme);
 }
 
 @mixin rd-component-themes($theme) {
