@@ -21,6 +21,26 @@ export class FunctionsComponent {
 
   readonly functions$: Observable<RedFunctionAst[]>;
 
+  readonly skeletons: string[] = [
+    'AIInstantiateObject() → Void',
+    'AIInstantiatePrototype() → Void',
+    'AIReleaseObject() → Void',
+    'AT_AddATID(widget: wref<inkWidget>, atid: script_ref<String>) → Void',
+    'Abs(a: Int32) → Int32',
+    'AbsF(a: Float) → Float',
+    'AcosF(a: Float) → Float',
+    'ActivateTickForTransformAnimator(entityID: entEntityID, componentName: CName, activate: Bool) → Void',
+    'AddToInventory(itemID: String, quantity: Int32) → Void',
+    'AngleApproach(target: Float, cur: Float, step: Float) → Float',
+    'AngleDistance(target: Float, current: Float) → Float',
+    'AngleNormalize(a: Float) → Float',
+    'AngleNormalize180(a: Float) → Float',
+    'AreDebugContextsEnabled() → Bool',
+    'ArmouryEquipWeapon(itemID: gameItemID, QuickslotID: Int32) → Void',
+    'ArraySortFloats() → Void',
+    'ArraySortInts() → Void'
+  ];
+
   constructor(dumpService: RedDumpService) {
     this.functions$ = dumpService.functions$;
   }

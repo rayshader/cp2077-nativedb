@@ -1,0 +1,33 @@
+.skt-function {
+  display: flex;
+  align-items: start;
+  height: 48px;
+
+  background-color: unset;
+}
+
+.skt-button {
+  width: 20px;
+  height: 20px;
+
+  margin: 2px 14px 0 6px;
+
+  border-radius: 50%;
+  background-color: var(--mat-divider-color);
+}
+
+.skt-title {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 4px;
+  margin-left: 12px;
+
+  color: transparent;
+
+  border-radius: 4px;
+  background-color: var(--mat-divider-color);
+}
+
+.badges {
+  display: flex;
+}

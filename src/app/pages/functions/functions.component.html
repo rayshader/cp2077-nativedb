@@ -10,4 +10,17 @@
   <div class="prototype">
     <span class="skt-rect skt-function"></span>
   </div>
+
+  @for (func of skeletons; track func) {
+    <div class="skt-function">
+      <div class="badges">
+        <div class="skt-button"></div>
+        <span class="skt-circle skt-scope"></span>
+        <span class="skt-circle skt-scope"></span>
+        <span class="skt-circle skt-scope"></span>
+      </div>
+
+      <span class="stx skt-title">{{func}}</span>
+    </div>
+  }
 }
