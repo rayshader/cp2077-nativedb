@@ -4,6 +4,7 @@
 @use 'styles/mat/tab' as *;
 @use 'styles/mat/icon' as *;
 @use 'styles/mat/button' as *;
+@use 'styles/cdk/virtual-scroll' as *;
 
 // App components
 @use 'styles/page' as *;
@@ -49,6 +50,8 @@
   @include article-theme($theme);
   @include accordion-item-theme($theme);
   @include badge-theme($theme);
+
+  @include virtual-scroll-theme($theme);
 }
 
 @mixin rd-component-colors($theme) {

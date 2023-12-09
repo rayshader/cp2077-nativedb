@@ -1,0 +1,6 @@
+@mixin virtual-scroll-theme($theme) {
+  .cdk-virtual-scroll-viewport {
+    overflow-x: hidden!important;
+    height: inherit;
+  }
+}

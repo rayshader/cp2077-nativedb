@@ -6,14 +6,19 @@
           <mat-icon class="badge-{{tab.icon}}" [svgIcon]="tab.icon" [title]="tab.alt"></mat-icon>
           <span class="count">{{tab.nodes.length}}</span>
         </ng-template>
-        @for (node of tab.nodes; track node.id) {
-          <a class="stx-type"
-             [class.disabled]="node.isEmpty"
-             [title]="node.name"
-             routerLink="/{{tab.uri}}/{{node.id}}">
-            {{node.name}}
-          </a>
-        }
+
+        <ng-template matTabContent>
+          <cdk-virtual-scroll-viewport itemSize="35"
+                                       cdkVirtualForTemplateCacheSize="30">
+            <a *cdkVirtualFor="let node of tab.nodes"
+               class="stx-type"
+               [class.disabled]="node.isEmpty"
+               [title]="node.name"
+               routerLink="/{{tab.uri}}/{{node.id}}">
+              {{node.name}}
+            </a>
+          </cdk-virtual-scroll-viewport>
+        </ng-template>
       </mat-tab>
     }
   } @else {
