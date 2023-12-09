@@ -1,6 +1,7 @@
 @mixin rd-ide-syntax-themes($theme) {
   .stx {
-    font-family: Consolas, monospace; /*'JetBrains Mono', */
+    font-family: monospace; /*'JetBrains Mono', Consolas, */
+    font-size: 1rem;
   }
 
   .stx-doc {
