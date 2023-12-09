@@ -8,6 +8,14 @@
         </ng-template>
 
         <ng-template matTabContent>
+          @if (tab.icon === 'function') {
+            <a class="stx-type"
+               routerLink="/f">
+              Global functions
+            </a>
+
+            <mat-divider></mat-divider>
+          }
           <cdk-virtual-scroll-viewport itemSize="35"
                                        cdkVirtualForTemplateCacheSize="30">
             <a *cdkVirtualFor="let node of tab.nodes"

@@ -6,6 +6,7 @@ import {AsyncPipe, NgTemplateOutlet} from "@angular/common";
 import {RouterLink} from "@angular/router";
 import {SearchService} from "../../../shared/services/search.service";
 import {CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport} from "@angular/cdk/scrolling";
+import {MatDividerModule} from "@angular/material/divider";
 
 export interface TabItemNode {
   readonly id: number;
@@ -31,7 +32,8 @@ interface TabItem {
     RouterLink,
     CdkVirtualScrollViewport,
     CdkFixedSizeVirtualScroll,
-    CdkVirtualForOf
+    CdkVirtualForOf,
+    MatDividerModule
   ],
   templateUrl: './ndb-tabs.component.html',
   styleUrl: './ndb-tabs.component.scss'
