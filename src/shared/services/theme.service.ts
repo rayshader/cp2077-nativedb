@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {LazyLoaderService} from "./lazy-loader.service";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 export type Theme = 'light-theme' | 'dark-theme';
 
@@ -10,6 +11,7 @@ export type Theme = 'light-theme' | 'dark-theme';
 export class ThemeService {
   private theme: BehaviorSubject<Theme> = new BehaviorSubject<Theme>('light-theme');
   private currentTheme: Theme = 'light-theme';
+  private isLoaded: boolean = false;
 
   private readonly mediaQuery: MediaQueryList;
 
@@ -18,17 +20,11 @@ export class ThemeService {
     this.mediaQuery.addEventListener('change', this.onColorSchemeChanged.bind(this));
     this.currentTheme = this.getTheme(this.mediaQuery.matches);
     this.theme.next(this.currentTheme);
+    this.onThemeChanged.pipe(takeUntilDestroyed()).subscribe(this.load.bind(this));
   }
 
   public get onThemeChanged(): Observable<Theme> {
     return this.theme.asObservable();
-  }
-
-  /**
-   * Lazy load supplemental styles per theme at application startup.
-   */
-  public load(): void {
-    this.lazyLoaderService.loadAsset('dark-theme');
   }
 
   /**
@@ -45,6 +41,14 @@ export class ThemeService {
 
     this.currentTheme = theme;
     this.theme.next(theme);
+  }
+
+  private load(theme: Theme): void {
+    if (this.isLoaded || theme !== 'dark-theme') {
+      return;
+    }
+    this.lazyLoaderService.loadAsset('dark-theme');
+    this.isLoaded = true;
   }
 
   private getTheme(isDark: boolean): Theme {

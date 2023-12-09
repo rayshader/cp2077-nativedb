@@ -33,7 +33,6 @@ export class NDBThemeModeComponent implements OnInit {
 
   ngOnInit(): void {
     this.themeService.onThemeChanged.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onThemeChanged.bind(this));
-    this.themeService.load();
   }
 
   toggleTheme(): void {
