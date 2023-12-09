@@ -55,7 +55,8 @@ export class RedDumpService {
     );
     this.functions$ = this.http.get(`/assets/reddump/globals.json`).pipe(
       map((json: any) => json.map((item: any) => RedFunctionAst.fromJson(item))),
-      shareReplay()
+      shareReplay(),
+      this.ignoreDuplicate(),
     );
     this.badges$ = combineLatest([this.classes$, this.structs$]).pipe(
       mergeAll(),
@@ -150,6 +151,17 @@ export class RedDumpService {
     return query$.pipe(
       map((objects) => {
         return objects.filter((object) => object.parent === name);
+      })
+    );
+  }
+
+  private ignoreDuplicate(): OperatorFunction<RedFunctionAst[], RedFunctionAst[]> {
+    // TODO: use SettingsService to enable/disable this filtering.
+    return pipe(
+      map((funcs) => {
+        return funcs.filter((func) => {
+          return !func.name.startsWith('Operator') && !func.name.startsWith('Cast');
+        });
       })
     );
   }
