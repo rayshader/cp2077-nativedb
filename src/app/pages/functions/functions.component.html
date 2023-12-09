@@ -1,6 +1,13 @@
-<h1 class="stx-type">Global functions</h1>
-<mat-icon class="badge-function" svgIcon="function" title="Global function"></mat-icon>
+@if (functions$ | async; as functions) {
+  <h1 class="stx-type">Global functions</h1>
+  <mat-icon class="badge-function" svgIcon="function" title="Global function"></mat-icon>
 
-@for (func of functions$ | async; track func.id) {
-  <function-span [node]="func" [canCopy]="false"></function-span>
+  @for (func of functions$ | async; track func.id) {
+    <function-span [node]="func" [canCopy]="false"></function-span>
+  }
+} @else {
+  <h1 class="stx-type">Loading...</h1>
+  <div class="prototype">
+    <span class="skt-rect skt-function"></span>
+  </div>
 }
