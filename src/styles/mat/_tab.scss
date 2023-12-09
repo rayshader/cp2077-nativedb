@@ -28,6 +28,10 @@
         overflow-x: hidden;
       }
     }
+
+    & .mat-mdc-tab-body-wrapper {
+      height: inherit;
+    }
   }
 }
 

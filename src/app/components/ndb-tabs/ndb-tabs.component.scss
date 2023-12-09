@@ -6,6 +6,15 @@ mat-tab-group {
   margin-top: 4px;
 }
 
+.skt-tab {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  display: flex;
+  flex-flow: column;
+  align-items: flex-start;
+  height: inherit;
+}
+
 a {
   display: block;
   margin: 0;
@@ -13,8 +22,20 @@ a {
 
   text-decoration: none;
 
-  &:hover {
+  &:not(.skt):hover {
     cursor: pointer;
     background-color: rgba(255, 255, 255, 0.10);
+  }
+
+  &.skt {
+    user-select: none;
+    display: inline-block;
+    margin: 8px 12px;
+    padding: 0;
+
+    color: transparent;
+
+    border-radius: 4px;
+
   }
 }

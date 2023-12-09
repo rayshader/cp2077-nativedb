@@ -28,6 +28,8 @@
   }
 
   .skt-accordion-item {
+    user-select: none;
+
     & .skt-header {
       cursor: pointer;
       display: flex;

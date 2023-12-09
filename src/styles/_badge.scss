@@ -24,6 +24,15 @@
     border-radius: 50%;
   }
 
+  .skt-rect {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    margin: 2px;
+
+    border-radius: 2px;
+  }
+
   .skt-scope {
     background-color: map.get($badges, primary);
   }

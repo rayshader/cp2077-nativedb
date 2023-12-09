@@ -34,10 +34,17 @@ interface TabItem {
 })
 export class NDBTabsComponent {
 
-  readonly tabs: Observable<TabItem[]>;
+  readonly tabs$: Observable<TabItem[]>;
+  readonly skeletons: TabItem[] = [
+    {uri: 'c', icon: 'class', alt: 'Classes', nodes: []},
+    {uri: 's', icon: 'struct', alt: 'Structs', nodes: []},
+    {uri: 'f', icon: 'function', alt: 'Global functions', nodes: []},
+    {uri: 'e', icon: 'enum', alt: 'Enums', nodes: []},
+    {uri: 'b', icon: 'bitfield', alt: 'Bitfields', nodes: []},
+  ];
 
   constructor(searchService: SearchService) {
-    this.tabs = combineLatest([
+    this.tabs$ = combineLatest([
       searchService.enums$,
       searchService.bitfields$,
       searchService.classes$,

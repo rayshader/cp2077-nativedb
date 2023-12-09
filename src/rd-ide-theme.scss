@@ -49,6 +49,10 @@
     &.disabled {
       color: darken(mediumseagreen, 15%);
     }
+
+    &.skt {
+      background-color: rgba(61, 179, 114, 0.5);
+    }
   }
 
   .stx-primitive-type {

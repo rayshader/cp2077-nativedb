@@ -1,18 +1,55 @@
-<mat-tab-group>
-  @for (tab of tabs | async; track tab.icon) {
-    <mat-tab [disabled]="tab.nodes.length === 0">
-      <ng-template mat-tab-label class="mat-tab-label">
-        <mat-icon class="badge-{{tab.icon}}" [svgIcon]="tab.icon" [title]="tab.alt"></mat-icon>
-        <span class="count">{{tab.nodes.length}}</span>
-      </ng-template>
-      @for (node of tab.nodes; track node.id) {
-        <a class="stx-type"
-           [class.disabled]="node.isEmpty"
-           [title]="node.name"
-           routerLink="/{{tab.uri}}/{{node.id}}">
-          {{node.name}}
-        </a>
-      }
-    </mat-tab>
+<mat-tab-group animationDuration="0ms">
+  @if (tabs$ | async; as tabs) {
+    @for (tab of tabs; track tab.icon) {
+      <mat-tab [disabled]="tab.nodes.length === 0">
+        <ng-template mat-tab-label class="mat-tab-label">
+          <mat-icon class="badge-{{tab.icon}}" [svgIcon]="tab.icon" [title]="tab.alt"></mat-icon>
+          <span class="count">{{tab.nodes.length}}</span>
+        </ng-template>
+        @for (node of tab.nodes; track node.id) {
+          <a class="stx-type"
+             [class.disabled]="node.isEmpty"
+             [title]="node.name"
+             routerLink="/{{tab.uri}}/{{node.id}}">
+            {{node.name}}
+          </a>
+        }
+      </mat-tab>
+    }
+  } @else {
+    @for (skt of skeletons; track skt.uri; let i = $index) {
+      <mat-tab [disabled]="true">
+        <ng-template mat-tab-label class="mat-tab-label">
+          <span class="skt-{{skt.icon}}" [class.skt-circle]="i < 2" [class.skt-rect]="i >= 2"></span>
+          <span class="count">{{skt.nodes.length}}</span>
+        </ng-template>
+        <div class="skt-tab">
+          <a class="stx-type skt" title="Loading...">ABaseQuestObjectiveWrapper</a>
+          <a class="stx-type skt" title="Loading...">ABaseWrapper</a>
+          <a class="stx-type skt" title="Loading...">AGenericTooltipController</a>
+          <a class="stx-type skt" title="Loading...">AGenericTooltipControllerWithDebug</a>
+          <a class="stx-type skt" title="Loading...">AHintItemController</a>
+          <a class="stx-type skt" title="Loading...">AIAIEvent</a>
+          <a class="stx-type skt" title="Loading...">AIActionBossDataDef</a>
+          <a class="stx-type skt" title="Loading...">AIActionChecks</a>
+          <a class="stx-type skt" title="Loading...">AIActionDataDef</a>
+          <a class="stx-type skt" title="Loading...">AIActionHelper</a>
+          <a class="stx-type skt" title="Loading...">AIActionHelperTask</a>
+          <a class="stx-type skt" title="Loading...">AIActionLookat</a>
+          <a class="stx-type skt" title="Loading...">AIActionMovePolicy</a>
+          <a class="stx-type skt" title="Loading...">AIActionParams</a>
+          <a class="stx-type skt" title="Loading...">AIActionSpot</a>
+          <a class="stx-type skt" title="Loading...">AIActionTarget</a>
+          <a class="stx-type skt" title="Loading...">AIActionTransactionSystem</a>
+          <a class="stx-type skt" title="Loading...">AIAddedAsHostileThreat</a>
+          <a class="stx-type skt" title="Loading...">AIAdjustableStreamingRangeTarget</a>
+          <a class="stx-type skt" title="Loading...">AIAggressiveReactionPresetCondition</a>
+          <a class="stx-type skt" title="Loading...">AIAimAtTargetCommand</a>
+          <a class="stx-type skt" title="Loading...">AIAimAtTargetCommandParams</a>
+          <a class="stx-type skt" title="Loading...">AIAlertedPatrolDef</a>
+          <a class="stx-type skt" title="Loading...">AIAlertedStateDelegate</a>
+        </div>
+      </mat-tab>
+    }
   }
 </mat-tab-group>
