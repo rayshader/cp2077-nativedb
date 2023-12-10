@@ -44,7 +44,7 @@
     @for (arg of node.arguments; track arg.name; let i = $index) {
       <argument-span [node]="arg"></argument-span>
       @if (i + 1 < node.arguments.length) {
-        <span class="stx-text">,&nbsp;</span>
+        <span class="stx-comma">,&nbsp;</span>
       }
     }
     <span class="stx-parenthesis">)</span>
