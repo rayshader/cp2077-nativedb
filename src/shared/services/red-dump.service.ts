@@ -33,15 +33,15 @@ export class RedDumpService {
 
   constructor(private readonly http: HttpClient) {
     this.enums$ = this.http.get(`/assets/reddump/enums.json`).pipe(
-      map((json: any) => json.map((item: any) => RedEnumAst.fromJson(item))),
+      map((json: any) => json.map(RedEnumAst.fromJson)),
       shareReplay()
     );
     this.bitfields$ = this.http.get(`/assets/reddump/bitfields.json`).pipe(
-      map((json: any) => json.map((item: any) => RedBitfieldAst.fromJson(item))),
+      map((json: any) => json.map(RedBitfieldAst.fromJson)),
       shareReplay()
     );
     const classes$ = this.http.get(`/assets/reddump/classes.json`).pipe(
-      map((json: any) => json.map((item: any) => RedClassAst.fromJson(item))),
+      map((json: any) => json.map(RedClassAst.fromJson)),
       shareReplay()
     );
 
@@ -54,7 +54,7 @@ export class RedDumpService {
       shareReplay()
     );
     this.functions$ = this.http.get(`/assets/reddump/globals.json`).pipe(
-      map((json: any) => json.map((item: any) => RedFunctionAst.fromJson(item))),
+      map((json: any) => json.map(RedFunctionAst.fromJson)),
       shareReplay(),
       this.ignoreDuplicate(),
     );
