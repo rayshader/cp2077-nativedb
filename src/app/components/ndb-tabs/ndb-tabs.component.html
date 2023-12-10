@@ -9,7 +9,7 @@
 
         <ng-template matTabContent>
           @if (tab.icon === 'function') {
-            <a class="stx-type"
+            <a class="stx stx-type"
                routerLink="/f">
               Global functions
             </a>
@@ -19,7 +19,7 @@
           <cdk-virtual-scroll-viewport itemSize="35"
                                        cdkVirtualForTemplateCacheSize="30">
             <a *cdkVirtualFor="let node of tab.nodes"
-               class="stx-type"
+               class="stx stx-type"
                [class.disabled]="node.isEmpty"
                [title]="node.name"
                routerLink="/{{tab.uri}}/{{node.id}}">
@@ -36,7 +36,7 @@
           <span class="skt-{{skt.icon}}" [class.skt-circle]="i < 2" [class.skt-rect]="i >= 2"></span>
           <span class="count">{{skt.nodes.length}}</span>
         </ng-template>
-        <div class="skt-tab">
+        <div class="skt-tab stx">
           <a class="stx-type skt" title="Loading...">ABaseQuestObjectiveWrapper</a>
           <a class="stx-type skt" title="Loading...">ABaseWrapper</a>
           <a class="stx-type skt" title="Loading...">AGenericTooltipController</a>

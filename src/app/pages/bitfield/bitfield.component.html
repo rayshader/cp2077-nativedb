@@ -1,9 +1,9 @@
 @if (bitfield$ | async; as bitfield) {
-  <h1 class="stx-type">{{bitfield.name}}</h1>
+  <h1 class="stx stx-type">{{bitfield.name}}</h1>
   <mat-icon class="badge-bitfield" svgIcon="bitfield"></mat-icon>
 
   @for (member of bitfield.members; track member.key) {
-    <p class="field">
+    <p class="field stx">
       <button mat-icon-button
               class="badge"
               (click)="copyClipboard(bitfield, member.key)"><mat-icon>content_copy</mat-icon></button>
@@ -15,7 +15,7 @@
     </p>
   }
 } @else {
-  <h1>Loading...</h1>
+  <h1 class="stx">Loading...</h1>
   <div class="prototype">
     <span class="skt-rect skt-bitfield"></span>
   </div>

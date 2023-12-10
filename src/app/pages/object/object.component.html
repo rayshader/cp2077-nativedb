@@ -1,5 +1,5 @@
 @if (data$ | async; as data) {
-  <h1 class="stx-type">{{data.object.name}}</h1>
+  <h1 class="stx stx-type">{{data.object.name}}</h1>
   <div class="prototype">
     <mat-icon class="badge" [attr.data-scope]="data.scope" svgIcon="scope" [title]="data.scope"></mat-icon>
     @if (data.isAbstract) {
@@ -31,7 +31,7 @@
       </div>
 
       @for (parent of data.parents; track parent.id) {
-        <div class="inheritance">
+        <div class="inheritance stx">
           <div class="align" [style.width]="data.align"></div>
           <mat-icon>subdirectory_arrow_right</mat-icon>
           <type-span [node]="parent"></type-span>
@@ -49,7 +49,7 @@
       </div>
 
       @for (child of data.children; track child.id) {
-        <div class="inheritance">
+        <div class="inheritance stx">
           <div class="align" [style.width]="data.align"></div>
           <mat-icon>subdirectory_arrow_left</mat-icon>
           <type-span [node]="child"></type-span>
@@ -86,7 +86,7 @@
     </ndb-accordion-item>
   </cdk-accordion>
 } @else {
-  <h1 class="stx-type">Loading...</h1>
+  <h1 class="stx stx-type">Loading...</h1>
   <div class="prototype">
     <span class="skt-circle skt-scope"></span>
     @if (kind === classKind) {

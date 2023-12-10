@@ -1,9 +1,9 @@
 @if (enum$ | async; as enum) {
-  <h1 class="stx-type">{{enum.name}}</h1>
+  <h1 class="stx stx-type">{{enum.name}}</h1>
   <mat-icon class="badge-enum" svgIcon="enum"></mat-icon>
 
   @for (member of enum.members; track member.key) {
-    <p class="field">
+    <p class="field stx">
       <button mat-icon-button
               class="badge"
               (click)="copyClipboard(enum, member.key)"><mat-icon>content_copy</mat-icon></button>
@@ -13,7 +13,7 @@
     </p>
   }
 } @else {
-  <h1>Loading...</h1>
+  <h1 class="stx">Loading...</h1>
   <div class="prototype">
     <span class="skt-rect skt-enum"></span>
   </div>
