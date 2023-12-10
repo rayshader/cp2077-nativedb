@@ -3,7 +3,7 @@
  */
 @function vanilla-theme() {
   @return (
-    family: monospace, // TODO: get vanilla font
+    family: 'Fira Code',
     size: 1rem,
 
     light: (
