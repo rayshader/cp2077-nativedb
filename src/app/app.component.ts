@@ -16,6 +16,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {UpdateDialogComponent} from "./components/update-dialog/update-dialog.component";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {NDBIdeThemeComponent} from "./components/ndb-ide-theme/ndb-ide-theme.component";
+import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from "@angular/material/form-field";
 
 interface AppData {
   gameVersion: string;
@@ -37,6 +38,9 @@ interface AppData {
     NDBSearchComponent,
     NDBThemeModeComponent,
     NDBIdeThemeComponent
+  ],
+  providers: [
+    {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}}
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
