@@ -1,0 +1,16 @@
+<button mat-icon-button [matMenuTriggerFor]="menu">
+  <mat-icon>format_color_fill</mat-icon>
+</button>
+
+<mat-menu #menu="matMenu">
+  @for (theme of themes; track theme.value) {
+    <button mat-menu-item (click)="selectTheme(theme)">
+      @if (theme.isSelected) {
+        <mat-icon color="primary">radio_button_checked</mat-icon>
+      } @else {
+        <mat-icon>radio_button_unchecked</mat-icon>
+      }
+      {{theme.name}}
+    </button>
+  }
+</mat-menu>

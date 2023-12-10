@@ -25,6 +25,7 @@
   @include mat.input-theme($theme);
   @include mat.form-field-theme($theme);
   @include mat.dialog-theme($theme);
+  @include mat.menu-theme($theme);
 }
 
 @mixin mat-component-colors($theme) {
@@ -40,6 +41,7 @@
   @include mat.input-color($theme);
   @include mat.form-field-color($theme);
   @include mat.dialog-color($theme);
+  @include mat.menu-color($theme);
 }
 
 @mixin rd-component-themes($theme) {

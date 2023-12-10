@@ -15,6 +15,7 @@ import {SwUpdate, VersionEvent, VersionReadyEvent} from "@angular/service-worker
 import {MatDialog} from "@angular/material/dialog";
 import {UpdateDialogComponent} from "./components/update-dialog/update-dialog.component";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {NDBIdeThemeComponent} from "./components/ndb-ide-theme/ndb-ide-theme.component";
 
 interface AppData {
   gameVersion: string;
@@ -28,13 +29,14 @@ interface AppData {
     RouterOutlet,
     RouterLink,
     HttpClientModule,
-    MatToolbarModule,
+    MatIconModule,
     MatChipsModule,
+    MatButtonModule,
+    MatToolbarModule,
     NDBTabsComponent,
     NDBSearchComponent,
     NDBThemeModeComponent,
-    MatButtonModule,
-    MatIconModule
+    NDBIdeThemeComponent
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
