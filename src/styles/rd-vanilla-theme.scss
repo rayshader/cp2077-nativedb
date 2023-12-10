@@ -1,0 +1,13 @@
+@use './rd-ide-theme' as *;
+@use './ide/vanilla' as *;
+
+$ide-theme: vanilla-theme();
+
+.ide-vanilla-theme {
+  @include rd-ide-typography($ide-theme);
+  @include rd-ide-theme($ide-theme, light);
+
+  &.dark-theme {
+    @include rd-ide-theme($ide-theme, dark);
+  }
+}

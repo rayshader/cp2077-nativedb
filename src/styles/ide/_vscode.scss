@@ -1,0 +1,38 @@
+/*
+ * IDE theme palette of VS Code modern theme.
+ */
+@function vscode-theme() {
+  @return (
+    family: Consolas,
+    size: 1rem,
+
+    light: (
+      background: white,
+
+      documentation: #008000,
+      text: black,
+      comma: black,
+      parenthesis: #31A0AF,
+      language: #0000FF,
+      function: #795E26,
+      argument: #001080,
+      number: #098658,
+      type: #267F99,
+      primitive-type: #267F99
+    ),
+    dark: (
+      background: #1F1F1F,
+
+      documentation: #6A9955,
+      text: #C8C8C8,
+      comma: #C8C8C8,
+      parenthesis: #DA5583,
+      language: #569CD6,
+      function: #DCDCAA,
+      argument: #9CDCFE,
+      number: #B5CEA8,
+      type: #4EC9B0,
+      primitive-type: #4EC9B0
+    )
+  );
+}

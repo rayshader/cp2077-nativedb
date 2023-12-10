@@ -1,0 +1,68 @@
+@use 'sass:map';
+@use 'sass:color';
+
+@mixin rd-ide-typography($theme) {
+  .stx {
+    font-family: map.get($theme, 'family');
+
+    &:not(h1) {
+      font-size: map.get($theme, 'size');
+    }
+  }
+}
+
+@mixin rd-ide-theme($theme, $mode) {
+  $colors: map.get($theme, $mode);
+
+  .stx-doc {
+    color: map.get($colors, documentation);
+
+    & mat-icon {
+      color: map.get($colors, documentation);
+    }
+  }
+
+  .stx-text {
+    color: map.get($colors, text);
+  }
+
+  .stx-comma {
+    color: map.get($colors, comma);
+  }
+
+  .stx-parenthesis {
+    color: map.get($colors, parenthesis);
+  }
+
+  .stx-lang {
+    color: map.get($colors, language);
+  }
+
+  .stx-function {
+    color: map.get($colors, function);
+  }
+
+  .stx-arg {
+    color: map.get($colors, argument);
+  }
+
+  .stx-number {
+    color: map.get($colors, number);
+  }
+
+  .stx-type {
+    color: map.get($colors, type);
+
+    &.disabled {
+      color: darken(map.get($colors, type), 15%);
+    }
+
+    &.skt {
+      background-color: color.change(map.get($colors, type), $alpha: 0.5);
+    }
+  }
+
+  .stx-primitive-type {
+    color: map.get($colors, primitive-type);
+  }
+}

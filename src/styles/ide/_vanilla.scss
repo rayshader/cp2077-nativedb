@@ -1,0 +1,38 @@
+/*
+ * IDE theme palette of vanilla theme.
+ */
+@function vanilla-theme() {
+  @return (
+    family: monospace, // TODO: get vanilla font
+    size: 1rem,
+
+    light: (
+      background: #F3F4F6,
+
+      documentation: #008000,
+      text: black,
+      comma: black,
+      parenthesis: black,
+      language: #D73A49,
+      function: #6F42C1,
+      argument: black,
+      number: #005CC5,
+      type: #E36209,
+      primitive-type: #D73A49
+    ),
+    dark: (
+      background: #1F1F1F,
+
+      documentation: #008000,
+      text: #C8C8C8,
+      comma: #C8C8C8,
+      parenthesis: #C8C8C8,
+      language: #D73A49,
+      function: #9f6bff,
+      argument: #C8C8C8,
+      number: #005CC5,
+      type: #E36209,
+      primitive-type: #D73A49
+    )
+  );
+}

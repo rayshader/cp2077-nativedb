@@ -1,0 +1,38 @@
+/*
+ * IDE theme palette of IntelliJ dracula theme.
+ */
+@function intellij-theme() {
+  @return (
+    family: 'JetBrains Mono',
+    size: 1rem,
+
+    light: (
+      background: white,
+
+      documentation: #8C8C8C,
+      text: black,
+      comma: black,
+      parenthesis: black,
+      language: #0033B3,
+      function: #00627A,
+      argument: black,
+      number: #1750EB,
+      type: black,
+      primitive-type: #0033B3
+    ),
+    dark: (
+      background: #2B2B2B,
+
+      documentation: #629755,
+      text: #A9B7C6,
+      comma: #CC7832,
+      parenthesis: #A9B7C6,
+      language: #CC7832,
+      function: #FFC66D,
+      argument: #A9B7C6,
+      number: #6897BB,
+      type: #A9B7C6,
+      primitive-type: #CC7832
+    )
+  );
+}

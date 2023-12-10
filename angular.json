@@ -44,8 +44,18 @@
                 "inject": false
               },
               {
-                "input": "src/rd-ide-theme.scss",
-                "bundleName": "ide-theme",
+                "input": "src/styles/rd-vscode-theme.scss",
+                "bundleName": "ide-vscode-theme",
+                "inject": false
+              },
+              {
+                "input": "src/styles/rd-intellij-theme.scss",
+                "bundleName": "ide-intellij-theme",
+                "inject": false
+              },
+              {
+                "input": "src/styles/rd-vanilla-theme.scss",
+                "bundleName": "ide-vanilla-theme",
                 "inject": false
               }
             ],

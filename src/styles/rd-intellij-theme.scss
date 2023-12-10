@@ -1,0 +1,13 @@
+@use './rd-ide-theme' as *;
+@use './ide/intellij' as *;
+
+$ide-theme: intellij-theme();
+
+.ide-intellij-theme {
+  @include rd-ide-typography($ide-theme);
+  @include rd-ide-theme($ide-theme, light);
+
+  &.dark-theme {
+    @include rd-ide-theme($ide-theme, dark);
+  }
+}
