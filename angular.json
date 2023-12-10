@@ -35,11 +35,11 @@
                 "bundleName": "styles"
               },
               {
-                "input": "src/rd-light-theme.scss",
+                "input": "src/styles/rd-light-theme.scss",
                 "bundleName": "light-theme"
               },
               {
-                "input": "src/rd-dark-theme.scss",
+                "input": "src/styles/rd-dark-theme.scss",
                 "bundleName": "dark-theme",
                 "inject": false
               },

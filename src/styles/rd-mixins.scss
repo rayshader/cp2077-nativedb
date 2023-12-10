@@ -1,16 +1,16 @@
 @use '@angular/material' as mat;
 
 // Material components
-@use 'styles/mat/tab' as *;
-@use 'styles/mat/icon' as *;
-@use 'styles/mat/button' as *;
-@use 'styles/cdk/virtual-scroll' as *;
+@use './mat/tab' as *;
+@use './mat/icon' as *;
+@use './mat/button' as *;
+@use './cdk/virtual-scroll' as *;
 
 // App components
-@use 'styles/page' as *;
-@use 'styles/article' as *;
-@use 'styles/accordion-item' as *;
-@use 'styles/badge' as *;
+@use './app/page' as *;
+@use './app/article' as *;
+@use './app/accordion-item' as *;
+@use './app/badge' as *;
 
 @mixin mat-component-themes($theme) {
   //@include mat.all-component-themes($theme);

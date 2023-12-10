@@ -1,8 +1,7 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
-@use 'rd-mixins' as rd;
-@use 'rd-theme' as *;
-@use 'rd-ide-theme' as *;
+@use './rd-mixins' as rd;
+@use './rd-theme' as *;
 
 @include mat.core();
 
@@ -23,5 +22,3 @@ $rd-light-theme: mat.define-light-theme((
 // Light theme
 @include rd.mat-component-themes($rd-light-theme);
 @include rd.rd-component-themes($rd-light-theme);
-
-@include rd-ide-syntax-themes($rd-light-theme);
