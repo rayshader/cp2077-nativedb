@@ -4,6 +4,7 @@
 @use './mat/tab' as *;
 @use './mat/icon' as *;
 @use './mat/button' as *;
+@use './mat/slide-toggle' as *;
 @use './cdk/virtual-scroll' as *;
 
 // App components
@@ -26,6 +27,8 @@
   @include mat.form-field-theme($theme);
   @include mat.dialog-theme($theme);
   @include mat.menu-theme($theme);
+  @include mat.select-theme($theme);
+  @include mat.slide-toggle-theme($theme);
 }
 
 @mixin mat-component-colors($theme) {
@@ -42,6 +45,8 @@
   @include mat.form-field-color($theme);
   @include mat.dialog-color($theme);
   @include mat.menu-color($theme);
+  @include mat.select-color($theme);
+  @include mat.slide-toggle-color($theme);
 }
 
 @mixin rd-component-themes($theme) {
@@ -52,6 +57,7 @@
   @include article-theme($theme);
   @include accordion-item-theme($theme);
   @include badge-theme($theme);
+  @include slide-toggle-theme($theme);
 
   @include virtual-scroll-theme($theme);
 }
@@ -62,4 +68,5 @@
   @include article-color($theme);
   @include accordion-item-color($theme);
   @include badge-color($theme);
+  @include slide-toggle-color($theme);
 }

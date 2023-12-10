@@ -1,0 +1,11 @@
+@mixin slide-toggle-theme($theme) {
+  mat-slide-toggle {
+    & label {
+      margin-left: 12px!important;
+    }
+  }
+}
+
+@mixin slide-toggle-color($theme) {
+
+}

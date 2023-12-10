@@ -1,1 +1,64 @@
 <h1>Settings</h1>
+
+<div class="setting">
+  <p>
+    Show / hide global functions related to operators and casts.
+  </p>
+
+  <mat-slide-toggle color="primary" [formControl]="ignoreDuplicate">
+    {{ignoreDuplicate.value ? "Hide" : "Show"}}
+  </mat-slide-toggle>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="setting">
+  <p>
+    Select automatic scrolling behavior when navigating to a new page.
+  </p>
+
+  <mat-form-field subscriptSizing="dynamic">
+    <mat-label>Scroll behavior</mat-label>
+    <mat-select [formControl]="scrollBehavior">
+      <mat-option value="disabled">Disabled</mat-option>
+      <mat-option value="smooth">Smooth</mat-option>
+      <mat-option value="instant">Instant</mat-option>
+      <mat-option value="auto">Browser</mat-option>
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="setting">
+  <p>
+    Select the language to use when grabbing code. It will copy and format the code according to the syntax you pick.
+  </p>
+
+  <mat-form-field subscriptSizing="dynamic">
+    <mat-label>Clipboard syntax</mat-label>
+    <mat-select [formControl]="clipboardSyntax">
+      @for (stx of syntax; track stx.value) {
+        <mat-option [value]="stx.value" [disabled]="stx.disabled">{{stx.name}}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="setting">
+  <p>
+    Select the language to use when listing functions and properties. It will format the code according to the syntax
+    you pick.
+  </p>
+
+  <mat-form-field subscriptSizing="dynamic">
+    <mat-label>Code syntax</mat-label>
+    <mat-select [formControl]="codeSyntax">
+      @for (stx of syntax; track stx.value) {
+        <mat-option [value]="stx.value" [disabled]="stx.disabled">{{stx.name}}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+</div>

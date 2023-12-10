@@ -1,0 +1,22 @@
+.setting {
+  display: flex;
+  align-items: center;
+
+  & p {
+    display: inline-flex;
+    flex: 3;
+
+    text-align: justify;
+  }
+
+  & mat-form-field {
+    display: flex;
+    flex: 1;
+
+    margin-left: 48px;
+  }
+}
+
+mat-divider {
+  margin: 24px 0;
+}

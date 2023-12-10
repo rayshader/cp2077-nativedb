@@ -8,7 +8,7 @@ import {HttpClientModule} from "@angular/common/http";
 import {NDBSearchComponent} from "./components/ndb-search/ndb-search.component";
 import {NDBThemeModeComponent} from "./components/ndb-theme-mode/ndb-theme-mode.component";
 import {MatChipsModule} from "@angular/material/chips";
-import {PageService} from "../shared/services/page.service";
+import {PageScrollBehavior, PageService} from "../shared/services/page.service";
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {SwUpdate, VersionEvent, VersionReadyEvent} from "@angular/service-worker";
@@ -64,8 +64,8 @@ export class AppComponent implements OnInit {
     }
   }
 
-  private scroll(): void {
-    this.page?.nativeElement.scrollTo({top: 0, behavior: 'smooth'});
+  private scroll(behavior: PageScrollBehavior): void {
+    this.page?.nativeElement.scrollTo({top: 0, behavior: behavior});
   }
 
   private onUpdate(event: VersionEvent): void {

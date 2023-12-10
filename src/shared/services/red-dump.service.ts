@@ -2,6 +2,7 @@ import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {
   combineLatest,
+  combineLatestWith,
   EMPTY,
   filter,
   map,
@@ -18,6 +19,7 @@ import {RedBitfieldAst} from "../red-ast/red-bitfield.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
 import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedPropertyAst} from "../red-ast/red-property.ast";
+import {SettingsService} from "./settings.service";
 
 @Injectable({
   providedIn: 'root'
@@ -31,7 +33,8 @@ export class RedDumpService {
 
   readonly badges$: Observable<number>;
 
-  constructor(private readonly http: HttpClient) {
+  constructor(private readonly http: HttpClient,
+              private readonly settingsService: SettingsService) {
     this.enums$ = this.http.get(`/assets/reddump/enums.json`).pipe(
       map((json: any) => json.map(RedEnumAst.fromJson)),
       shareReplay()
@@ -156,10 +159,13 @@ export class RedDumpService {
   }
 
   private ignoreDuplicate(): OperatorFunction<RedFunctionAst[], RedFunctionAst[]> {
-    // TODO: use SettingsService to enable/disable this filtering.
     return pipe(
-      map((funcs) => {
-        return funcs.filter((func) => {
+      combineLatestWith(this.settingsService.ignoreDuplicate$),
+      map(([functions, ignoreDuplicate]) => {
+        if (!ignoreDuplicate) {
+          return functions;
+        }
+        return functions.filter((func) => {
           return !func.name.startsWith('Operator') && !func.name.startsWith('Cast');
         });
       })
