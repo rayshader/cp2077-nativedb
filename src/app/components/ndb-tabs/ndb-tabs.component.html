@@ -1,4 +1,4 @@
-<mat-tab-group animationDuration="0ms">
+<mat-tab-group [style.width]="width" animationDuration="0ms">
   @if (tabs$ | async; as tabs) {
     @for (tab of tabs; track tab.icon) {
       <mat-tab [disabled]="tab.nodes.length === 0">
@@ -75,3 +75,10 @@
     }
   }
 </mat-tab-group>
+
+<div class="slider"
+     title="Double-click to restore default position"
+     (dblclick)="onRestoreDefault()"
+     (mousedown)="onStartResizing()">
+  <mat-divider vertical></mat-divider>
+</div>

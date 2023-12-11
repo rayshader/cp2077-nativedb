@@ -1,9 +1,22 @@
+:host {
+  display: flex;
+}
+
 mat-tab-group {
-  width: 320px;
+  min-width: 320px;
+  max-width: 50vw;
 }
 
 .count {
   margin-top: 4px;
+}
+
+.slider {
+  cursor: col-resize;
+  display: flex;
+
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 .skt-tab {
