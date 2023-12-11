@@ -5,6 +5,7 @@ import {PageScrollBehavior} from "./page.service";
 export interface Settings {
   readonly ignoreDuplicate: boolean;
   readonly scrollBehavior: PageScrollBehavior;
+  readonly highlightEmptyObject: boolean;
   readonly clipboardSyntax: CodeSyntax;
   readonly codeSyntax: CodeSyntax;
 }
@@ -24,6 +25,7 @@ export class SettingsService {
 
   private readonly ignoreDuplicateSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly scrollBehaviorSubject: BehaviorSubject<PageScrollBehavior> = new BehaviorSubject<PageScrollBehavior>('smooth');
+  private readonly highlightEmptyObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly clipboardSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
   private readonly codeSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
 
@@ -38,6 +40,11 @@ export class SettingsService {
   readonly scrollBehavior$: Observable<PageScrollBehavior> = this.scrollBehaviorSubject.asObservable();
 
   /**
+   * Whether empty class/struct should be highlighted?
+   */
+  readonly highlightEmptyObject$: Observable<boolean> = this.highlightEmptyObjectSubject.asObservable();
+
+  /**
    * Which code syntax must be used when copying code to the clipboard?
    */
   readonly clipboard$: Observable<CodeSyntax> = this.clipboardSubject.asObservable();
@@ -50,11 +57,13 @@ export class SettingsService {
   constructor() {
     const ignoreDuplicate: boolean = (localStorage.getItem('ignore-duplicate') ?? 'true') === 'true';
     const scrollBehavior: PageScrollBehavior = (localStorage.getItem('scroll-behavior') ?? 'smooth') as PageScrollBehavior;
+    const highlightEmptyObject: boolean = (localStorage.getItem('highlight-empty-object') ?? 'true') === 'true';
     const clipboard: string = localStorage.getItem('clipboard-syntax') ?? CodeSyntax.redscript.toString();
     const code: string = localStorage.getItem('code-syntax') ?? CodeSyntax.redscript.toString();
 
     this.ignoreDuplicateSubject.next(ignoreDuplicate);
     this.scrollBehaviorSubject.next(scrollBehavior);
+    this.highlightEmptyObjectSubject.next(highlightEmptyObject);
     this.clipboardSubject.next(+clipboard);
     this.codeSubject.next(+code);
   }
@@ -63,14 +72,22 @@ export class SettingsService {
     return combineLatest([
       this.ignoreDuplicate$,
       this.scrollBehavior$,
+      this.highlightEmptyObject$,
       this.clipboard$,
       this.code$
     ])
       .pipe(
-        map(([ignoreDuplicate, scrollBehavior, clipboard, code]) => {
+        map(([
+               ignoreDuplicate,
+               scrollBehavior,
+               highlightEmptyObject,
+               clipboard,
+               code
+             ]) => {
           return {
             ignoreDuplicate: ignoreDuplicate,
             scrollBehavior: scrollBehavior,
+            highlightEmptyObject: highlightEmptyObject,
             clipboardSyntax: clipboard,
             codeSyntax: code
           };
@@ -86,6 +103,11 @@ export class SettingsService {
   updateScrollBehavior(behavior: PageScrollBehavior): void {
     localStorage.setItem('scroll-behavior', behavior);
     this.scrollBehaviorSubject.next(behavior);
+  }
+
+  updateHighlightEmptyObject(state: boolean): void {
+    localStorage.setItem('highlight-empty-object', `${state}`);
+    this.highlightEmptyObjectSubject.next(state);
   }
 
   updateClipboard(syntax: CodeSyntax): void {

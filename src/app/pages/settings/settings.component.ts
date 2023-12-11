@@ -38,6 +38,7 @@ export class SettingsComponent implements OnInit {
 
   readonly ignoreDuplicate: FormControl<boolean | null> = new FormControl(true);
   readonly scrollBehavior: FormControl<ScrollBehavior | 'disabled' | null> = new FormControl('smooth');
+  readonly highlightEmptyObject: FormControl<boolean | null> = new FormControl(true);
   readonly clipboardSyntax: FormControl<CodeSyntax | null> = new FormControl(CodeSyntax.redscript);
   readonly codeSyntax: FormControl<CodeSyntax | null> = new FormControl(CodeSyntax.redscript);
 
@@ -50,6 +51,7 @@ export class SettingsComponent implements OnInit {
 
     this.ignoreDuplicate.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onIgnoreDuplicateChanged.bind(this));
     this.scrollBehavior.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onScrollBehaviorChanged.bind(this));
+    this.highlightEmptyObject.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onHighlightEmptyObjectChanged.bind(this));
     this.clipboardSyntax.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onClipboardSyntaxSelected.bind(this));
     this.codeSyntax.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onCodeSyntaxSelected.bind(this));
   }
@@ -66,6 +68,13 @@ export class SettingsComponent implements OnInit {
       return;
     }
     this.settingsService.updateScrollBehavior(behavior);
+  }
+
+  private onHighlightEmptyObjectChanged(state: boolean | null): void {
+    if (state === null) {
+      return;
+    }
+    this.settingsService.updateHighlightEmptyObject(state);
   }
 
   private onClipboardSyntaxSelected(syntax: CodeSyntax | null): void {
@@ -85,6 +94,7 @@ export class SettingsComponent implements OnInit {
   private onSettingsLoaded(settings: Settings): void {
     this.ignoreDuplicate.setValue(settings.ignoreDuplicate, {emitEvent: false});
     this.scrollBehavior.setValue(settings.scrollBehavior, {emitEvent: false});
+    this.highlightEmptyObject.setValue(settings.highlightEmptyObject, {emitEvent: false});
     this.clipboardSyntax.setValue(settings.clipboardSyntax, {emitEvent: false});
     this.codeSyntax.setValue(settings.codeSyntax, {emitEvent: false});
   }

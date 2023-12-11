@@ -32,6 +32,18 @@
 
 <div class="setting">
   <p>
+    Highlight empty classes / structs when they have no properties nor functions.
+  </p>
+
+  <mat-slide-toggle color="primary" [formControl]="highlightEmptyObject">
+    {{highlightEmptyObject.value ? "On" : "Off"}}
+  </mat-slide-toggle>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="setting">
+  <p>
     Select the language to use when grabbing code. It will copy and format the code according to the syntax you pick.
   </p>
 
