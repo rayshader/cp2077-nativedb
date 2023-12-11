@@ -32,7 +32,7 @@
   <p>
     You can see items, in the left panel, with a <span class="stx-type disabled">darker color</span> to tell you
     "there is nothing to see". Whether its a class or a struct, it means there is no properties nor functions. However,
-    it might still inherit from parents and/or be inherited by children.
+    it might still inherit from parents and/or be inherited by children. You can change this behavior in the settings.
   </p>
 </article>
 
@@ -71,6 +71,12 @@
   <p class="scope">
     <mat-icon class="badge" data-scope="private" svgIcon="scope" title="private"></mat-icon>
     private
+  </p>
+
+  <p>
+    Properties and functions are sorted by visibility first (public > protected > private) and then alphabetically.
+    You can customize your navigation by taking a look at the settings.
+    <!-- TODO: enable/disable sorting to show in the default order of the RTTI dump. -->
   </p>
 </article>
 
@@ -137,7 +143,8 @@
   <p>
     You can manually switch the appearance of this application between light and dark mode. By default, it will follow
     your system preferences. Finally, you can customize the appearance of the code using pre-defined themes. You can
-    find them in the settings, including IDE-like themes.
+    find them in the settings, including IDE-like themes. When selecting a new theme, it may take some time to show,
+    because it is loaded on-demand.
   </p>
 </article>
 
