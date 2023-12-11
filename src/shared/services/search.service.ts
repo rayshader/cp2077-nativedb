@@ -43,14 +43,14 @@ export class SearchService {
 
   private transformData<T extends RedNodeAst>(data$: Observable<T[]>): Observable<TabItemNode[]> {
     return combineLatest([
-      data$.pipe(this.getTabData(this.settingsService)),
+      data$.pipe(this.getTabData()),
       this.query$
     ]).pipe(this.filterByQuery());
   }
 
-  private getTabData<T extends RedNodeAst>(settingsService: SettingsService): OperatorFunction<T[], TabItemNode[]> {
+  private getTabData<T extends RedNodeAst>(): OperatorFunction<T[], TabItemNode[]> {
     return pipe(
-      combineLatestWith(settingsService.highlightEmptyObject$),
+      combineLatestWith(this.settingsService.highlightEmptyObject$),
       map(([nodes, highlightEmptyObject]) => nodes.map((node) => {
         let isEmpty: boolean = false;
 
@@ -61,6 +61,7 @@ export class SearchService {
         }
         return <TabItemNode>{
           id: node.id,
+          uri: `/${RedNodeKind[node.kind][0]}/${node.id}`,
           name: node.name,
           isEmpty: highlightEmptyObject && isEmpty,
         };

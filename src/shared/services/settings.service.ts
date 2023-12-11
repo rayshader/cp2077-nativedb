@@ -7,6 +7,7 @@ export interface Settings {
   readonly scrollBehavior: PageScrollBehavior;
   readonly highlightEmptyObject: boolean;
   readonly showEmptyAccordion: boolean;
+  readonly mergeObject: boolean;
   readonly clipboardSyntax: CodeSyntax;
   readonly codeSyntax: CodeSyntax;
 }
@@ -28,6 +29,7 @@ export class SettingsService {
   private readonly scrollBehaviorSubject: BehaviorSubject<PageScrollBehavior> = new BehaviorSubject<PageScrollBehavior>('smooth');
   private readonly highlightEmptyObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly showEmptyAccordionSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private readonly mergeObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private readonly clipboardSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
   private readonly codeSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
 
@@ -52,6 +54,11 @@ export class SettingsService {
   readonly showEmptyAccordion$: Observable<boolean> = this.showEmptyAccordionSubject.asObservable();
 
   /**
+   * Whether classes and structs should be listed in one tab?
+   */
+  readonly mergeObject$: Observable<boolean> = this.mergeObjectSubject.asObservable();
+
+  /**
    * Which code syntax must be used when copying code to the clipboard?
    */
   readonly clipboard$: Observable<CodeSyntax> = this.clipboardSubject.asObservable();
@@ -66,6 +73,7 @@ export class SettingsService {
     const scrollBehavior: PageScrollBehavior = (localStorage.getItem('scroll-behavior') ?? 'smooth') as PageScrollBehavior;
     const highlightEmptyObject: boolean = (localStorage.getItem('highlight-empty-object') ?? 'true') === 'true';
     const showEmptyAccordion: boolean = (localStorage.getItem('show-empty-accordion') ?? 'false') === 'true';
+    const mergeObject: boolean = (localStorage.getItem('merge-object') ?? 'false') === 'true';
     const clipboard: string = localStorage.getItem('clipboard-syntax') ?? CodeSyntax.redscript.toString();
     const code: string = localStorage.getItem('code-syntax') ?? CodeSyntax.redscript.toString();
 
@@ -73,6 +81,7 @@ export class SettingsService {
     this.scrollBehaviorSubject.next(scrollBehavior);
     this.highlightEmptyObjectSubject.next(highlightEmptyObject);
     this.showEmptyAccordionSubject.next(showEmptyAccordion);
+    this.mergeObjectSubject.next(mergeObject);
     this.clipboardSubject.next(+clipboard);
     this.codeSubject.next(+code);
   }
@@ -83,6 +92,7 @@ export class SettingsService {
       this.scrollBehavior$,
       this.highlightEmptyObject$,
       this.showEmptyAccordion$,
+      this.mergeObject$,
       this.clipboard$,
       this.code$
     ])
@@ -92,6 +102,7 @@ export class SettingsService {
                scrollBehavior,
                highlightEmptyObject,
                showEmptyAccordion,
+               mergeObject,
                clipboard,
                code
              ]) => {
@@ -100,6 +111,7 @@ export class SettingsService {
             scrollBehavior: scrollBehavior,
             highlightEmptyObject: highlightEmptyObject,
             showEmptyAccordion: showEmptyAccordion,
+            mergeObject: mergeObject,
             clipboardSyntax: clipboard,
             codeSyntax: code
           };
@@ -125,6 +137,11 @@ export class SettingsService {
   updateShowEmptyAccordion(state: boolean): void {
     localStorage.setItem('show-empty-accordion', `${state}`);
     this.showEmptyAccordionSubject.next(state);
+  }
+
+  updateMergeObject(state: boolean): void {
+    localStorage.setItem('merge-object', `${state}`);
+    this.mergeObjectSubject.next(state);
   }
 
   updateClipboard(syntax: CodeSyntax): void {

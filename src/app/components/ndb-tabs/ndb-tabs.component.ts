@@ -7,15 +7,16 @@ import {RouterLink} from "@angular/router";
 import {SearchService} from "../../../shared/services/search.service";
 import {CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport} from "@angular/cdk/scrolling";
 import {MatDividerModule} from "@angular/material/divider";
+import {SettingsService} from "../../../shared/services/settings.service";
 
 export interface TabItemNode {
   readonly id: number;
+  readonly uri: string;
   readonly name: string;
   readonly isEmpty: boolean;
 }
 
 interface TabItem {
-  readonly uri: string;
   readonly icon: string;
   readonly alt: string;
   readonly nodes: TabItemNode[];
@@ -42,28 +43,51 @@ export class NDBTabsComponent {
 
   readonly tabs$: Observable<TabItem[]>;
   readonly skeletons: TabItem[] = [
-    {uri: 'c', icon: 'class', alt: 'Classes', nodes: []},
-    {uri: 's', icon: 'struct', alt: 'Structs', nodes: []},
-    {uri: 'f', icon: 'function', alt: 'Global functions', nodes: []},
-    {uri: 'e', icon: 'enum', alt: 'Enums', nodes: []},
-    {uri: 'b', icon: 'bitfield', alt: 'Bitfields', nodes: []},
+    {icon: 'class', alt: 'Classes', nodes: []},
+    {icon: 'struct', alt: 'Structs', nodes: []},
+    {icon: 'function', alt: 'Global functions', nodes: []},
+    {icon: 'enum', alt: 'Enums', nodes: []},
+    {icon: 'bitfield', alt: 'Bitfields', nodes: []},
   ];
 
-  constructor(searchService: SearchService) {
+  constructor(searchService: SearchService,
+              settingsService: SettingsService) {
     this.tabs$ = combineLatest([
       searchService.enums$,
       searchService.bitfields$,
       searchService.classes$,
       searchService.structs$,
       searchService.functions$,
+      settingsService.mergeObject$,
     ]).pipe(
-      map(([enums, bitfields, classes, structs, functions]) => {
+      map(([
+             enums,
+             bitfields,
+             classes,
+             structs,
+             functions,
+             merge
+           ]) => {
+        const objects: TabItem[] = [];
+
+        if (!merge) {
+          objects.push(
+            {icon: 'class', alt: 'Classes', nodes: classes},
+            {icon: 'struct', alt: 'Structs', nodes: structs}
+          );
+        } else {
+          const nodes: TabItemNode[] = [...classes, ...structs];
+
+          nodes.sort((a, b) => a.name.localeCompare(b.name));
+          objects.push(
+            {icon: '', alt: 'Classes & structs', nodes: nodes},
+          );
+        }
         return [
-          {uri: 'c', icon: 'class', alt: 'Classes', nodes: classes},
-          {uri: 's', icon: 'struct', alt: 'Structs', nodes: structs},
-          {uri: 'f', icon: 'function', alt: 'Global functions', nodes: functions},
-          {uri: 'e', icon: 'enum', alt: 'Enums', nodes: enums},
-          {uri: 'b', icon: 'bitfield', alt: 'Bitfields', nodes: bitfields},
+          ...objects,
+          {icon: 'function', alt: 'Global functions', nodes: functions},
+          {icon: 'enum', alt: 'Enums', nodes: enums},
+          {icon: 'bitfield', alt: 'Bitfields', nodes: bitfields},
         ];
       })
     );

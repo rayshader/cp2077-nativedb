@@ -56,6 +56,18 @@
 
 <div class="setting">
   <p>
+    Merge classes and structs in one tab or split them in two tabs.
+  </p>
+
+  <mat-slide-toggle color="primary" [formControl]="mergeObject">
+    {{mergeObject.value ? "Merge" : "Split"}}
+  </mat-slide-toggle>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="setting">
+  <p>
     Select the language to use when grabbing code. It will copy and format the code according to the syntax you pick.
   </p>
 

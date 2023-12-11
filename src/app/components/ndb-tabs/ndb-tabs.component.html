@@ -3,7 +3,14 @@
     @for (tab of tabs; track tab.icon) {
       <mat-tab [disabled]="tab.nodes.length === 0">
         <ng-template mat-tab-label class="mat-tab-label">
-          <mat-icon class="badge-{{tab.icon}}" [svgIcon]="tab.icon" [title]="tab.alt"></mat-icon>
+          @if (tab.icon.length > 0) {
+            <mat-icon class="badge-{{tab.icon}}" [svgIcon]="tab.icon" [title]="tab.alt"></mat-icon>
+          } @else {
+            <div>
+              <mat-icon class="badge-class" svgIcon="class" title="Classes"></mat-icon>
+              <mat-icon class="badge-struct" svgIcon="struct" title="Structs"></mat-icon>
+            </div>
+          }
           <span class="count">{{tab.nodes.length}}</span>
         </ng-template>
 
@@ -22,7 +29,7 @@
                class="stx stx-type"
                [class.disabled]="node.isEmpty"
                [title]="node.name"
-               routerLink="/{{tab.uri}}/{{node.id}}">
+               [routerLink]="node.uri">
               {{node.name}}
             </a>
           </cdk-virtual-scroll-viewport>
@@ -30,7 +37,7 @@
       </mat-tab>
     }
   } @else {
-    @for (skt of skeletons; track skt.uri; let i = $index) {
+    @for (skt of skeletons; track skt.icon; let i = $index) {
       <mat-tab [disabled]="true">
         <ng-template mat-tab-label class="mat-tab-label">
           <span class="skt-{{skt.icon}}" [class.skt-circle]="i < 2" [class.skt-rect]="i >= 2"></span>
