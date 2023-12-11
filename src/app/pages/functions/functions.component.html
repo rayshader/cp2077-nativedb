@@ -2,7 +2,7 @@
   <h1 class="stx stx-type">Global functions</h1>
   <mat-icon class="badge-function" svgIcon="function" title="Global function"></mat-icon>
 
-  @for (func of functions$ | async; track func.id) {
+  @for (func of functions; track func.id) {
     <function-span [node]="func" [canCopy]="false"></function-span>
   }
 } @else {
