@@ -17,6 +17,7 @@ import {RedPropertyAst} from "../../../shared/red-ast/red-property.ast";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {RedOriginDef, RedVisibilityDef} from "../../../shared/red-ast/red-definitions.ast";
 import {PageService} from "../../../shared/services/page.service";
+import {SettingsService} from "../../../shared/services/settings.service";
 
 interface ObjectData {
   readonly object: RedClassAst;
@@ -29,6 +30,11 @@ interface ObjectData {
   readonly functions: RedFunctionAst[];
   readonly badges: number;
   readonly align: string;
+
+  readonly showParents: boolean;
+  readonly showChildren: boolean;
+  readonly showProperties: boolean;
+  readonly showFunctions: boolean;
 }
 
 @Component({
@@ -61,6 +67,7 @@ export class ObjectComponent {
 
   constructor(private readonly dumpService: RedDumpService,
               private readonly pageService: PageService,
+              private readonly settingsService: SettingsService,
               private readonly route: ActivatedRoute) {
     this.kind = (this.route.snapshot.data as any).kind;
   }
@@ -86,13 +93,15 @@ export class ObjectComponent {
       object$,
       parents$,
       children$,
-      this.dumpService.badges$
+      this.dumpService.badges$,
+      this.settingsService.showEmptyAccordion$
     ]).pipe(
       map(([
              object,
              parents,
              children,
              badges,
+             showEmptyAccordion
            ]) => {
         const properties = object.properties;
         const functions = object.functions;
@@ -108,7 +117,11 @@ export class ObjectComponent {
           properties: properties,
           functions: functions,
           badges: badges,
-          align: `${72 + badges * 24 + 12 - 30}px`
+          align: `${72 + badges * 24 + 12 - 30}px`,
+          showParents: parents.length > 0 || showEmptyAccordion,
+          showChildren: children.length > 0 || showEmptyAccordion,
+          showProperties: properties.length > 0 || showEmptyAccordion,
+          showFunctions: functions.length > 0 || showEmptyAccordion,
         };
       })
     );

@@ -21,69 +21,77 @@
   </div>
 
   <cdk-accordion multi="true">
-    <ndb-accordion-item [expanded]="data.parents.length > 0"
-                       [disabled]="data.parents.length === 0">
-      <div header class="header">
-        <h3>Inherits</h3>
-        <mat-chip [highlighted]="data.parents.length > 0"
-                  [disabled]="data.parents.length === 0"
-                  [disableRipple]="true">{{data.parents.length}}</mat-chip>
-      </div>
-
-      @for (parent of data.parents; track parent.id) {
-        <div class="inheritance stx">
-          <div class="align" [style.width]="data.align"></div>
-          <mat-icon>subdirectory_arrow_right</mat-icon>
-          <type-span [node]="parent"></type-span>
+    @if (data.showParents) {
+      <ndb-accordion-item [expanded]="data.parents.length > 0"
+                          [disabled]="data.parents.length === 0">
+        <div header class="header">
+          <h3>Inherits</h3>
+          <mat-chip [highlighted]="data.parents.length > 0"
+                    [disabled]="data.parents.length === 0"
+                    [disableRipple]="true">{{data.parents.length}}</mat-chip>
         </div>
-      }
-    </ndb-accordion-item>
 
-    <ndb-accordion-item [expanded]="data.children.length > 0"
-                       [disabled]="data.children.length === 0">
-      <div header class="header">
-        <h3>Inherited by</h3>
-        <mat-chip [highlighted]="data.children.length > 0"
-                  [disabled]="data.children.length === 0"
-                  [disableRipple]="true">{{data.children.length}}</mat-chip>
-      </div>
+        @for (parent of data.parents; track parent.id) {
+          <div class="inheritance stx">
+            <div class="align" [style.width]="data.align"></div>
+            <mat-icon>subdirectory_arrow_right</mat-icon>
+            <type-span [node]="parent"></type-span>
+          </div>
+        }
+      </ndb-accordion-item>
+    }
 
-      @for (child of data.children; track child.id) {
-        <div class="inheritance stx">
-          <div class="align" [style.width]="data.align"></div>
-          <mat-icon>subdirectory_arrow_left</mat-icon>
-          <type-span [node]="child"></type-span>
+    @if (data.showChildren) {
+      <ndb-accordion-item [expanded]="data.children.length > 0"
+                         [disabled]="data.children.length === 0">
+        <div header class="header">
+          <h3>Inherited by</h3>
+          <mat-chip [highlighted]="data.children.length > 0"
+                    [disabled]="data.children.length === 0"
+                    [disableRipple]="true">{{data.children.length}}</mat-chip>
         </div>
-      }
-    </ndb-accordion-item>
 
-    <ndb-accordion-item [expanded]="data.properties.length > 0"
-                       [disabled]="data.properties.length === 0">
-      <div header class="header">
-        <h3>Properties</h3>
-        <mat-chip [highlighted]="data.properties.length > 0"
-                  [disabled]="data.properties.length === 0"
-                  [disableRipple]="true">{{data.properties.length}}</mat-chip>
-      </div>
+        @for (child of data.children; track child.id) {
+          <div class="inheritance stx">
+            <div class="align" [style.width]="data.align"></div>
+            <mat-icon>subdirectory_arrow_left</mat-icon>
+            <type-span [node]="child"></type-span>
+          </div>
+        }
+      </ndb-accordion-item>
+    }
 
-      @for (prop of data.properties; track prop.name) {
-        <property-span [node]="prop" [badges]="data.badges"></property-span>
-      }
-    </ndb-accordion-item>
+    @if (data.showProperties) {
+      <ndb-accordion-item [expanded]="data.properties.length > 0"
+                         [disabled]="data.properties.length === 0">
+        <div header class="header">
+          <h3>Properties</h3>
+          <mat-chip [highlighted]="data.properties.length > 0"
+                    [disabled]="data.properties.length === 0"
+                    [disableRipple]="true">{{data.properties.length}}</mat-chip>
+        </div>
 
-    <ndb-accordion-item [expanded]="data.functions.length > 0"
-                       [disabled]="data.functions.length === 0">
-      <div header class="header">
-        <h3>Functions</h3>
-        <mat-chip [highlighted]="data.functions.length > 0"
-                  [disabled]="data.functions.length === 0"
-                  [disableRipple]="true">{{data.functions.length}}</mat-chip>
-      </div>
+        @for (prop of data.properties; track prop.name) {
+          <property-span [node]="prop" [badges]="data.badges"></property-span>
+        }
+      </ndb-accordion-item>
+    }
 
-      @for (func of data.functions; track func.id) {
-        <function-span [node]="func" [canCopy]="true" [memberOf]="data.object" [badges]="data.badges"></function-span>
-      }
-    </ndb-accordion-item>
+    @if (data.showFunctions) {
+      <ndb-accordion-item [expanded]="data.functions.length > 0"
+                         [disabled]="data.functions.length === 0">
+        <div header class="header">
+          <h3>Functions</h3>
+          <mat-chip [highlighted]="data.functions.length > 0"
+                    [disabled]="data.functions.length === 0"
+                    [disableRipple]="true">{{data.functions.length}}</mat-chip>
+        </div>
+
+        @for (func of data.functions; track func.id) {
+          <function-span [node]="func" [canCopy]="true" [memberOf]="data.object" [badges]="data.badges"></function-span>
+        }
+      </ndb-accordion-item>
+    }
   </cdk-accordion>
 } @else {
   <h1 class="stx stx-type">Loading...</h1>

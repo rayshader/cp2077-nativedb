@@ -44,6 +44,18 @@
 
 <div class="setting">
   <p>
+    Show / hide empty panels of classes and structs (inherits, inherited by, properties and functions).
+  </p>
+
+  <mat-slide-toggle color="primary" [formControl]="showEmptyAccordion">
+    {{showEmptyAccordion.value ? "Show" : "Hide"}}
+  </mat-slide-toggle>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="setting">
+  <p>
     Select the language to use when grabbing code. It will copy and format the code according to the syntax you pick.
   </p>
 

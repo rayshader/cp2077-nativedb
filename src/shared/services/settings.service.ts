@@ -6,6 +6,7 @@ export interface Settings {
   readonly ignoreDuplicate: boolean;
   readonly scrollBehavior: PageScrollBehavior;
   readonly highlightEmptyObject: boolean;
+  readonly showEmptyAccordion: boolean;
   readonly clipboardSyntax: CodeSyntax;
   readonly codeSyntax: CodeSyntax;
 }
@@ -26,6 +27,7 @@ export class SettingsService {
   private readonly ignoreDuplicateSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly scrollBehaviorSubject: BehaviorSubject<PageScrollBehavior> = new BehaviorSubject<PageScrollBehavior>('smooth');
   private readonly highlightEmptyObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  private readonly showEmptyAccordionSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private readonly clipboardSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
   private readonly codeSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
 
@@ -45,6 +47,11 @@ export class SettingsService {
   readonly highlightEmptyObject$: Observable<boolean> = this.highlightEmptyObjectSubject.asObservable();
 
   /**
+   * Whether empty accordions of an object should be visible?
+   */
+  readonly showEmptyAccordion$: Observable<boolean> = this.showEmptyAccordionSubject.asObservable();
+
+  /**
    * Which code syntax must be used when copying code to the clipboard?
    */
   readonly clipboard$: Observable<CodeSyntax> = this.clipboardSubject.asObservable();
@@ -58,12 +65,14 @@ export class SettingsService {
     const ignoreDuplicate: boolean = (localStorage.getItem('ignore-duplicate') ?? 'true') === 'true';
     const scrollBehavior: PageScrollBehavior = (localStorage.getItem('scroll-behavior') ?? 'smooth') as PageScrollBehavior;
     const highlightEmptyObject: boolean = (localStorage.getItem('highlight-empty-object') ?? 'true') === 'true';
+    const showEmptyAccordion: boolean = (localStorage.getItem('show-empty-accordion') ?? 'false') === 'true';
     const clipboard: string = localStorage.getItem('clipboard-syntax') ?? CodeSyntax.redscript.toString();
     const code: string = localStorage.getItem('code-syntax') ?? CodeSyntax.redscript.toString();
 
     this.ignoreDuplicateSubject.next(ignoreDuplicate);
     this.scrollBehaviorSubject.next(scrollBehavior);
     this.highlightEmptyObjectSubject.next(highlightEmptyObject);
+    this.showEmptyAccordionSubject.next(showEmptyAccordion);
     this.clipboardSubject.next(+clipboard);
     this.codeSubject.next(+code);
   }
@@ -73,6 +82,7 @@ export class SettingsService {
       this.ignoreDuplicate$,
       this.scrollBehavior$,
       this.highlightEmptyObject$,
+      this.showEmptyAccordion$,
       this.clipboard$,
       this.code$
     ])
@@ -81,6 +91,7 @@ export class SettingsService {
                ignoreDuplicate,
                scrollBehavior,
                highlightEmptyObject,
+               showEmptyAccordion,
                clipboard,
                code
              ]) => {
@@ -88,6 +99,7 @@ export class SettingsService {
             ignoreDuplicate: ignoreDuplicate,
             scrollBehavior: scrollBehavior,
             highlightEmptyObject: highlightEmptyObject,
+            showEmptyAccordion: showEmptyAccordion,
             clipboardSyntax: clipboard,
             codeSyntax: code
           };
@@ -108,6 +120,11 @@ export class SettingsService {
   updateHighlightEmptyObject(state: boolean): void {
     localStorage.setItem('highlight-empty-object', `${state}`);
     this.highlightEmptyObjectSubject.next(state);
+  }
+
+  updateShowEmptyAccordion(state: boolean): void {
+    localStorage.setItem('show-empty-accordion', `${state}`);
+    this.showEmptyAccordionSubject.next(state);
   }
 
   updateClipboard(syntax: CodeSyntax): void {
