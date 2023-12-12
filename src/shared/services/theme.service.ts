@@ -47,7 +47,7 @@ export class ThemeService {
     if (this.isLoaded || theme !== 'dark-theme') {
       return;
     }
-    this.lazyLoaderService.loadAsset('dark-theme');
+    this.lazyLoaderService.loadStylesheet('dark-theme');
     this.isLoaded = true;
   }
 

@@ -17,6 +17,7 @@ export interface IDEThemeChanged {
 interface IDEItem {
   theme: IDETheme;
   isLoaded: boolean;
+  font?: string;
 }
 
 @Injectable({
@@ -30,9 +31,17 @@ export class IDEThemeService {
   private currentTheme: IDETheme = IDETheme.vscode;
 
   private readonly themes: IDEItem[] = [
-    {theme: IDETheme.vanilla, isLoaded: false},
+    {
+      theme: IDETheme.vanilla,
+      isLoaded: false,
+      font: 'https://fonts.googleapis.com/css2?family=Fira+Code:wght@500&display=swap'
+    },
     {theme: IDETheme.vscode, isLoaded: false},
-    {theme: IDETheme.intellij, isLoaded: false}
+    {
+      theme: IDETheme.intellij,
+      isLoaded: false,
+      font: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap'
+    }
   ];
 
   constructor(private readonly lazyLoaderService: LazyLoaderService) {
@@ -75,7 +84,10 @@ export class IDEThemeService {
     if (item.isLoaded) {
       return;
     }
-    this.lazyLoaderService.loadAsset(`ide-${IDETheme[item.theme]}-theme`)
+    this.lazyLoaderService.loadStylesheet(`ide-${IDETheme[item.theme]}-theme`)
+    if (item.font) {
+      this.lazyLoaderService.loadFont(item.font);
+    }
     item.isLoaded = true;
   }
 }

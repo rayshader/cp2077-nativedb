@@ -6,18 +6,20 @@ import {Injectable} from '@angular/core';
 export class LazyLoaderService {
 
   /**
-   * Load asset with its stylesheet.
+   * Load a stylesheet by its name.
    */
-  public loadAsset(name: string): void {
-    this.loadStyle(`${name}.css`);
+  public loadStylesheet(name: string): void {
+    const $link: HTMLLinkElement = document.createElement('link');
+
+    $link.rel = 'stylesheet';
+    $link.href = `${name}.css`;
+    document.head.appendChild($link);
   }
 
   /**
-   * Attach a stylesheet to lazy-load from {@link url}.
-   * @param url of asset to load.
-   * @protected
+   * Load font as a stylesheet.
    */
-  protected loadStyle(url: string): void {
+  public loadFont(url: string): void {
     const $link: HTMLLinkElement = document.createElement('link');
 
     $link.rel = 'stylesheet';
