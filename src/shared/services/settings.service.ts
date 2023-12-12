@@ -9,6 +9,7 @@ export interface Settings {
   readonly showEmptyAccordion: boolean;
   readonly mergeObject: boolean;
   readonly tabsWidth: number;
+  readonly isBarPinned: boolean;
   readonly clipboardSyntax: CodeSyntax;
   readonly codeSyntax: CodeSyntax;
 }
@@ -27,41 +28,55 @@ export enum CodeSyntax {
 export class SettingsService {
 
   private readonly ignoreDuplicateSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  private readonly scrollBehaviorSubject: BehaviorSubject<PageScrollBehavior> = new BehaviorSubject<PageScrollBehavior>('smooth');
+  private readonly highlightEmptyObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  private readonly showEmptyAccordionSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private readonly mergeObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private readonly tabsWidthSubject: BehaviorSubject<number> = new BehaviorSubject<number>(320);
+  private readonly isBarPinnedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  private readonly clipboardSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
+  private readonly codeSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
+
   /**
    * Whether duplicate operators/casts in global functions should be ignored (hidden)?
    */
   readonly ignoreDuplicate$: Observable<boolean> = this.ignoreDuplicateSubject.asObservable();
-  private readonly scrollBehaviorSubject: BehaviorSubject<PageScrollBehavior> = new BehaviorSubject<PageScrollBehavior>('smooth');
+
   /**
    * Which scrolling behavior should be used when navigating to a new page?
    */
   readonly scrollBehavior$: Observable<PageScrollBehavior> = this.scrollBehaviorSubject.asObservable();
-  private readonly highlightEmptyObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+
   /**
    * Whether empty class/struct should be highlighted?
    */
   readonly highlightEmptyObject$: Observable<boolean> = this.highlightEmptyObjectSubject.asObservable();
-  private readonly showEmptyAccordionSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
   /**
    * Whether empty accordions of an object should be visible?
    */
   readonly showEmptyAccordion$: Observable<boolean> = this.showEmptyAccordionSubject.asObservable();
-  private readonly mergeObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+
   /**
    * Whether classes and structs should be listed in one tab?
    */
   readonly mergeObject$: Observable<boolean> = this.mergeObjectSubject.asObservable();
-  private readonly tabsWidthSubject: BehaviorSubject<number> = new BehaviorSubject<number>(320);
+
   /**
    * Width of the <ndb-tabs> panel (in pixels).
    */
   readonly tabsWidth$: Observable<number> = this.tabsWidthSubject.asObservable();
-  private readonly clipboardSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
+
+  /**
+   * Whether title bar of a page must be pinned at the top when scrolling?
+   */
+  readonly isBarPinned$: Observable<boolean> = this.isBarPinnedSubject.asObservable();
+
   /**
    * Which code syntax must be used when copying code to the clipboard?
    */
   readonly clipboard$: Observable<CodeSyntax> = this.clipboardSubject.asObservable();
-  private readonly codeSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
+
   /**
    * Which code syntax must be used when formatting functions and properties?
    */
@@ -74,6 +89,7 @@ export class SettingsService {
     const showEmptyAccordion: boolean = (localStorage.getItem('show-empty-accordion') ?? 'false') === 'true';
     const mergeObject: boolean = (localStorage.getItem('merge-object') ?? 'false') === 'true';
     const tabsWidth: number = +(localStorage.getItem('tabs-width') ?? '320');
+    const isBarPinned: boolean = (localStorage.getItem('is-bar-pinned') ?? 'true') === 'true';
     const clipboard: string = localStorage.getItem('clipboard-syntax') ?? CodeSyntax.redscript.toString();
     const code: string = localStorage.getItem('code-syntax') ?? CodeSyntax.redscript.toString();
 
@@ -83,6 +99,7 @@ export class SettingsService {
     this.showEmptyAccordionSubject.next(showEmptyAccordion);
     this.mergeObjectSubject.next(mergeObject);
     this.tabsWidthSubject.next(tabsWidth);
+    this.isBarPinnedSubject.next(isBarPinned);
     this.clipboardSubject.next(+clipboard);
     this.codeSubject.next(+code);
   }
@@ -95,6 +112,7 @@ export class SettingsService {
       this.showEmptyAccordion$,
       this.mergeObject$,
       this.tabsWidth$,
+      this.isBarPinned$,
       this.clipboard$,
       this.code$
     ])
@@ -106,6 +124,7 @@ export class SettingsService {
                showEmptyAccordion,
                mergeObject,
                tabsWidth,
+               isBarPinned,
                clipboard,
                code
              ]) => {
@@ -116,6 +135,7 @@ export class SettingsService {
             showEmptyAccordion: showEmptyAccordion,
             mergeObject: mergeObject,
             tabsWidth: tabsWidth,
+            isBarPinned: isBarPinned,
             clipboardSyntax: clipboard,
             codeSyntax: code
           };
@@ -151,6 +171,11 @@ export class SettingsService {
   updateTabsWidth(width: number): void {
     localStorage.setItem('tabs-width', width.toString());
     this.tabsWidthSubject.next(width);
+  }
+
+  updateIsBarPinned(state: boolean): void {
+    localStorage.setItem('is-bar-pinned', `${state}`);
+    this.isBarPinnedSubject.next(state);
   }
 
   updateClipboard(syntax: CodeSyntax): void {
