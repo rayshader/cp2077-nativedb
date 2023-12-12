@@ -12,6 +12,7 @@
 @use './app/article' as *;
 @use './app/accordion-item' as *;
 @use './app/badge' as *;
+@use './app/title-bar' as *;
 
 @mixin mat-component-themes($theme) {
   //@include mat.all-component-themes($theme);
@@ -58,6 +59,7 @@
   @include accordion-item-theme($theme);
   @include badge-theme($theme);
   @include slide-toggle-theme($theme);
+  @include title-bar-theme($theme);
 
   @include virtual-scroll-theme($theme);
 }
@@ -69,4 +71,5 @@
   @include accordion-item-color($theme);
   @include badge-color($theme);
   @include slide-toggle-color($theme);
+  @include title-bar-color($theme);
 }

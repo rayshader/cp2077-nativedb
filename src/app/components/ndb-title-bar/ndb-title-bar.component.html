@@ -1,0 +1,14 @@
+<div class="title">
+  <h1 class="stx stx-type">{{title}}</h1>
+  <div class="prototype">
+    <ng-content></ng-content>
+  </div>
+</div>
+
+@if (!hidden) {
+  <button mat-icon-button
+          class="pin"
+          (click)="togglePin()">
+    <mat-icon [svgIcon]="isPinned ? 'pin-off' : 'pin'"></mat-icon>
+  </button>
+}

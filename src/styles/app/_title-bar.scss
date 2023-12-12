@@ -1,0 +1,37 @@
+@use 'sass:map';
+
+@mixin title-bar-theme($theme) {
+  $bg-palette: map.get($theme, background);
+
+  ndb-title-bar {
+    z-index: 1;
+    display: flex;
+    top: 0;
+
+    background-color: map.get($bg-palette, background);
+
+    &.pin {
+      position: sticky;
+    }
+
+    & .title {
+      flex: 1;
+    }
+
+    & .prototype {
+      margin-bottom: 12px;
+    }
+
+    & button.pin {
+      margin-top: 24px;
+    }
+  }
+}
+
+@mixin title-bar-color($theme) {
+  $bg-palette: map.get($theme, background);
+
+  ndb-title-bar {
+    background-color: map.get($bg-palette, background);
+  }
+}
