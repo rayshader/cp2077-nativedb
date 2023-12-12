@@ -1,6 +1,7 @@
 @if (functions$ | async; as functions) {
-  <h1 class="stx stx-type">Global functions</h1>
-  <mat-icon class="badge-function" svgIcon="function" title="Global function"></mat-icon>
+  <ndb-title-bar title="Global functions">
+    <mat-icon class="badge-function" svgIcon="function" title="Global function"></mat-icon>
+  </ndb-title-bar>
 
   @for (func of functions; track func.id) {
     <function-span [node]="func" [canCopy]="false"></function-span>

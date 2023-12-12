@@ -6,6 +6,7 @@ import {AsyncPipe} from "@angular/common";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {PageService} from "../../../shared/services/page.service";
+import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
 
 @Component({
   selector: 'function',
@@ -14,6 +15,7 @@ import {PageService} from "../../../shared/services/page.service";
     AsyncPipe,
     MatIconModule,
     FunctionSpanComponent,
+    NDBTitleBarComponent,
   ],
   templateUrl: './function.component.html',
   styleUrl: './function.component.scss'

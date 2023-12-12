@@ -1,6 +1,7 @@
 @if (bitfield$ | async; as bitfield) {
-  <h1 class="stx stx-type">{{bitfield.name}}</h1>
-  <mat-icon class="badge-bitfield" svgIcon="bitfield"></mat-icon>
+  <ndb-title-bar [title]="bitfield.name">
+    <mat-icon class="badge-bitfield" svgIcon="bitfield"></mat-icon>
+  </ndb-title-bar>
 
   @for (member of bitfield.members; track member.key) {
     <p class="field stx">

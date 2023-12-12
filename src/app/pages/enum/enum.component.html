@@ -1,6 +1,7 @@
 @if (enum$ | async; as enum) {
-  <h1 class="stx stx-type">{{enum.name}}</h1>
-  <mat-icon class="badge-enum" svgIcon="enum"></mat-icon>
+  <ndb-title-bar [title]="enum.name">
+    <mat-icon class="badge-enum" svgIcon="enum"></mat-icon>
+  </ndb-title-bar>
 
   @for (member of enum.members; track member.key) {
     <p class="field stx">

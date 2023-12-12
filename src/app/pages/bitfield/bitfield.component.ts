@@ -6,6 +6,7 @@ import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {AsyncPipe} from "@angular/common";
 import {RedBitfieldAst} from "../../../shared/red-ast/red-bitfield.ast";
 import {PageService} from "../../../shared/services/page.service";
+import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
 
 @Component({
   selector: 'bitfield',
@@ -13,7 +14,8 @@ import {PageService} from "../../../shared/services/page.service";
   imports: [
     MatButtonModule,
     MatIconModule,
-    AsyncPipe
+    AsyncPipe,
+    NDBTitleBarComponent
   ],
   templateUrl: './bitfield.component.html',
   styleUrl: './bitfield.component.scss'

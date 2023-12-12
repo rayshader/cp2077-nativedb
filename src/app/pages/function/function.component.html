@@ -1,6 +1,7 @@
 @if (function$ | async; as func) {
-  <h1 class="stx stx-type">{{func.name}}</h1>
-  <mat-icon class="badge-function" svgIcon="function" title="Global function"></mat-icon>
+  <ndb-title-bar [title]="func.name" [hidden]="true">
+    <mat-icon class="badge-function" svgIcon="function" title="Global function"></mat-icon>
+  </ndb-title-bar>
 
   <function-span [node]="func" [canCopy]="true"></function-span>
 } @else {

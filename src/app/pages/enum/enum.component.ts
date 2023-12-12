@@ -6,6 +6,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {RedEnumAst} from "../../../shared/red-ast/red-enum.ast";
 import {PageService} from "../../../shared/services/page.service";
+import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
 
 @Component({
   selector: 'enum',
@@ -13,7 +14,8 @@ import {PageService} from "../../../shared/services/page.service";
   imports: [
     MatButtonModule,
     MatIconModule,
-    AsyncPipe
+    AsyncPipe,
+    NDBTitleBarComponent
   ],
   templateUrl: './enum.component.html',
   styleUrl: './enum.component.scss'

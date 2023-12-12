@@ -18,6 +18,8 @@ import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {RedOriginDef, RedVisibilityDef} from "../../../shared/red-ast/red-definitions.ast";
 import {PageService} from "../../../shared/services/page.service";
 import {SettingsService} from "../../../shared/services/settings.service";
+import {MatButtonModule} from "@angular/material/button";
+import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
 
 interface ObjectData {
   readonly object: RedClassAst;
@@ -45,10 +47,12 @@ interface ObjectData {
     CdkAccordionModule,
     MatIconModule,
     MatChipsModule,
+    MatButtonModule,
     FunctionSpanComponent,
     PropertySpanComponent,
+    TypeSpanComponent,
     NDBAccordionItemComponent,
-    TypeSpanComponent
+    NDBTitleBarComponent
   ],
   templateUrl: './object.component.html',
   styleUrl: './object.component.scss'
