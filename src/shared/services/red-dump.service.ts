@@ -11,7 +11,8 @@ import {
   OperatorFunction,
   pipe,
   reduce,
-  shareReplay
+  shareReplay,
+  zip
 } from "rxjs";
 import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
 import {RedEnumAst} from "../red-ast/red-enum.ast";
@@ -32,6 +33,8 @@ export class RedDumpService {
   readonly functions$: Observable<RedFunctionAst[]>;
 
   readonly badges$: Observable<number>;
+
+  private readonly nodes$: Observable<RedNodeAst[]>;
 
   constructor(private readonly http: HttpClient,
               private readonly settingsService: SettingsService) {
@@ -73,17 +76,26 @@ export class RedDumpService {
       reduce(this.getMax),
       shareReplay(),
     );
-  }
-
-  getById(id: number): Observable<RedNodeAst | undefined> {
-    return combineLatest([
+    this.nodes$ = zip([
       this.enums$.pipe(this.castMap<RedNodeAst[]>()),
       this.bitfields$.pipe(this.castMap<RedNodeAst[]>()),
       this.classes$.pipe(this.castMap<RedNodeAst[]>()),
       this.structs$.pipe(this.castMap<RedNodeAst[]>()),
       this.functions$.pipe(this.castMap<RedNodeAst[]>()),
     ]).pipe(
-      mergeAll(),
+      map((data) => [
+        ...data[0],
+        ...data[1],
+        ...data[2],
+        ...data[3],
+        ...data[4],
+      ]),
+      shareReplay()
+    );
+  }
+
+  getById(id: number): Observable<RedNodeAst | undefined> {
+    return this.nodes$.pipe(
       map((nodes) => nodes.find((node) => node.id === id))
     );
   }
