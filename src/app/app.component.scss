@@ -19,6 +19,8 @@
   display: flex;
   flex: 4;
 
+  margin-left: 24px;
+
   & rd-search {
     width: 100%;
   }
@@ -34,8 +36,4 @@ section {
   overflow-y: scroll;
 
   padding: 0 24px 24px;
-}
-
-button {
-  margin-right: 24px;
 }
