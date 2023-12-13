@@ -1,14 +1,13 @@
 import {Routes} from '@angular/router';
 import {ReadmeComponent} from "./pages/readme/readme.component";
 import {RedNodeKind} from "../shared/red-ast/red-node.ast";
+import {firstUsageGuard} from "./first-usage.guard";
+import {RecentVisitsComponent} from "./pages/recent-visits/recent-visits.component";
 
 export const routes: Routes = [
-  {path: '', component: ReadmeComponent},
+  {path: '', component: RecentVisitsComponent, canActivate: [firstUsageGuard]},
+  {path: 'readme', component: ReadmeComponent},
   {path: 'settings', loadComponent: () => import('./pages/settings/settings.component').then(c => c.SettingsComponent)},
-  {
-    path: 'history',
-    loadComponent: () => import('./pages/recent-visits/recent-visits.component').then(c => c.RecentVisitsComponent)
-  },
   {
     path: 'bookmarks',
     loadComponent: () => import('./pages/bookmarks/bookmarks.component').then(c => c.BookmarksComponent)

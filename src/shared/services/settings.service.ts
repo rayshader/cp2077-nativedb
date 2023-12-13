@@ -27,6 +27,7 @@ export enum CodeSyntax {
 })
 export class SettingsService {
 
+  private firstUsage: boolean = true;
   private readonly ignoreDuplicateSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly scrollBehaviorSubject: BehaviorSubject<PageScrollBehavior> = new BehaviorSubject<PageScrollBehavior>('smooth');
   private readonly highlightEmptyObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
@@ -36,6 +37,13 @@ export class SettingsService {
   private readonly isBarPinnedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly clipboardSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
   private readonly codeSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
+
+  /**
+   * Whether this application is used for the first time on this device?
+   */
+  get isFirstUsage(): boolean {
+    return this.firstUsage;
+  }
 
   /**
    * Whether duplicate operators/casts in global functions should be ignored (hidden)?
@@ -83,6 +91,7 @@ export class SettingsService {
   readonly code$: Observable<CodeSyntax> = this.codeSubject.asObservable();
 
   constructor() {
+    this.firstUsage = (localStorage.getItem('first-usage') ?? 'true') === 'true';
     const ignoreDuplicate: boolean = (localStorage.getItem('ignore-duplicate') ?? 'true') === 'true';
     const scrollBehavior: PageScrollBehavior = (localStorage.getItem('scroll-behavior') ?? 'smooth') as PageScrollBehavior;
     const highlightEmptyObject: boolean = (localStorage.getItem('highlight-empty-object') ?? 'true') === 'true';
@@ -141,6 +150,14 @@ export class SettingsService {
           };
         })
       );
+  }
+
+  toggleFirstUsage(): void {
+    if (!this.firstUsage) {
+      return;
+    }
+    this.firstUsage = false;
+    localStorage.setItem('first-usage', 'false');
   }
 
   updateIgnoreDuplicate(state: boolean): void {
