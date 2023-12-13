@@ -7,6 +7,7 @@ import {FunctionSpanComponent} from "../../components/spans/function-span/functi
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {PageService} from "../../../shared/services/page.service";
 import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
+import {RecentVisitService} from "../../../shared/services/recent-visit.service";
 
 @Component({
   selector: 'function',
@@ -25,12 +26,14 @@ export class FunctionComponent {
   function$: Observable<RedFunctionAst | undefined> = EMPTY;
 
   constructor(private readonly dumpService: RedDumpService,
-              private readonly pageService: PageService) {
+              private readonly pageService: PageService,
+              private readonly recentVisitService: RecentVisitService) {
   }
 
   @Input()
   set id(id: string) {
     this.pageService.restoreScroll();
+    this.recentVisitService.pushLastVisit(+id);
     this.function$ = this.dumpService.getFunctionById(+id);
   }
 

@@ -1,0 +1,19 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+mat-divider {
+  margin-bottom: 24px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  height: 32px;
+
+  & mat-icon {
+    margin-right: 12px;
+  }
+}

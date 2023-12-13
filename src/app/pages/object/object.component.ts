@@ -20,6 +20,7 @@ import {PageService} from "../../../shared/services/page.service";
 import {SettingsService} from "../../../shared/services/settings.service";
 import {MatButtonModule} from "@angular/material/button";
 import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
+import {RecentVisitService} from "../../../shared/services/recent-visit.service";
 
 interface ObjectData {
   readonly object: RedClassAst;
@@ -71,6 +72,7 @@ export class ObjectComponent {
 
   constructor(private readonly dumpService: RedDumpService,
               private readonly pageService: PageService,
+              private readonly recentVisitService: RecentVisitService,
               private readonly settingsService: SettingsService,
               private readonly route: ActivatedRoute) {
     this.kind = (this.route.snapshot.data as any).kind;
@@ -79,6 +81,7 @@ export class ObjectComponent {
   @Input()
   set id(id: string) {
     this.pageService.restoreScroll();
+    this.recentVisitService.pushLastVisit(+id);
     const object$ = of(this.kind).pipe(
       switchMap((kind) => {
         if (kind === RedNodeKind.class) {

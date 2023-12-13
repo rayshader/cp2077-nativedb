@@ -7,6 +7,7 @@ import {AsyncPipe} from "@angular/common";
 import {RedBitfieldAst} from "../../../shared/red-ast/red-bitfield.ast";
 import {PageService} from "../../../shared/services/page.service";
 import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
+import {RecentVisitService} from "../../../shared/services/recent-visit.service";
 
 @Component({
   selector: 'bitfield',
@@ -25,12 +26,14 @@ export class BitfieldComponent {
   bitfield$: Observable<RedBitfieldAst | undefined> = EMPTY;
 
   constructor(private readonly dumpService: RedDumpService,
-              private readonly pageService: PageService) {
+              private readonly pageService: PageService,
+              private readonly recentVisitService: RecentVisitService) {
   }
 
   @Input()
   set id(id: string) {
     this.pageService.restoreScroll();
+    this.recentVisitService.pushLastVisit(+id);
     this.bitfield$ = this.dumpService.getBitfieldById(+id);
   }
 

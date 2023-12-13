@@ -1,0 +1,22 @@
+<div class="header">
+  <h1>Last recent visits</h1>
+
+  <button mat-icon-button
+          title="Remove all recent visits"
+          (click)="onClearAll()"
+          [disabled]="cannotClearAll$ | async">
+    <mat-icon>clear</mat-icon>
+  </button>
+</div>
+
+<mat-divider></mat-divider>
+
+@if (recentVisits$ | async; as recentVisits) {
+  @for (recentVisit of recentVisits; track recentVisit.node.id) {
+    <div class="stx item">
+      <mat-icon class="badge-{{recentVisit.icon}}" [svgIcon]="recentVisit.icon" [title]="recentVisit.alt"></mat-icon>
+
+      <type-span [node]="recentVisit.node"></type-span>
+    </div>
+  }
+}

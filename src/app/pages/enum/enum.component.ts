@@ -7,6 +7,7 @@ import {MatButtonModule} from "@angular/material/button";
 import {RedEnumAst} from "../../../shared/red-ast/red-enum.ast";
 import {PageService} from "../../../shared/services/page.service";
 import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
+import {RecentVisitService} from "../../../shared/services/recent-visit.service";
 
 @Component({
   selector: 'enum',
@@ -25,12 +26,14 @@ export class EnumComponent {
   enum$: Observable<RedEnumAst | undefined> = EMPTY;
 
   constructor(private readonly dumpService: RedDumpService,
-              private readonly pageService: PageService) {
+              private readonly pageService: PageService,
+              private readonly recentVisitService: RecentVisitService) {
   }
 
   @Input()
   set id(id: string) {
     this.pageService.restoreScroll();
+    this.recentVisitService.pushLastVisit(+id);
     this.enum$ = this.dumpService.getEnumById(+id);
   }
 

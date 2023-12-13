@@ -6,6 +6,10 @@ export const routes: Routes = [
   {path: '', component: ReadmeComponent},
   {path: 'settings', loadComponent: () => import('./pages/settings/settings.component').then(c => c.SettingsComponent)},
   {
+    path: 'history',
+    loadComponent: () => import('./pages/recent-visits/recent-visits.component').then(c => c.RecentVisitsComponent)
+  },
+  {
     path: 'bookmarks',
     loadComponent: () => import('./pages/bookmarks/bookmarks.component').then(c => c.BookmarksComponent)
   },

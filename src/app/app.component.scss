@@ -15,10 +15,6 @@
   flex: 1;
 }
 
-.bookmarks {
-  margin-right: 24px;
-}
-
 .search {
   display: flex;
   flex: 4;
@@ -38,4 +34,8 @@ section {
   overflow-y: scroll;
 
   padding: 0 24px 24px;
+}
+
+button {
+  margin-right: 24px;
 }
