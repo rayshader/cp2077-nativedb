@@ -6,6 +6,7 @@ import {getRedNodeKindName, RedNodeAst, RedNodeKind} from "../../../shared/red-a
 import {AsyncPipe} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
+import {MatDividerModule} from "@angular/material/divider";
 
 interface BookmarkItem {
   readonly node: RedNodeAst;
@@ -19,7 +20,8 @@ interface BookmarkItem {
   imports: [
     AsyncPipe,
     MatIconModule,
-    TypeSpanComponent
+    TypeSpanComponent,
+    MatDividerModule
   ],
   templateUrl: './bookmarks.component.html',
   styleUrl: './bookmarks.component.scss'

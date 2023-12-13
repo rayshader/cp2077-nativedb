@@ -1,5 +1,7 @@
 <h1>Bookmarks</h1>
 
+<mat-divider></mat-divider>
+
 @if (bookmarks$ | async; as bookmarks) {
   @for (bookmark of bookmarks; track bookmark.node.id) {
     <div class="stx">

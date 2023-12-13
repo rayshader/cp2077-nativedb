@@ -18,5 +18,11 @@
 }
 
 mat-divider {
-  margin: 24px 0;
+  &:not(:first-of-type) {
+    margin: 24px 0;
+  }
+
+  &:first-of-type {
+    margin-bottom: 24px;
+  }
 }
