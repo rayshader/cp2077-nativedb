@@ -5,6 +5,12 @@
   </div>
 </div>
 
+<button mat-icon-button
+        title="Copy URL to clipboard"
+        (click)="copyUrl()">
+  <mat-icon>share</mat-icon>
+</button>
+
 @if (_node !== undefined) {
   <button mat-icon-button
           [title]="isBookmarked ? 'Remove bookmark' : 'Add bookmark'"

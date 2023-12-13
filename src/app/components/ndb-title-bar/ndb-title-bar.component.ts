@@ -61,6 +61,10 @@ export class NDBTitleBarComponent {
     this.bookmarkService.toggleBookmark(this._node);
   }
 
+  copyUrl(): void {
+    navigator.clipboard.writeText(window.location.href);
+  }
+
   private onSettingsLoaded(state: boolean): void {
     this.isPinned = state;
   }
