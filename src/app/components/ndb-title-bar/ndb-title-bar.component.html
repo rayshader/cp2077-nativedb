@@ -7,6 +7,7 @@
 
 @if (_node !== undefined) {
   <button mat-icon-button
+          [title]="isBookmarked ? 'Remove bookmark' : 'Add bookmark'"
           (click)="toggleBookmark()">
     @if (isBookmarked) {
       <mat-icon>bookmark</mat-icon>
@@ -19,6 +20,7 @@
 @if (!hidden) {
   <button mat-icon-button
           class="pin"
+          [title]="isPinned ? 'Unpin title when scrolling' : 'Pin title to the top when scrolling'"
           (click)="togglePin()">
     <mat-icon [svgIcon]="isPinned ? 'pin-off' : 'pin'"></mat-icon>
   </button>
