@@ -15,4 +15,9 @@ button {
   display: flex;
 
   margin: 48px auto;
+
+  &.inline {
+    display: inline-flex;
+    margin: 0;
+  }
 }
