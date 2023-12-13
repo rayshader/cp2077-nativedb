@@ -1,7 +1,7 @@
 import {Routes} from '@angular/router';
 import {ReadmeComponent} from "./pages/readme/readme.component";
 import {RedNodeKind} from "../shared/red-ast/red-node.ast";
-import {firstUsageGuard} from "./first-usage.guard";
+import {firstUsageGuard} from "./guards/first-usage.guard";
 import {RecentVisitsComponent} from "./pages/recent-visits/recent-visits.component";
 
 export const routes: Routes = [

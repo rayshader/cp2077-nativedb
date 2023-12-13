@@ -1,6 +1,6 @@
 import {inject} from "@angular/core";
 import {Router} from "@angular/router";
-import {SettingsService} from "../shared/services/settings.service";
+import {SettingsService} from "../../shared/services/settings.service";
 
 export function firstUsageGuard() {
   const settingsService: SettingsService = inject(SettingsService);
