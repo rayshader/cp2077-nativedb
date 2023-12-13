@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {BookmarkService} from "../../../shared/services/bookmark.service";
-import {delay, filter, map, mergeAll, Observable, of, scan, switchMap} from "rxjs";
+import {filter, map, mergeAll, Observable, of, scan, zip} from "rxjs";
 import {getRedNodeKindName, RedNodeAst, RedNodeKind} from "../../../shared/red-ast/red-node.ast";
 import {AsyncPipe} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
@@ -36,11 +36,10 @@ export class BookmarksComponent implements OnInit {
 
   ngOnInit(): void {
     const bookmarks: number[] = this.bookmarkService.getAll();
+    const bookmarks$ = bookmarks.map((id) => this.dumpService.getById(id));
 
-    this.bookmarks$ = of(bookmarks).pipe(
-      delay(1),
+    this.bookmarks$ = zip(bookmarks$).pipe(
       mergeAll(),
-      switchMap((id) => this.dumpService.getById(id)),
       filter((node) => node !== undefined),
       map((node) => <BookmarkItem>{
         node: node,
