@@ -20,7 +20,7 @@ export class RecentVisitService {
   }
 
   getAll(): RecentVisitItem[] {
-    return this.recentVisits;
+    return [...this.recentVisits];
   }
 
   pushLastVisit(id: number): void {
