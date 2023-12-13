@@ -1,0 +1,13 @@
+h1 {
+  margin-bottom: 24px;
+}
+
+div {
+  display: flex;
+  align-items: center;
+  height: 32px;
+
+  & mat-icon {
+    margin-right: 12px;
+  }
+}

@@ -13,3 +13,9 @@ export interface RedNodeAst {
   readonly name: string;
   readonly kind: RedNodeKind;
 }
+
+export function getRedNodeKindName(kind: RedNodeKind): string {
+  const name: string = RedNodeKind[kind];
+
+  return `${name[0].toUpperCase()}${name.substring(1)}`;
+}

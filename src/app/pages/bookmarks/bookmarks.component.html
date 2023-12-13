@@ -1,0 +1,11 @@
+<h1>Bookmarks</h1>
+
+@if (bookmarks$ | async; as bookmarks) {
+  @for (bookmark of bookmarks; track bookmark.node.id) {
+    <div class="stx">
+      <mat-icon class="badge-{{bookmark.icon}}" [svgIcon]="bookmark.icon" [title]="bookmark.alt"></mat-icon>
+
+      <type-span [node]="bookmark.node"></type-span>
+    </div>
+  }
+}

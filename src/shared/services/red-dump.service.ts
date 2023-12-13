@@ -75,6 +75,19 @@ export class RedDumpService {
     );
   }
 
+  getById(id: number): Observable<RedNodeAst | undefined> {
+    return combineLatest([
+      this.enums$.pipe(this.castMap<RedNodeAst[]>()),
+      this.bitfields$.pipe(this.castMap<RedNodeAst[]>()),
+      this.classes$.pipe(this.castMap<RedNodeAst[]>()),
+      this.structs$.pipe(this.castMap<RedNodeAst[]>()),
+      this.functions$.pipe(this.castMap<RedNodeAst[]>()),
+    ]).pipe(
+      mergeAll(),
+      map((nodes) => nodes.find((node) => node.id === id))
+    );
+  }
+
   getTypeById(id: number): Observable<RedNodeKind | undefined> {
     return combineLatest([
       this.enums$,
@@ -91,23 +104,23 @@ export class RedDumpService {
   }
 
   getEnumById(id: number): Observable<RedEnumAst | undefined> {
-    return this.enums$.pipe(this.getById(id));
+    return this.enums$.pipe(this.findById(id));
   }
 
   getBitfieldById(id: number): Observable<RedBitfieldAst | undefined> {
-    return this.bitfields$.pipe(this.getById(id));
+    return this.bitfields$.pipe(this.findById(id));
   }
 
   getClassById(id: number): Observable<RedClassAst | undefined> {
-    return this.classes$.pipe(this.getById(id));
+    return this.classes$.pipe(this.findById(id));
   }
 
   getStructById(id: number): Observable<RedClassAst | undefined> {
-    return this.structs$.pipe(this.getById(id));
+    return this.structs$.pipe(this.findById(id));
   }
 
   getFunctionById(id: number): Observable<RedFunctionAst | undefined> {
-    return this.functions$.pipe(this.getById(id));
+    return this.functions$.pipe(this.findById(id));
   }
 
   getParentsByName(name: string,
@@ -172,9 +185,15 @@ export class RedDumpService {
     );
   }
 
-  private getById<T extends RedNodeAst>(id: number): OperatorFunction<T[], T | undefined> {
+  private findById<T extends RedNodeAst>(id: number): OperatorFunction<T[], T | undefined> {
     return pipe(
       map((objects) => objects.find((object) => object.id === id))
+    );
+  }
+
+  private castMap<T>(): OperatorFunction<any, T> {
+    return pipe(
+      map((value) => value as T),
     );
   }
 

@@ -4,13 +4,17 @@ import {MatIconModule} from "@angular/material/icon";
 import {SettingsService} from "../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {take} from "rxjs";
+import {RedNodeAst} from "../../../shared/red-ast/red-node.ast";
+import {BookmarkService} from "../../../shared/services/bookmark.service";
+import {AsyncPipe} from "@angular/common";
 
 @Component({
   selector: 'ndb-title-bar',
   standalone: true,
   imports: [
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    AsyncPipe
   ],
   templateUrl: './ndb-title-bar.component.html',
   styleUrl: './ndb-title-bar.component.scss'
@@ -24,9 +28,19 @@ export class NDBTitleBarComponent {
   hidden: boolean = false;
 
   isPinned: boolean = true;
+  isBookmarked: boolean = false;
 
-  constructor(private readonly settingsService: SettingsService) {
+  constructor(private readonly settingsService: SettingsService,
+              private readonly bookmarkService: BookmarkService) {
     this.settingsService.isBarPinned$.pipe(take(1), takeUntilDestroyed()).subscribe(this.onSettingsLoaded.bind(this));
+  }
+
+  protected _node?: RedNodeAst;
+
+  @Input()
+  set node(value: RedNodeAst) {
+    this._node = value;
+    this.isBookmarked = this.bookmarkService.isBookmarked(value);
   }
 
   @HostBinding('class.pin')
@@ -37,6 +51,14 @@ export class NDBTitleBarComponent {
   togglePin(): void {
     this.isPinned = !this.isPinned;
     this.settingsService.updateIsBarPinned(this.isPinned);
+  }
+
+  toggleBookmark(): void {
+    if (!this._node) {
+      return;
+    }
+    this.isBookmarked = !this.isBookmarked;
+    this.bookmarkService.toggleBookmark(this._node);
   }
 
   private onSettingsLoaded(state: boolean): void {

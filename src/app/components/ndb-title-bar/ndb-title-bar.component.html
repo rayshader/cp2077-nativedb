@@ -5,6 +5,17 @@
   </div>
 </div>
 
+@if (_node !== undefined) {
+  <button mat-icon-button
+          (click)="toggleBookmark()">
+    @if (isBookmarked) {
+      <mat-icon>bookmark</mat-icon>
+    } @else {
+      <mat-icon>bookmark_border</mat-icon>
+    }
+  </button>
+}
+
 @if (!hidden) {
   <button mat-icon-button
           class="pin"
