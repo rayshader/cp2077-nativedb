@@ -1,7 +1,7 @@
 :host {
   display: flex;
   flex-wrap: wrap;
-  min-height: 48px;
+  margin: 24px 0;
 
   & .badges {
     display: flex;
@@ -15,6 +15,6 @@
   & .prototype {
     display: flex;
     flex-wrap: wrap;
-    margin-top: 3px;
+    margin-top: 1px;
   }
 }
