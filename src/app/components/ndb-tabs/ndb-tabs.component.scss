@@ -3,8 +3,14 @@
 }
 
 mat-tab-group {
-  min-width: 320px;
-  max-width: 50vw;
+  @media (min-width: 1024px) {
+    min-width: 320px;
+    max-width: 50vw;
+  }
+
+  @media (max-width: 1025px) {
+    width: 100vw!important;
+  }
 }
 
 .count {
@@ -17,6 +23,10 @@ mat-tab-group {
 
   padding-left: 8px;
   padding-right: 8px;
+
+  @media (max-width: 1025px) {
+    display: none;
+  }
 }
 
 .skt-tab {

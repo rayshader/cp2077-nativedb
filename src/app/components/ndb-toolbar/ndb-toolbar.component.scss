@@ -1,0 +1,51 @@
+.home {
+  cursor: pointer;
+
+  @media (max-width: 599px) {
+    display: none;
+  }
+}
+
+.version {
+  margin-left: 24px;
+}
+
+.space {
+  display: flex;
+  flex: 1;
+}
+
+.search {
+  display: flex;
+  flex: 4;
+
+  margin-left: 24px;
+
+  & rd-search {
+    width: 100%;
+  }
+
+  @media (max-width: 1024px) {
+    margin: 0 12px;
+  }
+
+  @media (max-width: 599px) {
+    margin: 0 2px;
+  }
+}
+
+@media (max-width: 1024px) {
+  mat-toolbar {
+    padding: 0;
+  }
+
+  .lg {
+    display: none;
+  }
+}
+
+@media (min-width: 1024px) {
+  .n-lg {
+    display: none;
+  }
+}

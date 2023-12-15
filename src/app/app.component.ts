@@ -1,12 +1,10 @@
 import {Component, DestroyRef, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {RouterLink, RouterOutlet} from '@angular/router';
+import {NavigationEnd, Router, RouterLink, RouterOutlet} from '@angular/router';
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {NDBTabsComponent} from "./components/ndb-tabs/ndb-tabs.component";
 import {IconsService} from "../shared/services/icons.service";
 import {HttpClientModule} from "@angular/common/http";
-import {NDBSearchComponent} from "./components/ndb-search/ndb-search.component";
-import {NDBThemeModeComponent} from "./components/ndb-theme-mode/ndb-theme-mode.component";
 import {MatChipsModule} from "@angular/material/chips";
 import {PageScrollBehavior, PageService} from "../shared/services/page.service";
 import {MatButtonModule} from "@angular/material/button";
@@ -15,8 +13,12 @@ import {SwUpdate, VersionEvent, VersionReadyEvent} from "@angular/service-worker
 import {MatDialog} from "@angular/material/dialog";
 import {UpdateDialogComponent} from "./components/update-dialog/update-dialog.component";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {NDBIdeThemeComponent} from "./components/ndb-ide-theme/ndb-ide-theme.component";
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from "@angular/material/form-field";
+import {MatSidenavModule} from "@angular/material/sidenav";
+import {NDBToolbarComponent} from "./components/ndb-toolbar/ndb-toolbar.component";
+import {NDBBottomBarComponent} from "./components/ndb-bottom-bar/ndb-bottom-bar.component";
+import {debounceTime, filter} from "rxjs";
+import {ResponsiveService} from "../shared/services/responsive.service";
 
 interface AppData {
   gameVersion: string;
@@ -34,10 +36,10 @@ interface AppData {
     MatChipsModule,
     MatButtonModule,
     MatToolbarModule,
+    MatSidenavModule,
     NDBTabsComponent,
-    NDBSearchComponent,
-    NDBThemeModeComponent,
-    NDBIdeThemeComponent
+    NDBToolbarComponent,
+    NDBBottomBarComponent
   ],
   providers: [
     {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}}
@@ -49,18 +51,66 @@ export class AppComponent implements OnInit {
   @ViewChild('page')
   page?: ElementRef;
 
+  showTabs: boolean = true;
+  isMobile: boolean = false;
+
   constructor(private readonly iconsService: IconsService,
               private readonly pageService: PageService,
+              private readonly responsiveService: ResponsiveService,
               private readonly dialog: MatDialog,
+              private readonly router: Router,
               private readonly swService: SwUpdate,
               private readonly dr: DestroyRef) {
   }
 
+  get displayTabs(): string {
+    if (!this.isMobile) {
+      return '';
+    }
+    return (!this.showTabs) ? 'none' : '';
+  }
+
+  get displayPage(): string {
+    if (!this.isMobile) {
+      return '';
+    }
+    return (this.showTabs) ? 'none' : '';
+  }
+
   ngOnInit(): void {
     this.iconsService.load();
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd),
+      takeUntilDestroyed(this.dr)
+    ).subscribe(this.onRouteChanged.bind(this));
+    this.responsiveService.mobile$.pipe(
+      debounceTime(500),
+      takeUntilDestroyed(this.dr)
+    ).subscribe(this.onMobile.bind(this));
     this.pageService.scroll$.pipe(takeUntilDestroyed(this.dr)).subscribe(this.scroll.bind(this));
     if (this.swService.isEnabled) {
       this.swService.versionUpdates.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onUpdate.bind(this));
+    }
+  }
+
+  onToggleTabs(): void {
+    if (!this.isMobile) {
+      return;
+    }
+    this.showTabs = !this.showTabs;
+  }
+
+  private onRouteChanged(): void {
+    if (!this.isMobile) {
+      return;
+    }
+    this.showTabs = false;
+  }
+
+  private onMobile(isMobile: boolean): void {
+    this.isMobile = isMobile;
+    if (isMobile) {
+      this.showTabs = false;
     }
   }
 

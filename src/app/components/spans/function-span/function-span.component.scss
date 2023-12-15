@@ -4,11 +4,39 @@
 
   & .badges {
     display: flex;
+
+    & .clipboard {
+      @media (max-width: 1025px) {
+        display: none;
+      }
+    }
   }
 
   & .prototype {
     display: flex;
     flex-wrap: wrap;
     margin-top: 1px;
+
+    &.break {
+      @media (max-width: 1025px) {
+        flex-flow: column;
+
+        & argument-span {
+          margin-left: 8px;
+        }
+      }
+    }
+
+    & .group {
+      display: flex;
+    }
+
+    @media (max-width: 1025px) {
+      overflow-x: auto;
+    }
+  }
+
+  @media (max-width: 1025px) {
+    flex-flow: column;
   }
 }

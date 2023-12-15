@@ -22,8 +22,29 @@
       margin-bottom: 12px;
     }
 
+    & .actions {
+      display: flex;
+
+      @media (max-width: 1025px) {
+        justify-content: center;
+      }
+    }
+
     & button {
       margin-top: 24px;
+
+      @media (max-width: 1025px) {
+        margin-top: 12px;
+      }
+    }
+
+    @media (max-width: 1025px) {
+      flex-flow: column-reverse;
+
+      h1 {
+        overflow-x: auto;
+        margin-top: 0;
+      }
     }
   }
 }

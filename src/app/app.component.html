@@ -1,49 +1,13 @@
-<mat-toolbar>
-  <span class="home" routerLink="">NativeDB</span>
-
-  <mat-chip class="version" [disableRipple]="true">v2.02</mat-chip>
-
-  <div class="space"></div>
-
-  <button mat-icon-button
-          title="Recent visits"
-          routerLink="">
-    <mat-icon>history</mat-icon>
-  </button>
-
-  <button mat-icon-button
-          title="Bookmarks"
-          routerLink="bookmarks">
-    <mat-icon>bookmarks</mat-icon>
-  </button>
-
-  <div class="search">
-    <ndb-search></ndb-search>
-  </div>
-
-  <div class="space"></div>
-
-  <ndb-theme-mode></ndb-theme-mode>
-
-  <ndb-ide-theme></ndb-ide-theme>
-
-  <button mat-icon-button
-          title="Settings"
-          routerLink="settings">
-    <mat-icon>settings</mat-icon>
-  </button>
-
-  <button mat-icon-button
-          title="Readme"
-          routerLink="readme">
-    <mat-icon>help</mat-icon>
-  </button>
-</mat-toolbar>
+<ndb-toolbar (toggle)="onToggleTabs()"></ndb-toolbar>
 
 <section>
-  <ndb-tabs></ndb-tabs>
+  <ndb-tabs [style.display]="displayTabs"></ndb-tabs>
 
-  <div #page class="page">
+  <div #page
+       class="page"
+       [style.display]="displayPage">
     <router-outlet></router-outlet>
   </div>
 </section>
+
+<ndb-bottom-bar></ndb-bottom-bar>

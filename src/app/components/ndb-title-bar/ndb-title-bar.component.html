@@ -5,29 +5,31 @@
   </div>
 </div>
 
-<button mat-icon-button
-        title="Copy URL to clipboard"
-        (click)="copyUrl()">
-  <mat-icon>share</mat-icon>
-</button>
-
-@if (_node !== undefined) {
+<div class="actions">
   <button mat-icon-button
-          [title]="isBookmarked ? 'Remove bookmark' : 'Add bookmark'"
-          (click)="toggleBookmark()">
-    @if (isBookmarked) {
-      <mat-icon>bookmark</mat-icon>
-    } @else {
-      <mat-icon>bookmark_border</mat-icon>
-    }
+          title="Copy URL to clipboard"
+          (click)="copyUrl()">
+    <mat-icon>share</mat-icon>
   </button>
-}
 
-@if (!hidden) {
-  <button mat-icon-button
-          class="pin"
-          [title]="isPinned ? 'Unpin title when scrolling' : 'Pin title to the top when scrolling'"
-          (click)="togglePin()">
-    <mat-icon [svgIcon]="isPinned ? 'pin-off' : 'pin'"></mat-icon>
-  </button>
-}
+  @if (_node !== undefined) {
+    <button mat-icon-button
+            [title]="isBookmarked ? 'Remove bookmark' : 'Add bookmark'"
+            (click)="toggleBookmark()">
+      @if (isBookmarked) {
+        <mat-icon>bookmark</mat-icon>
+      } @else {
+        <mat-icon>bookmark_border</mat-icon>
+      }
+    </button>
+  }
+
+  @if (!hidden) {
+    <button mat-icon-button
+            class="pin"
+            [title]="isPinned ? 'Unpin title when scrolling' : 'Pin title to the top when scrolling'"
+            (click)="togglePin()">
+      <mat-icon [svgIcon]="isPinned ? 'pin-off' : 'pin'"></mat-icon>
+    </button>
+  }
+</div>

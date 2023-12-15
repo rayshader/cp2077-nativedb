@@ -23,6 +23,10 @@
 
     & .align {
       display: inline-block;
+
+      @media (max-width: 1025px) {
+        width: 30px!important;
+      }
     }
 
     & mat-icon {

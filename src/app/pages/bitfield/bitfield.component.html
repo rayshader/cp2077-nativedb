@@ -6,7 +6,7 @@
   @for (member of bitfield.members; track member.key) {
     <p class="field stx">
       <button mat-icon-button
-              class="badge"
+              class="badge clipboard"
               (click)="copyClipboard(bitfield, member.key)"><mat-icon>content_copy</mat-icon></button>
       <span class="stx-text">{{member.key}}</span>
       <span class="stx-text">&nbsp;=&nbsp;</span>

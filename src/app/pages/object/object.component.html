@@ -86,8 +86,11 @@
                     [disableRipple]="true">{{data.functions.length}}</mat-chip>
         </div>
 
-        @for (func of data.functions; track func.id) {
+        @for (func of data.functions; track func.id; let i = $index) {
           <function-span [node]="func" [canCopy]="true" [memberOf]="data.object" [badges]="data.badges"></function-span>
+          @if (data.isMobile && i + 1 < data.functions.length) {
+            <mat-divider></mat-divider>
+          }
         }
       </ndb-accordion-item>
     }

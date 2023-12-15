@@ -21,6 +21,8 @@ import {SettingsService} from "../../../shared/services/settings.service";
 import {MatButtonModule} from "@angular/material/button";
 import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
 import {RecentVisitService} from "../../../shared/services/recent-visit.service";
+import {ResponsiveService} from "../../../shared/services/responsive.service";
+import {MatDividerModule} from "@angular/material/divider";
 
 interface ObjectData {
   readonly object: RedClassAst;
@@ -34,6 +36,7 @@ interface ObjectData {
   readonly badges: number;
   readonly align: string;
 
+  readonly isMobile: boolean;
   readonly showParents: boolean;
   readonly showChildren: boolean;
   readonly showProperties: boolean;
@@ -49,6 +52,7 @@ interface ObjectData {
     MatIconModule,
     MatChipsModule,
     MatButtonModule,
+    MatDividerModule,
     FunctionSpanComponent,
     PropertySpanComponent,
     TypeSpanComponent,
@@ -74,6 +78,7 @@ export class ObjectComponent {
               private readonly pageService: PageService,
               private readonly recentVisitService: RecentVisitService,
               private readonly settingsService: SettingsService,
+              private readonly responsiveService: ResponsiveService,
               private readonly route: ActivatedRoute) {
     this.kind = (this.route.snapshot.data as any).kind;
   }
@@ -101,14 +106,16 @@ export class ObjectComponent {
       parents$,
       children$,
       this.dumpService.badges$,
-      this.settingsService.showEmptyAccordion$
+      this.settingsService.showEmptyAccordion$,
+      this.responsiveService.mobile$,
     ]).pipe(
       map(([
              object,
              parents,
              children,
              badges,
-             showEmptyAccordion
+             showEmptyAccordion,
+             isMobile
            ]) => {
         const properties = object.properties;
         const functions = object.functions;
@@ -125,6 +132,7 @@ export class ObjectComponent {
           functions: functions,
           badges: badges,
           align: `${72 + badges * 24 + 12 - 30}px`,
+          isMobile: isMobile,
           showParents: parents.length > 0 || showEmptyAccordion,
           showChildren: children.length > 0 || showEmptyAccordion,
           showProperties: properties.length > 0 || showEmptyAccordion,

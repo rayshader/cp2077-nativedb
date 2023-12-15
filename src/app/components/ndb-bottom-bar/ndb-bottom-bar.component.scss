@@ -1,0 +1,10 @@
+mat-toolbar {
+  position: absolute;
+  bottom: 0;
+  z-index: 1;
+}
+
+.space {
+  display: flex;
+  flex: 1;
+}

@@ -9,6 +9,16 @@
     & .align-clipboard {
       display: inline-block;
       width: 32px;
+
+      @media (max-width: 1025px) {
+        display: none;
+      }
+    }
+
+    & .align {
+      @media (max-width: 1025px) {
+        display: none;
+      }
     }
   }
 
@@ -16,5 +26,9 @@
     display: flex;
     flex-wrap: wrap;
     margin-top: 1px;
+  }
+
+  @media (max-width: 1025px) {
+    flex-flow: column;
   }
 }

@@ -15,6 +15,11 @@
 
     margin-left: 48px;
   }
+
+  @media (max-width: 500px) {
+    flex-flow: column;
+    align-items: end;
+  }
 }
 
 mat-divider {

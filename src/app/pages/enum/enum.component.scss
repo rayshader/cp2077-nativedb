@@ -13,4 +13,15 @@
   & button {
     margin-right: 12px;
   }
+
+  & .clipboard {
+    @media (max-width: 1025px) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1025px) {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
 }

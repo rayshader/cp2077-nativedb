@@ -1,0 +1,55 @@
+<mat-toolbar>
+  <button mat-icon-button
+          class="n-lg"
+          (click)="toggleTabs()">
+    @if (isTabsOpen) {
+      <mat-icon>close</mat-icon>
+    } @else {
+      <mat-icon>menu</mat-icon>
+    }
+  </button>
+
+  <span class="home" routerLink="">NativeDB</span>
+
+  <mat-chip class="lg version" [disableRipple]="true">v2.02</mat-chip>
+
+  <div class="lg space"></div>
+
+  <button mat-icon-button
+          class="lg"
+          title="Recent visits"
+          routerLink="">
+    <mat-icon>history</mat-icon>
+  </button>
+
+  <button mat-icon-button
+          class="lg"
+          title="Bookmarks"
+          routerLink="bookmarks">
+    <mat-icon>bookmarks</mat-icon>
+  </button>
+
+  <div class="search">
+    <ndb-search></ndb-search>
+  </div>
+
+  <div class="lg space"></div>
+
+  <ndb-theme-mode class="lg"></ndb-theme-mode>
+
+  <ndb-ide-theme class="lg"></ndb-ide-theme>
+
+  <button mat-icon-button
+          class="lg"
+          title="Settings"
+          routerLink="settings">
+    <mat-icon>settings</mat-icon>
+  </button>
+
+  <button mat-icon-button
+          class="lg"
+          title="Readme"
+          routerLink="readme">
+    <mat-icon>help</mat-icon>
+  </button>
+</mat-toolbar>
