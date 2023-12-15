@@ -3,7 +3,7 @@
  */
 @function vscode-theme() {
   @return (
-    family: Consolas,
+    family: #{Consolas, monospace},
     size: 1rem,
 
     light: (
