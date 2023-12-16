@@ -70,8 +70,11 @@
                     [disableRipple]="true">{{data.properties.length}}</mat-chip>
         </div>
 
-        @for (prop of data.properties; track prop.name) {
+        @for (prop of data.properties; track prop.name; let i = $index) {
           <property-span [node]="prop" [badges]="data.badges"></property-span>
+          @if (data.isMobile && i + 1 < data.properties.length) {
+            <mat-divider></mat-divider>
+          }
         }
       </ndb-accordion-item>
     }
