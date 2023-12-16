@@ -4,7 +4,8 @@
     <span class="stx-type"><</span>
     <type-span [node]="node.innerType"></type-span>
     @if (node.size !== undefined) {
-      <span class="stx-number">; {{node.size}}</span>
+      <span class="stx-type">;&nbsp;</span>
+      <span class="stx-number">{{node.size}}</span>
     }
     <span class="stx-type">></span>
   } @else if (isPrimitive) {
