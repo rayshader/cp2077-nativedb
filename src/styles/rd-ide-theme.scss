@@ -12,12 +12,19 @@
 }
 
 @mixin rd-ide-background($theme, $name) {
+  $light: map.get($theme, light);
+  $dark: map.get($theme, dark);
+
   .mat-app-background {
     &.ide-#{$name}-theme {
-      background-color: map.get(map.get($theme, light), background);
+      background-color: map.get($light, background);
 
       &.dark-theme {
-        background-color: map.get(map.get($theme, dark), background);
+        background-color: map.get($dark, background);
+
+        .mat-toolbar {
+          background-color: map.get($dark, toolbar);
+        }
       }
     }
   }
