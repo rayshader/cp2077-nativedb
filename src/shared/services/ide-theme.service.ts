@@ -36,7 +36,11 @@ export class IDEThemeService {
       isLoaded: false,
       font: 'https://fonts.googleapis.com/css2?family=Fira+Code&display=swap'
     },
-    {theme: IDETheme.vscode, isLoaded: false},
+    {
+      theme: IDETheme.vscode,
+      isLoaded: false,
+      font: 'https://fonts.googleapis.com/css2?family=Inconsolata&display=swap'
+    },
     {
       theme: IDETheme.intellij,
       isLoaded: false,
