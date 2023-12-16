@@ -29,6 +29,13 @@ mat-tab-group {
   }
 }
 
+.skt-divider {
+  width: inherit;
+  height: 1px;
+
+  background-color: var(--mat-divider-color);
+}
+
 .skt-tab {
   overflow-y: scroll;
   overflow-x: hidden;
