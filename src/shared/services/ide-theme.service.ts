@@ -34,13 +34,13 @@ export class IDEThemeService {
     {
       theme: IDETheme.vanilla,
       isLoaded: false,
-      font: 'https://fonts.googleapis.com/css2?family=Fira+Code:wght@500&display=swap'
+      font: 'https://fonts.googleapis.com/css2?family=Fira+Code&display=swap'
     },
     {theme: IDETheme.vscode, isLoaded: false},
     {
       theme: IDETheme.intellij,
       isLoaded: false,
-      font: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500&display=swap'
+      font: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap'
     }
   ];
 
