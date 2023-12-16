@@ -1,7 +1,10 @@
+@use 'sass:map';
 @use './rd-ide-theme' as *;
 @use './ide/vscode' as *;
 
 $ide-theme: vscode-theme();
+
+@include rd-ide-background($ide-theme, vscode);
 
 .ide-vscode-theme {
   @include rd-ide-typography($ide-theme);

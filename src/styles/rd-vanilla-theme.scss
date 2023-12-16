@@ -1,7 +1,10 @@
+@use 'sass:map';
 @use './rd-ide-theme' as *;
 @use './ide/vanilla' as *;
 
 $ide-theme: vanilla-theme();
+
+@include rd-ide-background($ide-theme, vanilla);
 
 .ide-vanilla-theme {
   @include rd-ide-typography($ide-theme);

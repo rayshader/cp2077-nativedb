@@ -1,7 +1,10 @@
+@use 'sass:map';
 @use './rd-ide-theme' as *;
 @use './ide/intellij' as *;
 
 $ide-theme: intellij-theme();
+
+@include rd-ide-background($ide-theme, intellij);
 
 .ide-intellij-theme {
   @include rd-ide-typography($ide-theme);

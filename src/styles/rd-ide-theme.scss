@@ -11,8 +11,24 @@
   }
 }
 
+@mixin rd-ide-background($theme, $name) {
+  .mat-app-background {
+    &.ide-#{$name}-theme {
+      background-color: map.get(map.get($theme, light), background);
+
+      &.dark-theme {
+        background-color: map.get(map.get($theme, dark), background);
+      }
+    }
+  }
+}
+
 @mixin rd-ide-theme($theme, $mode) {
   $colors: map.get($theme, $mode);
+
+  ndb-title-bar {
+    background-color: map.get($colors, background);
+  }
 
   .stx-doc {
     color: map.get($colors, documentation);

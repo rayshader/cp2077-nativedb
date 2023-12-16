@@ -1,0 +1,15 @@
+@use 'sass:map';
+
+@mixin toolbar-theme($theme) {
+
+}
+
+@mixin toolbar-color($theme) {
+  $isDark: map.get($theme, is-dark);
+
+  @if ($isDark) {
+    .mat-toolbar {
+      background-color: #121212;
+    }
+  }
+}
