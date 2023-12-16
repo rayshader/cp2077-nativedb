@@ -3,7 +3,7 @@
  */
 @function intellij-theme() {
   @return (
-    family: 'JetBrains Mono',
+    family: #{'JetBrains Mono', monospace},
     size: 1rem,
 
     light: (
