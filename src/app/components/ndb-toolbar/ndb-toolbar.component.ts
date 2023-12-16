@@ -52,6 +52,17 @@ export class NDBToolbarComponent {
     this.toggle.emit();
   }
 
+  onSearch(): void {
+    if (!this.isMobile) {
+      return;
+    }
+    if (this.isTabsOpen) {
+      return;
+    }
+    this.isTabsOpen = true;
+    this.toggle.emit();
+  }
+
   private onMobile(isMobile: boolean): void {
     this.isMobile = isMobile;
     this.isTabsOpen = !isMobile;

@@ -1,4 +1,4 @@
-import {Component, DestroyRef, OnInit} from '@angular/core';
+import {Component, DestroyRef, EventEmitter, OnInit, Output} from '@angular/core';
 import {MatInputModule} from "@angular/material/input";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatIconModule} from "@angular/material/icon";
@@ -21,6 +21,9 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 })
 export class NDBSearchComponent implements OnInit {
 
+  @Output()
+  search: EventEmitter<void> = new EventEmitter<void>();
+
   query: FormControl<string | null> = new FormControl('');
 
   constructor(private readonly searchService: SearchService,
@@ -37,6 +40,9 @@ export class NDBSearchComponent implements OnInit {
         query ??= '';
         query = query.trim();
         this.searchService.search(query);
+        if (query.length > 0) {
+          this.search.emit();
+        }
       });
   }
 
