@@ -1,4 +1,4 @@
-import {Component, HostListener, Renderer2} from '@angular/core';
+import {AfterViewInit, Component, DestroyRef, HostListener, QueryList, Renderer2, ViewChildren} from '@angular/core';
 import {MatTabsModule} from "@angular/material/tabs";
 import {combineLatest, map, Observable, take} from "rxjs";
 import {MatIconModule} from "@angular/material/icon";
@@ -40,7 +40,10 @@ interface TabItem {
   templateUrl: './ndb-tabs.component.html',
   styleUrl: './ndb-tabs.component.scss'
 })
-export class NDBTabsComponent {
+export class NDBTabsComponent implements AfterViewInit {
+
+  @ViewChildren(CdkVirtualScrollViewport)
+  readonly viewports?: QueryList<CdkVirtualScrollViewport>;
 
   readonly tabs$: Observable<TabItem[]>;
   readonly skeletons: TabItem[] = [
@@ -57,6 +60,7 @@ export class NDBTabsComponent {
 
   constructor(private readonly renderer: Renderer2,
               private readonly settingsService: SettingsService,
+              private readonly dr: DestroyRef,
               searchService: SearchService) {
     this.settingsService.tabsWidth$.pipe(take(1), takeUntilDestroyed()).subscribe(this.onWidthLoaded.bind(this));
     this.tabs$ = combineLatest([
@@ -98,6 +102,17 @@ export class NDBTabsComponent {
         ];
       })
     );
+  }
+
+  ngAfterViewInit(): void {
+    this.viewports?.changes.pipe(takeUntilDestroyed(this.dr)).subscribe(() => {
+      const viewports = this.viewports?.toArray();
+
+      if (!viewports || viewports.length === 0) {
+        return;
+      }
+      viewports[0].checkViewportSize();
+    });
   }
 
   protected onStartResizing(): void {
