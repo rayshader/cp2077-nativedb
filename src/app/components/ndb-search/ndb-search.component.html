@@ -1,4 +1,31 @@
 <mat-form-field color="accent" subscriptSizing="dynamic">
   <mat-icon matPrefix>search</mat-icon>
   <input matInput [formControl]="query" placeholder="Search" />
+  @if (query.value?.length ?? 0 > 0) {
+    <button matSuffix
+            mat-icon-button
+            title="Clear search query"
+            (click)="clear()">
+      <mat-icon>close</mat-icon>
+    </button>
+  }
+  <button matSuffix
+          mat-icon-button
+          title="Search by..."
+          [matMenuTriggerFor]="menu">
+    <mat-icon>tune</mat-icon>
+  </button>
 </mat-form-field>
+
+<mat-menu #menu="matMenu">
+  @for (item of filters; track item.value) {
+    <button mat-menu-item (click)="onFilterChanged(item)">
+      @if (item.value === filter) {
+        <mat-icon color="primary">radio_button_checked</mat-icon>
+      } @else {
+        <mat-icon>radio_button_unchecked</mat-icon>
+      }
+      {{item.name}}
+    </button>
+  }
+</mat-menu>
