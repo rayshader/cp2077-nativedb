@@ -1,5 +1,5 @@
 import {ApplicationConfig, isDevMode} from '@angular/core';
-import {provideRouter, withComponentInputBinding} from '@angular/router';
+import {PreloadAllModules, provideRouter, withComponentInputBinding, withPreloading} from '@angular/router';
 import {provideAnimations} from '@angular/platform-browser/animations';
 import {provideHttpClient} from "@angular/common/http";
 import {provideServiceWorker} from '@angular/service-worker';
@@ -10,7 +10,8 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideRouter(
       routes,
-      withComponentInputBinding()
+      withComponentInputBinding(),
+      withPreloading(PreloadAllModules)
     ),
     provideAnimations(),
     provideHttpClient(),
