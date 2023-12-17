@@ -30,6 +30,16 @@
   </p>
 
   <p>
+    You can choose what your query will search for. This icon <mat-icon>tune</mat-icon> provides a few options:
+  </p>
+  <ul>
+    <li>Name: default, query will run on the name of enums, bitfields, classes, structs and functions.</li>
+    <li>Property: query will run on the name of properties in classes and structs.</li>
+    <li>Function: query will run on the name of functions in classes, structs and functions.</li>
+    <li>Usage: query will run on the name of types in classes, structs and functions.</li>
+  </ul>
+
+  <p>
     You can see items, in the left panel, with a <span class="stx-type disabled">darker color</span> to tell you
     "there is nothing to see". Whether its a class or a struct, it means there is no properties nor functions. However,
     it might still inherit from parents and/or be inherited by children. You can change this behavior in the settings.
