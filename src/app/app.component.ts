@@ -21,6 +21,7 @@ import {debounceTime, filter} from "rxjs";
 import {ResponsiveService} from "../shared/services/responsive.service";
 
 interface AppData {
+  appVersion: string;
   gameVersion: string;
 }
 

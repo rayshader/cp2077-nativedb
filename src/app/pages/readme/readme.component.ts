@@ -10,6 +10,7 @@ import {MatButtonModule} from "@angular/material/button";
 import {RouterLink} from "@angular/router";
 import {cyrb53} from "../../../shared/string";
 import {PageService} from "../../../shared/services/page.service";
+import {MatChipsModule} from "@angular/material/chips";
 
 @Component({
   selector: 'readme',
@@ -20,6 +21,7 @@ import {PageService} from "../../../shared/services/page.service";
     MatIconModule,
     MatDividerModule,
     MatButtonModule,
+    MatChipsModule,
     FunctionSpanComponent
   ],
   templateUrl: './readme.component.html',
