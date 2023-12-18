@@ -31,6 +31,7 @@ interface AItem<T> {
 export class SettingsComponent implements OnInit {
 
   readonly syntax: AItem<CodeSyntax>[] = [
+    {value: CodeSyntax.vanilla, name: 'Vanilla', disabled: false},
     {value: CodeSyntax.redscript, name: 'Red · Scripts', disabled: false},
     {value: CodeSyntax.lua, name: 'Lua · CET', disabled: true},
     {value: CodeSyntax.cppRED4ext, name: 'C++ · RED4ext', disabled: true},
