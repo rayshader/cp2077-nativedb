@@ -27,15 +27,28 @@ export enum RedPrimitiveDef {
   LocalizationString,
   CName,
   TweakDBID,
+  NodeRef,
+  DataBuffer,
+  serializationDeferredDataBuffer,
+  SharedDataBuffer,
+  CDateTime,
+  CGUID,
+  CRUID,
+  //CRUIDRef,
+  EditorObjectID,
+  //GamedataLocKeyWrapper,
+  MessageResourcePath,
+  //RuntimeEntityRef,
   Variant
 }
 
 export enum RedTemplateDef {
-  ref = 19,
+  ref = RedPrimitiveDef.Variant + 1,
   wref,
   script_ref,
   ResRef,
   ResAsyncRef,
   array,
-  curveData
+  curveData,
+  multiChannelCurve
 }
