@@ -99,14 +99,17 @@
     }
   </cdk-accordion>
 } @else {
-  <h1 class="stx stx-type">Loading...</h1>
-  <div class="prototype">
-    <span class="skt-circle skt-scope"></span>
-    @if (kind === classKind) {
-      <span class="skt-circle skt-class"></span>
-    } @else if (kind === structKind) {
-      <span class="skt-circle skt-struct"></span>
-    }
+  <div class="title">
+    <h1 class="stx stx-type">Loading...</h1>
+    <div class="prototype">
+      <span class="skt-circle skt-scope"></span>
+      <span class="skt-circle skt-scope"></span>
+      @if (kind === classKind) {
+        <span class="skt-circle skt-class"></span>
+      } @else if (kind === structKind) {
+        <span class="skt-circle skt-struct"></span>
+      }
+    </div>
   </div>
 
   <div class="skt-accordion-item">
