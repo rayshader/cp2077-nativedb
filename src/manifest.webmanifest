@@ -1,11 +1,42 @@
 {
   "name": "NativeDB",
-  "short_name": "NativeDB",
+  "short_name": "NDB",
   "theme_color": "#1976d2",
-  "background_color": "#fafafa",
-  "display": "standalone",
+  "background_color": "#1f1f1f",
+  "display": "minimal-ui",
+  "id": "/",
   "scope": "./",
   "start_url": "./",
   "icons": [
+     {
+        "src": "/assets/logo/512.png",
+        "type": "image/png",
+        "sizes": "512x512",
+        "purpose": "any"
+     },
+     {
+        "src": "/assets/logo/256.png",
+        "type": "image/png",
+        "sizes": "256x256",
+        "purpose": "any"
+     },
+     {
+        "src": "/assets/logo/192.png",
+        "type": "image/png",
+        "sizes": "192x192",
+        "purpose": "any"
+     },
+     {
+        "src": "/assets/logo/96.png",
+        "type": "image/png",
+        "sizes": "96x96",
+        "purpose": "any"
+     },
+     {
+        "src": "/assets/logo/48.png",
+        "type": "image/png",
+        "sizes": "48x48",
+        "purpose": "any"
+     }
   ]
 }
