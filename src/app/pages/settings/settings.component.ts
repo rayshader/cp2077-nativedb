@@ -97,14 +97,14 @@ export class SettingsComponent implements OnInit {
   }
 
   private onClipboardSyntaxSelected(syntax: CodeSyntax | null): void {
-    if (!syntax) {
+    if (syntax === null) {
       return;
     }
     this.settingsService.updateClipboard(syntax);
   }
 
   private onCodeSyntaxSelected(syntax: CodeSyntax | null): void {
-    if (!syntax) {
+    if (syntax === null) {
       return;
     }
     this.settingsService.updateCode(syntax);
