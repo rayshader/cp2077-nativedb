@@ -1,18 +1,43 @@
-@if (node) {
-  @if (node.innerType) {
-    <span class="stx-lang">{{node.name}}</span>
-    <span class="stx-type"><</span>
-    <type-span [node]="node.innerType"></type-span>
-    @if (node.size !== undefined) {
-      <span class="stx-type">;&nbsp;</span>
-      <span class="stx-number">{{node.size}}</span>
+@if (syntax$ | async; as syntax) {
+  @if (node) {
+    @if (node.innerType) {
+      @switch (syntax) {
+        @case (vanilla) {
+          <span class="stx-lang">{{node | ndbFormatCode:syntax}}</span>
+          <span class="stx-text">:</span>
+          <type-span [node]="node.innerType"></type-span>
+        }
+        @case (redscript) {
+          <span class="stx-lang">{{node | ndbFormatCode:syntax}}</span>
+          <span class="stx-type"><</span>
+          <type-span [node]="node.innerType"></type-span>
+          @if (node.size !== undefined) {
+            <span class="stx-type">;&nbsp;</span>
+            <span class="stx-number">{{node.size}}</span>
+          }
+          <span class="stx-type">></span>
+        }
+        @case (cpp) {
+          <span class="stx-lang">{{node | ndbFormatCode:syntax}}</span>
+          <span class="stx-type"><</span>
+          <type-span [node]="node.innerType"></type-span>
+          @if (node.size !== undefined) {
+            <span class="stx-type">,&nbsp;</span>
+            <span class="stx-number">{{node.size}}</span>
+          }
+          <span class="stx-type">></span>
+        }
+      }
+    } @else if (isPrimitive) {
+      <span class="stx-primitive-type">{{node | ndbFormatCode:syntax}}</span>
+    } @else {
+      <span class="stx-type redirect" (click)="onRedirect()">{{node.name}}</span>
     }
-    <span class="stx-type">></span>
-  } @else if (isPrimitive) {
-    <span class="stx-primitive-type">{{node.name}}</span>
   } @else {
-    <span class="stx-type redirect" (click)="onRedirect()">{{node.name}}</span>
+    @if (syntax === cpp) {
+      <span class="stx-primitive-type">void</span>
+    } @else {
+      <span class="stx-primitive-type">Void</span>
+    }
   }
-} @else {
-  <span class="stx-primitive-type">Void</span>
 }

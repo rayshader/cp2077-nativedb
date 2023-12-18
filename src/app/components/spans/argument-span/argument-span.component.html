@@ -1,11 +1,41 @@
-@if (node) {
-  @if (node.isOut) {
-    <span class="stx-lang">out&nbsp;</span>
+@if (syntax$ | async; as syntax) {
+  @if (node) {
+    @switch (syntax) {
+      @case (cpp) {
+        <!--
+        @if (node.isConst) {
+          <span class="stx-lang">const&nbsp;</span>
+        }
+        -->
+        @if (node.isOptional) {
+          <span class="stx-lang">Optional</span>
+          <span class="stx-type"><</span>
+        }
+        <type-span [node]="node.type"></type-span>
+        @if (node.isOptional) {
+          <span class="stx-type">></span>
+        }
+        @if (node.isOut) {
+          <span class="stx-text">&</span>
+        }
+        <span class="stx-arg">&nbsp;{{node.name}}</span>
+      }
+      @default {
+        <!--
+        @if (node.isConst) {
+          <span class="stx-lang">const&nbsp;</span>
+        }
+        -->
+        @if (node.isOut) {
+          <span class="stx-lang">out&nbsp;</span>
+        }
+        @if (node.isOptional) {
+          <span class="stx-lang">opt&nbsp;</span>
+        }
+        <span class="stx-arg">{{node.name}}</span>
+        <span class="stx-text">:&nbsp;</span>
+        <type-span [node]="node.type"></type-span>
+      }
+    }
   }
-  @if (node.isOptional) {
-    <span class="stx-lang">opt&nbsp;</span>
-  }
-  <span class="stx-arg">{{node.name}}</span>
-  <span class="stx-text">:&nbsp;</span>
-  <type-span [node]="node.type"></type-span>
 }
