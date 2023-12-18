@@ -7,6 +7,7 @@ import {take} from "rxjs";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {CodeSyntax, Settings, SettingsService} from "../../../shared/services/settings.service";
+import {PageScrollBehavior} from "../../../shared/services/page.service";
 
 interface AItem<T> {
   readonly value: T;
@@ -37,7 +38,7 @@ export class SettingsComponent implements OnInit {
   ];
 
   readonly ignoreDuplicate: FormControl<boolean | null> = new FormControl(true);
-  readonly scrollBehavior: FormControl<ScrollBehavior | 'disabled' | null> = new FormControl('smooth');
+  readonly scrollBehavior: FormControl<PageScrollBehavior | null> = new FormControl('smooth');
   readonly highlightEmptyObject: FormControl<boolean | null> = new FormControl(true);
   readonly showEmptyAccordion: FormControl<boolean | null> = new FormControl(false);
   readonly mergeObject: FormControl<boolean | null> = new FormControl(false);
