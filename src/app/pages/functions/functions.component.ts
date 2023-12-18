@@ -43,8 +43,8 @@ export class FunctionsComponent {
     'ArraySortInts() → Void'
   ];
 
-  constructor(dumpService: RedDumpService) {
-    this.functions$ = dumpService.functions$;
+  constructor(private readonly dumpService: RedDumpService) {
+    this.functions$ = this.dumpService.functions$;
   }
 
 }
