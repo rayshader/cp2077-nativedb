@@ -30,12 +30,17 @@ interface AItem<T> {
 })
 export class SettingsComponent implements OnInit {
 
-  readonly syntax: AItem<CodeSyntax>[] = [
-    {value: CodeSyntax.vanilla, name: 'Vanilla', disabled: false},
+  readonly clipboardOptions: AItem<CodeSyntax>[] = [
     {value: CodeSyntax.redscript, name: 'Red · Scripts', disabled: false},
     {value: CodeSyntax.lua, name: 'Lua · CET', disabled: true},
     {value: CodeSyntax.cppRED4ext, name: 'C++ · RED4ext', disabled: true},
     {value: CodeSyntax.cppRedLib, name: 'C++ · RedLib', disabled: true},
+  ];
+
+  readonly codeOptions: AItem<CodeSyntax>[] = [
+    {value: CodeSyntax.vanilla, name: 'Vanilla', disabled: false},
+    {value: CodeSyntax.redscript, name: 'Red · Scripts', disabled: false},
+    {value: CodeSyntax.cppRED4ext, name: 'C++ · RED4ext / RedLib', disabled: false}
   ];
 
   readonly ignoreDuplicate: FormControl<boolean | null> = new FormControl(true);
