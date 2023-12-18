@@ -7,13 +7,15 @@
     <function-span [node]="func" [canCopy]="false"></function-span>
   }
 } @else {
-  <h1 class="stx stx-type">Loading...</h1>
-  <div class="prototype">
-    <span class="skt-rect skt-function"></span>
+  <div class="title">
+    <h1 class="stx stx-type">Loading...</h1>
+    <div class="prototype">
+      <span class="skt-function skt-rect"></span>
+    </div>
   </div>
 
   @for (func of skeletons; track func) {
-    <div class="skt-function">
+    <div class="skt-function-def">
       <div class="badges">
         <div class="skt-button"></div>
         <span class="skt-circle skt-scope"></span>
