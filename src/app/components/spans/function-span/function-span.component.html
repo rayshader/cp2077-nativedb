@@ -40,7 +40,9 @@
 
   <div class="prototype stx" [class.break]="node.arguments.length > 0">
     <div class="group">
-      <span class="stx-function">{{node.name}}</span>
+      <span class="stx-function"
+            [class.stx-function-fullname]="hasFullName"
+            [title]="hasFullName ? node.fullName : ''">{{node.name}}</span>
       <span class="stx-parenthesis">(</span>
     </div>
 

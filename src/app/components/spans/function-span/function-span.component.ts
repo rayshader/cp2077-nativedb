@@ -75,6 +75,13 @@ export class FunctionSpanComponent {
     return RedVisibilityDef[this.node.visibility];
   }
 
+  get hasFullName(): boolean {
+    if (!this.node) {
+      return false;
+    }
+    return this.node.fullName !== this.node.name;
+  }
+
   protected async copyToClipboard(): Promise<void> {
     if (!this.node) {
       return;
