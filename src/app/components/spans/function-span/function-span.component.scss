@@ -1,6 +1,11 @@
 :host {
   display: flex;
+  flex-flow: column;
   margin: 24px 0;
+
+  & .content {
+    display: flex;
+  }
 
   & .badges {
     display: flex;

@@ -37,6 +37,14 @@
     background-color: map.get($colors, background);
   }
 
+  ndb-documentation {
+    & textarea {
+      font-family: map.get($theme, family)!important;
+      color: map.get($colors, documentation)!important;
+      caret-color: map.get($colors, documentation)!important;
+    }
+  }
+
   .stx-doc {
     color: map.get($colors, documentation);
 

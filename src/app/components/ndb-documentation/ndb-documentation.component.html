@@ -1,0 +1,42 @@
+@if (mode == 'view') {
+  <p>{{body}}</p>
+} @else if (mode == 'edit') {
+  <form [formGroup]="form">
+    <mat-form-field>
+    <textarea matInput
+              [cdkTextareaAutosize]="true"
+              [cdkAutosizeMinRows]="4"
+              formControlName="input"></textarea>
+    </mat-form-field>
+  </form>
+
+  <div class="actions">
+    <button mat-icon-button
+            title="Guidelines"
+            (click)="openGuidelines()">
+      <mat-icon>help_outline</mat-icon>
+    </button>
+
+    @if (!isEmpty) {
+      <button mat-icon-button
+              color="warn"
+              title="Delete"
+              (click)="delete()">
+        <mat-icon>delete</mat-icon>
+      </button>
+    }
+
+    <button mat-icon-button
+            title="Cancel"
+            (click)="cancel()">
+      <mat-icon>clear</mat-icon>
+    </button>
+
+    <button mat-icon-button
+            color="primary"
+            title="Save"
+            (click)="save()">
+      <mat-icon>check</mat-icon>
+    </button>
+  </div>
+}

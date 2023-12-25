@@ -8,6 +8,7 @@ import {RedFunctionAst} from "../../../../shared/red-ast/red-function.ast";
 import {RedClassAst} from "../../../../shared/red-ast/red-class.ast";
 import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
 import {RedTypeAst} from "../../../../shared/red-ast/red-type.ast";
+import {NDBDocumentationComponent} from "../../ndb-documentation/ndb-documentation.component";
 
 @Component({
   selector: 'function-span',
@@ -16,7 +17,8 @@ import {RedTypeAst} from "../../../../shared/red-ast/red-type.ast";
     MatIconModule,
     MatButtonModule,
     ArgumentSpanComponent,
-    TypeSpanComponent
+    TypeSpanComponent,
+    NDBDocumentationComponent
   ],
   templateUrl: './function-span.component.html',
   styleUrl: './function-span.component.scss'
@@ -27,6 +29,11 @@ export class FunctionSpanComponent {
    * Offset in pixels to add between badges and function's name, with at least 12px.
    */
   align: string = '12px';
+
+  /**
+   * Whether documentation section should be visible?
+   */
+  isVisible: boolean = false;
 
   @Input()
   node?: RedFunctionAst;
@@ -80,6 +87,14 @@ export class FunctionSpanComponent {
       return false;
     }
     return this.node.fullName !== this.node.name;
+  }
+
+  showDocumentation(): void {
+    this.isVisible = true;
+  }
+
+  hideDocumentation(): void {
+    this.isVisible = false;
   }
 
   protected async copyToClipboard(): Promise<void> {

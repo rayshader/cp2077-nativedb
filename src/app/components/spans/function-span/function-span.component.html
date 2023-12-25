@@ -1,64 +1,73 @@
 @if (node) {
-  <div class="badges">
-    @if (canCopy) {
-      <button mat-icon-button
-              class="badge clipboard"
-              title="Copy to clipboard"
-              (click)="copyToClipboard()"><mat-icon>content_copy</mat-icon></button>
-    }
-    <button mat-icon-button
-            class="badge"
-            title="Documentation"
-            [class.stx-doc]="!!documentation"><mat-icon>info_outline</mat-icon></button>
-    <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>
-    @if (node.isNative) {
-      <mat-icon class="badge" svgIcon="native" title="native"></mat-icon>
-    }
-    @if (node.isStatic) {
-      <mat-icon class="badge" svgIcon="static" title="static"></mat-icon>
-    }
-    @if (node.isFinal) {
-      <mat-icon class="badge" svgIcon="final" title="final"></mat-icon>
-    }
-    @if (node.isThreadSafe) {
-      <mat-icon class="badge" svgIcon="timer" title="threadsafe"></mat-icon>
-    }
-    @if (node.isCallback) {
-      <mat-icon class="badge" svgIcon="callback" title="callback"></mat-icon>
-    }
-    @if (node.isConst) {
-      <mat-icon class="badge" svgIcon="const" title="const"></mat-icon>
-    }
-    @if (node.isQuest) {
-      <mat-icon class="badge" svgIcon="quest" title="quest"></mat-icon>
-    }
-    @if (node.isTimer) {
-      <mat-icon class="badge" svgIcon="timer" title="timer"></mat-icon>
-    }
-    <div [style.width]="align"></div>
-  </div>
+  @if (isVisible) {
+    <ndb-documentation (closed)="hideDocumentation()"></ndb-documentation>
+  }
 
-  <div class="prototype stx" [class.break]="node.arguments.length > 0">
-    <div class="group">
-      <span class="stx-function"
-            [class.stx-function-fullname]="hasFullName"
-            [title]="hasFullName ? node.fullName : ''">{{node.name}}</span>
-      <span class="stx-parenthesis">(</span>
+  <div class="content">
+    <div class="badges">
+      @if (canCopy) {
+        <button mat-icon-button
+                class="badge clipboard"
+                title="Copy to clipboard"
+                (click)="copyToClipboard()"><mat-icon>content_copy</mat-icon></button>
+      }
+      <button mat-icon-button
+              class="badge"
+              title="Documentation"
+              [class.stx-doc]="!!documentation"
+              (click)="showDocumentation()">
+        <mat-icon>info_outline</mat-icon>
+      </button>
+      <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>
+      @if (node.isNative) {
+        <mat-icon class="badge" svgIcon="native" title="native"></mat-icon>
+      }
+      @if (node.isStatic) {
+        <mat-icon class="badge" svgIcon="static" title="static"></mat-icon>
+      }
+      @if (node.isFinal) {
+        <mat-icon class="badge" svgIcon="final" title="final"></mat-icon>
+      }
+      @if (node.isThreadSafe) {
+        <mat-icon class="badge" svgIcon="timer" title="threadsafe"></mat-icon>
+      }
+      @if (node.isCallback) {
+        <mat-icon class="badge" svgIcon="callback" title="callback"></mat-icon>
+      }
+      @if (node.isConst) {
+        <mat-icon class="badge" svgIcon="const" title="const"></mat-icon>
+      }
+      @if (node.isQuest) {
+        <mat-icon class="badge" svgIcon="quest" title="quest"></mat-icon>
+      }
+      @if (node.isTimer) {
+        <mat-icon class="badge" svgIcon="timer" title="timer"></mat-icon>
+      }
+      <div [style.width]="align"></div>
     </div>
 
-    @for (arg of node.arguments; track arg.name; let i = $index) {
+    <div class="prototype stx" [class.break]="node.arguments.length > 0">
       <div class="group">
-        <argument-span [node]="arg"></argument-span>
-        @if (i + 1 < node.arguments.length) {
-          <span class="stx-comma">,&nbsp;</span>
-        }
+        <span class="stx-function"
+              [class.stx-function-fullname]="hasFullName"
+              [title]="hasFullName ? node.fullName : ''">{{node.name}}</span>
+        <span class="stx-parenthesis">(</span>
       </div>
-    }
 
-    <div class="group">
-      <span class="stx-parenthesis">)</span>
-      <span class="stx-text">&nbsp;→&nbsp;</span>
-      <type-span [node]="node.returnType"></type-span>
+      @for (arg of node.arguments; track arg.name; let i = $index) {
+        <div class="group">
+          <argument-span [node]="arg"></argument-span>
+          @if (i + 1 < node.arguments.length) {
+            <span class="stx-comma">,&nbsp;</span>
+          }
+        </div>
+      }
+
+      <div class="group">
+        <span class="stx-parenthesis">)</span>
+        <span class="stx-text">&nbsp;→&nbsp;</span>
+        <type-span [node]="node.returnType"></type-span>
+      </div>
     </div>
   </div>
 }
