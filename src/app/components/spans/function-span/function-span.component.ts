@@ -7,12 +7,12 @@ import {MatButtonModule} from "@angular/material/button";
 import {RedFunctionAst} from "../../../../shared/red-ast/red-function.ast";
 import {RedClassAst} from "../../../../shared/red-ast/red-class.ast";
 import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
-import {RedTypeAst} from "../../../../shared/red-ast/red-type.ast";
 import {NDBDocumentationComponent} from "../../ndb-documentation/ndb-documentation.component";
 import {ClassDocumentation} from "../../../../shared/services/documentation.service";
 import {SettingsService} from "../../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {BehaviorSubject, combineLatest, Observable} from "rxjs";
+import {CodeFormatterService} from "../../../../shared/services/code-formatter.service";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {RouterLink} from "@angular/router";
 import {cyrb53} from "../../../../shared/string";
@@ -76,7 +76,8 @@ export class FunctionSpanComponent {
   private readonly documentationSubject: BehaviorSubject<ClassDocumentation | undefined> = new BehaviorSubject<ClassDocumentation | undefined>(undefined);
   private readonly documentation$: Observable<ClassDocumentation | undefined> = this.documentationSubject.asObservable();
 
-  constructor(private readonly settingsService: SettingsService) {
+  constructor(private readonly fmtService: CodeFormatterService,
+              private readonly settingsService: SettingsService) {
     combineLatest([
       this.settingsService.showDocumentation$,
       this.documentation$
@@ -156,33 +157,9 @@ export class FunctionSpanComponent {
     if (!this.node) {
       return;
     }
-    let data: string = '';
-    let hasReturn: boolean = this.node.returnType !== undefined;
+    const code: string = this.fmtService.formatCode(this.node, this.memberOf);
 
-    if (this.memberOf && !this.node.isStatic) {
-      data += `let ${this.memberOf.name.toLowerCase()}: ${this.memberOf.name};\n`;
-    }
-    for (const arg of this.node.arguments) {
-      data += `let ${arg.name}: ${RedTypeAst.toString(arg.type)};\n`;
-    }
-    if (hasReturn) {
-      data += `let result: ${RedTypeAst.toString(this.node.returnType!)};\n`;
-    }
-    if (this.memberOf || hasReturn || this.node.arguments.length > 0) {
-      data += '\n';
-    }
-    if (hasReturn) {
-      data += 'result = ';
-    }
-    if (this.memberOf) {
-      data += (!this.node.isStatic) ? this.memberOf.name.toLowerCase() : this.memberOf.name;
-      data += '.';
-    }
-    data += `${this.node.name}(`;
-    data += this.node.arguments.map((argument) => argument.name).join(', ');
-    data += ');';
-
-    await navigator.clipboard.writeText(data);
+    await navigator.clipboard.writeText(code);
   }
 
   protected async copyUrlToClipboard(): Promise<void> {
