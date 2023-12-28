@@ -1,6 +1,7 @@
 @if (mode == 'view') {
   <p class="stx stx-doc"
-     (click)="mode = 'edit'"
+     title="Double-click to edit"
+     (dblclick)="mode = 'edit'"
      [innerHTML]="body | ndbFormatDocumentation"></p>
 } @else if (mode == 'edit') {
   <form [formGroup]="form">
