@@ -1,5 +1,7 @@
 @if (mode == 'view') {
-  <p>{{body}}</p>
+  <p class="stx stx-doc"
+     (click)="mode = 'edit'"
+     [innerHTML]="body | ndbFormatDocumentation"></p>
 } @else if (mode == 'edit') {
   <form [formGroup]="form">
     <mat-form-field>
@@ -35,7 +37,8 @@
     <button mat-icon-button
             color="primary"
             title="Save"
-            (click)="save()">
+            (click)="save()"
+            [disabled]="!isChanged">
       <mat-icon>check</mat-icon>
     </button>
   </div>

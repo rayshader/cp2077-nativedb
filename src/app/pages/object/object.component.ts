@@ -23,6 +23,7 @@ import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar
 import {RecentVisitService} from "../../../shared/services/recent-visit.service";
 import {ResponsiveService} from "../../../shared/services/responsive.service";
 import {MatDividerModule} from "@angular/material/divider";
+import {ClassDocumentation, DocumentationService} from "../../../shared/services/documentation.service";
 
 interface ObjectData {
   readonly object: RedClassAst;
@@ -35,6 +36,8 @@ interface ObjectData {
   readonly functions: RedFunctionAst[];
   readonly badges: number;
   readonly align: string;
+
+  readonly documentation: ClassDocumentation;
 
   readonly isMobile: boolean;
   readonly showParents: boolean;
@@ -75,6 +78,7 @@ export class ObjectComponent {
   protected readonly importOnlyOrigin: RedOriginDef = RedOriginDef.importOnly;
 
   constructor(private readonly dumpService: RedDumpService,
+              private readonly documentationService: DocumentationService,
               private readonly pageService: PageService,
               private readonly recentVisitService: RecentVisitService,
               private readonly settingsService: SettingsService,
@@ -100,11 +104,13 @@ export class ObjectComponent {
     );
     const parents$ = object$.pipe(this.getParents());
     const children$ = object$.pipe(this.getChildren());
+    const documentation$ = object$.pipe(this.getDocumentation());
 
     this.data$ = combineLatest([
       object$,
       parents$,
       children$,
+      documentation$,
       this.dumpService.badges$,
       this.settingsService.showEmptyAccordion$,
       this.responsiveService.mobile$,
@@ -113,6 +119,7 @@ export class ObjectComponent {
              object,
              parents,
              children,
+             documentation,
              badges,
              showEmptyAccordion,
              isMobile
@@ -133,6 +140,7 @@ export class ObjectComponent {
           badges: badges,
           align: `${72 + badges * 24 + 12 - 30}px`,
           isMobile: isMobile,
+          documentation: documentation,
           showParents: parents.length > 0 || showEmptyAccordion,
           showChildren: children.length > 0 || showEmptyAccordion,
           showProperties: properties.length > 0 || showEmptyAccordion,
@@ -176,6 +184,17 @@ export class ObjectComponent {
           name: child.name,
           size: -1
         })
+      })
+    );
+  }
+
+  private getDocumentation(): OperatorFunction<RedClassAst | undefined, ClassDocumentation> {
+    return pipe(
+      switchMap((object) => {
+        if (!object) {
+          return EMPTY;
+        }
+        return this.documentationService.getClassById(object.id);
       })
     );
   }

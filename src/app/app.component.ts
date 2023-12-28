@@ -19,6 +19,7 @@ import {NDBToolbarComponent} from "./components/ndb-toolbar/ndb-toolbar.componen
 import {NDBBottomBarComponent} from "./components/ndb-bottom-bar/ndb-bottom-bar.component";
 import {debounceTime, filter} from "rxjs";
 import {ResponsiveService} from "../shared/services/responsive.service";
+import {DocumentationDatabase} from "../shared/repositories/documentation.database";
 
 interface AppData {
   appVersion: string;
@@ -57,6 +58,7 @@ export class AppComponent implements OnInit {
 
   constructor(private readonly iconsService: IconsService,
               private readonly pageService: PageService,
+              private readonly documentationDB: DocumentationDatabase,
               private readonly responsiveService: ResponsiveService,
               private readonly dialog: MatDialog,
               private readonly router: Router,
@@ -92,6 +94,7 @@ export class AppComponent implements OnInit {
     if (this.swService.isEnabled) {
       this.swService.versionUpdates.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onUpdate.bind(this));
     }
+    this.documentationDB.init().pipe(takeUntilDestroyed(this.dr)).subscribe();
   }
 
   onToggleTabs(): void {

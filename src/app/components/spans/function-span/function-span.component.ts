@@ -9,6 +9,7 @@ import {RedClassAst} from "../../../../shared/red-ast/red-class.ast";
 import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
 import {RedTypeAst} from "../../../../shared/red-ast/red-type.ast";
 import {NDBDocumentationComponent} from "../../ndb-documentation/ndb-documentation.component";
+import {ClassDocumentation} from "../../../../shared/services/documentation.service";
 
 @Component({
   selector: 'function-span',
@@ -31,15 +32,12 @@ export class FunctionSpanComponent {
   align: string = '12px';
 
   /**
-   * Whether documentation section should be visible?
+   * Whether documentation should be visible?
    */
   isVisible: boolean = false;
 
   @Input()
   node?: RedFunctionAst;
-
-  @Input()
-  canCopy: boolean = true;
 
   /**
    * Optional, when this function is a member of a class or a struct.
@@ -47,11 +45,11 @@ export class FunctionSpanComponent {
   @Input()
   memberOf?: RedClassAst;
 
-  /**
-   * Optional, documentation of this function.
-   */
   @Input()
-  documentation?: string;
+  documentation?: ClassDocumentation;
+
+  @Input()
+  canCopy: boolean = true;
 
   /**
    * Total number of badges to align with.
@@ -89,8 +87,20 @@ export class FunctionSpanComponent {
     return this.node.fullName !== this.node.name;
   }
 
-  showDocumentation(): void {
-    this.isVisible = true;
+  /**
+   * Whether this function is documented?
+   */
+  get hasDocumentation(): boolean {
+    if (!this.documentation || !this.node) {
+      return false;
+    }
+    const functions = this.documentation.functions ?? [];
+
+    return functions.some((item) => item.id === this.node!.id);
+  }
+
+  toggleDocumentation(): void {
+    this.isVisible = !this.isVisible;
   }
 
   hideDocumentation(): void {

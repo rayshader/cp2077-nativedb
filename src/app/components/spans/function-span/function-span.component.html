@@ -1,6 +1,7 @@
 @if (node) {
   @if (isVisible) {
-    <ndb-documentation (closed)="hideDocumentation()"></ndb-documentation>
+    <ndb-documentation [data]="{documentation: documentation, node: node}"
+                       (closed)="hideDocumentation()"></ndb-documentation>
   }
 
   <div class="content">
@@ -14,8 +15,8 @@
       <button mat-icon-button
               class="badge"
               title="Documentation"
-              [class.stx-doc]="!!documentation"
-              (click)="showDocumentation()">
+              [class.stx-doc]="hasDocumentation"
+              (click)="toggleDocumentation()">
         <mat-icon>info_outline</mat-icon>
       </button>
       <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>

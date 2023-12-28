@@ -90,7 +90,11 @@
         </div>
 
         @for (func of data.functions; track func.id; let i = $index) {
-          <function-span [node]="func" [canCopy]="true" [memberOf]="data.object" [badges]="data.badges"></function-span>
+          <function-span [node]="func"
+                         [memberOf]="data.object"
+                         [documentation]="data.documentation"
+                         [canCopy]="true"
+                         [badges]="data.badges"></function-span>
           @if (data.isMobile && i + 1 < data.functions.length) {
             <mat-divider></mat-divider>
           }

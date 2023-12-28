@@ -1,5 +1,7 @@
 import {RedTypeAst, RedTypeJson} from "./red-type.ast";
 import {RedVisibilityDef} from "./red-definitions.ast";
+import {RedNodeAst, RedNodeKind} from "./red-node.ast";
+import {cyrb53} from "../string";
 
 export interface RedPropertyJson {
   readonly a: RedTypeJson; // type
@@ -7,14 +9,14 @@ export interface RedPropertyJson {
   readonly c: number; // flags
 }
 
-export interface RedPropertyAst {
+export interface RedPropertyAst extends RedNodeAst {
   readonly visibility: RedVisibilityDef;
   readonly isPersistent: boolean;
   //readonly isReplicated: boolean;
   //readonly isInline: boolean;
   //readonly isEdit: boolean;
   //readonly isConst: boolean;
-  readonly name: string;
+  //readonly name: string;
   readonly type: RedTypeAst;
 }
 
@@ -43,11 +45,14 @@ export class RedPropertyAst {
 
   static fromJson(json: RedPropertyJson): RedPropertyAst {
     const flags: number = json.c;
+    const name: string = json.b ?? '';
 
     return {
+      id: cyrb53(name),
+      kind: RedNodeKind.property,
       visibility: getVisibilityFromPropertyFlags(flags),
       isPersistent: ((flags >> RedPropertyFlags.isPersistent) & 1) !== 0,
-      name: json.b ?? '',
+      name: name,
       type: RedTypeAst.fromJson(json.a)
     };
   }
