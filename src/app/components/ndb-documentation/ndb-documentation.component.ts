@@ -14,6 +14,7 @@ import {NDBFormatDocumentationPipe} from "../../pipes/ndb-format-documentation.p
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {RedPropertyAst} from "../../../shared/red-ast/red-property.ast";
 import {firstValueFrom} from "rxjs";
+import {Router} from "@angular/router";
 
 export interface DocumentationData {
   readonly documentation?: ClassDocumentation;
@@ -55,7 +56,8 @@ export class NDBDocumentationComponent {
   private documentation?: ClassDocumentation;
   private node?: RedFunctionAst | RedPropertyAst;
 
-  constructor(private readonly documentationService: DocumentationService) {
+  constructor(private readonly documentationService: DocumentationService,
+              private readonly router: Router) {
     this.input.valueChanges.pipe(takeUntilDestroyed()).subscribe(this.onChanged.bind(this));
   }
 
@@ -83,6 +85,20 @@ export class NDBDocumentationComponent {
 
   private get input(): AbstractControl<string> {
     return this.form.get('input')!;
+  }
+
+  onLinkClicked(event: Event): void {
+    const $element: HTMLElement = event.target as HTMLElement;
+
+    if ($element.tagName !== 'A') {
+      return;
+    }
+    const route: string | null = $element.getAttribute('data-route');
+
+    if (!route) {
+      return;
+    }
+    this.router.navigateByUrl(route);
   }
 
   openGuidelines(): void {

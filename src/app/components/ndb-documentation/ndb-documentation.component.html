@@ -1,6 +1,7 @@
 @if (mode == 'view') {
   <p class="stx stx-doc"
      title="Double-click to edit"
+     (click)="onLinkClicked($event)"
      (dblclick)="mode = 'edit'"
      [innerHTML]="body | ndbFormatDocumentation"></p>
 } @else if (mode == 'edit') {

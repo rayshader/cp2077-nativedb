@@ -2,6 +2,11 @@
   ndb-documentation {
     & p {
       background-color: rgba(0, 0, 0, 0.05);
+
+      & a:hover {
+        cursor: pointer;
+        text-decoration: underline;
+      }
     }
 
     & mat-form-field {
