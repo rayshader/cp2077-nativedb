@@ -99,21 +99,6 @@ export class RedDumpService {
     );
   }
 
-  getTypeById(id: number): Observable<RedNodeKind | undefined> {
-    return combineLatest([
-      this.enums$,
-      this.bitfields$,
-      this.classes$,
-      this.structs$,
-      this.functions$
-    ]).pipe(
-      mergeAll(),
-      mergeAll(),
-      filter((node: RedNodeAst) => node.id === id),
-      map((node: RedNodeAst) => node.kind)
-    );
-  }
-
   getEnumById(id: number): Observable<RedEnumAst | undefined> {
     return this.enums$.pipe(this.findById(id));
   }
