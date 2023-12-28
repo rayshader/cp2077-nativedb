@@ -1,5 +1,6 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
+import {RedPrimitiveDef} from "../../shared/red-ast/red-definitions.ast";
 
 @Pipe({
   name: 'ndbFormatDocumentation',
@@ -8,8 +9,14 @@ import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
 export class NDBFormatDocumentationPipe implements PipeTransform {
 
   private static readonly LINK_RULE: RegExp = RegExp(/\[(?<type>[A-Za-z_-]*)]/g);
+  private static readonly PRIMITIVES: string[] = [];
 
   constructor(private readonly sanitizer: DomSanitizer) {
+    if (NDBFormatDocumentationPipe.PRIMITIVES.length === 0) {
+      for (let i = RedPrimitiveDef.Void; i <= RedPrimitiveDef.Variant; i++) {
+        NDBFormatDocumentationPipe.PRIMITIVES.push(RedPrimitiveDef[i]);
+      }
+    }
   }
 
   transform(body: string): SafeHtml {
@@ -27,6 +34,11 @@ export class NDBFormatDocumentationPipe implements PipeTransform {
   }
 
   private createLink(type: string): string {
+    const isPrimitive: boolean = NDBFormatDocumentationPipe.PRIMITIVES.some((primitive) => primitive === type);
+
+    if (isPrimitive) {
+      return `<span class="stx-type">${type}</span>`;
+    }
     return `<a class="stx-type" title="Navigate to ${type}" data-route="/${type}">${type}</a>`;
   }
 
