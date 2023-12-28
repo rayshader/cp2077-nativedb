@@ -122,7 +122,7 @@ export class NDBDocumentationComponent {
 
   cancel(): void {
     this.input.setValue(this.body, {emitEvent: false});
-    this.closed.emit();
+    this.mode = 'view';
   }
 
   async save(): Promise<void> {
@@ -147,7 +147,7 @@ export class NDBDocumentationComponent {
       }
       this.body = body;
       this.documented.emit(true);
-      this.closed.emit();
+      this.mode = 'view';
     } catch (error) {
       // TODO: show a toast!
       console.error(error);
