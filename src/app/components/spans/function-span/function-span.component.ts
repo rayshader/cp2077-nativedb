@@ -10,6 +10,9 @@ import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
 import {RedTypeAst} from "../../../../shared/red-ast/red-type.ast";
 import {NDBDocumentationComponent} from "../../ndb-documentation/ndb-documentation.component";
 import {ClassDocumentation} from "../../../../shared/services/documentation.service";
+import {SettingsService} from "../../../../shared/services/settings.service";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {BehaviorSubject, combineLatest, Observable} from "rxjs";
 
 @Component({
   selector: 'function-span',
@@ -45,11 +48,26 @@ export class FunctionSpanComponent {
   @Input()
   memberOf?: RedClassAst;
 
-  @Input()
   documentation?: ClassDocumentation;
 
   @Input()
   canCopy: boolean = true;
+
+  private readonly documentationSubject: BehaviorSubject<ClassDocumentation | undefined> = new BehaviorSubject<ClassDocumentation | undefined>(undefined);
+  private readonly documentation$: Observable<ClassDocumentation | undefined> = this.documentationSubject.asObservable();
+
+  constructor(private readonly settingsService: SettingsService) {
+    combineLatest([
+      this.settingsService.showDocumentation$,
+      this.documentation$
+    ]).pipe(takeUntilDestroyed()).subscribe(this.onShowDocumentation.bind(this));
+  }
+
+  @Input('documentation')
+  set _documentation(value: ClassDocumentation | undefined) {
+    this.documentation = value;
+    this.documentationSubject.next(value);
+  }
 
   /**
    * Total number of badges to align with.
@@ -138,6 +156,13 @@ export class FunctionSpanComponent {
     data += ');';
 
     await navigator.clipboard.writeText(data);
+  }
+
+  private onShowDocumentation([state, ]: [boolean, ClassDocumentation | undefined]): void {
+    if (!this.hasDocumentation) {
+      return;
+    }
+    this.isVisible = state;
   }
 
 }

@@ -5,6 +5,7 @@ import {PageScrollBehavior} from "./page.service";
 export interface Settings {
   readonly ignoreDuplicate: boolean;
   readonly scrollBehavior: PageScrollBehavior;
+  readonly showDocumentation: boolean;
   readonly highlightEmptyObject: boolean;
   readonly showEmptyAccordion: boolean;
   readonly mergeObject: boolean;
@@ -30,6 +31,7 @@ export class SettingsService {
   private firstUsage: boolean = true;
   private readonly ignoreDuplicateSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly scrollBehaviorSubject: BehaviorSubject<PageScrollBehavior> = new BehaviorSubject<PageScrollBehavior>('smooth');
+  private readonly showDocumentationSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly highlightEmptyObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly showEmptyAccordionSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private readonly mergeObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -54,6 +56,11 @@ export class SettingsService {
    * Which scrolling behavior should be used when navigating to a new page?
    */
   readonly scrollBehavior$: Observable<PageScrollBehavior> = this.scrollBehaviorSubject.asObservable();
+
+  /**
+   * Whether documented properties/functions should be visible?
+   */
+  readonly showDocumentation$: Observable<boolean> = this.showDocumentationSubject.asObservable();
 
   /**
    * Whether empty class/struct should be highlighted?
@@ -94,6 +101,7 @@ export class SettingsService {
     this.firstUsage = (localStorage.getItem('first-usage') ?? 'true') === 'true';
     const ignoreDuplicate: boolean = (localStorage.getItem('ignore-duplicate') ?? 'true') === 'true';
     const scrollBehavior: PageScrollBehavior = (localStorage.getItem('scroll-behavior') ?? 'smooth') as PageScrollBehavior;
+    const showDocumentation: boolean = (localStorage.getItem('show-documentation') ?? 'true') === 'true';
     const highlightEmptyObject: boolean = (localStorage.getItem('highlight-empty-object') ?? 'true') === 'true';
     const showEmptyAccordion: boolean = (localStorage.getItem('show-empty-accordion') ?? 'false') === 'true';
     const mergeObject: boolean = (localStorage.getItem('merge-object') ?? 'false') === 'true';
@@ -104,6 +112,7 @@ export class SettingsService {
 
     this.ignoreDuplicateSubject.next(ignoreDuplicate);
     this.scrollBehaviorSubject.next(scrollBehavior);
+    this.showDocumentationSubject.next(showDocumentation);
     this.highlightEmptyObjectSubject.next(highlightEmptyObject);
     this.showEmptyAccordionSubject.next(showEmptyAccordion);
     this.mergeObjectSubject.next(mergeObject);
@@ -117,6 +126,7 @@ export class SettingsService {
     return combineLatest([
       this.ignoreDuplicate$,
       this.scrollBehavior$,
+      this.showDocumentation$,
       this.highlightEmptyObject$,
       this.showEmptyAccordion$,
       this.mergeObject$,
@@ -129,6 +139,7 @@ export class SettingsService {
         map(([
                ignoreDuplicate,
                scrollBehavior,
+               showDocumentation,
                highlightEmptyObject,
                showEmptyAccordion,
                mergeObject,
@@ -140,6 +151,7 @@ export class SettingsService {
           return {
             ignoreDuplicate: ignoreDuplicate,
             scrollBehavior: scrollBehavior,
+            showDocumentation: showDocumentation,
             highlightEmptyObject: highlightEmptyObject,
             showEmptyAccordion: showEmptyAccordion,
             mergeObject: mergeObject,
@@ -168,6 +180,11 @@ export class SettingsService {
   updateScrollBehavior(behavior: PageScrollBehavior): void {
     localStorage.setItem('scroll-behavior', behavior);
     this.scrollBehaviorSubject.next(behavior);
+  }
+
+  updateShowDocumentation(state: boolean): void {
+    localStorage.setItem('show-documentation', `${state}`);
+    this.showDocumentationSubject.next(state);
   }
 
   updateHighlightEmptyObject(state: boolean): void {

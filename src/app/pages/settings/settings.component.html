@@ -34,6 +34,18 @@
 
 <div class="setting">
   <p>
+    Show / hide documented properties / functions by default.
+  </p>
+
+  <mat-slide-toggle color="primary" [formControl]="showDocumentation">
+    {{showDocumentation.value ? "Show" : "Hide"}}
+  </mat-slide-toggle>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="setting">
+  <p>
     Highlight empty classes / structs when they have no properties nor functions.
   </p>
 
