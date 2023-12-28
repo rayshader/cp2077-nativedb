@@ -16,7 +16,8 @@
               class="badge"
               title="Documentation"
               [class.stx-doc]="hasDocumentation"
-              (click)="toggleDocumentation()">
+              (click)="toggleDocumentation()"
+              [disabled]="documentation === undefined">
         <mat-icon>info_outline</mat-icon>
       </button>
       <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>
