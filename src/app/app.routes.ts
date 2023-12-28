@@ -14,9 +14,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/bookmarks/bookmarks.component').then(c => c.BookmarksComponent)
   },
 
-  // NOTE: Vanilla route to prevent dead links.
-  {path: 'Globals', redirectTo: 'f'},
-
   {path: 'e/:id', loadComponent: () => import('./pages/enum/enum.component').then(c => c.EnumComponent)},
   {path: 'b/:id', loadComponent: () => import('./pages/bitfield/bitfield.component').then(c => c.BitfieldComponent)},
   {
@@ -33,5 +30,6 @@ export const routes: Routes = [
   {path: 'f/:id', loadComponent: () => import('./pages/function/function.component').then(c => c.FunctionComponent)},
 
   // NOTE: Vanilla route to prevent dead links.
+  {path: 'Globals', redirectTo: 'f'},
   {path: ':name', children: [], canActivate: [vanillaRedirectGuard]}
 ];
