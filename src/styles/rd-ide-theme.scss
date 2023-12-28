@@ -38,6 +38,10 @@
   }
 
   ndb-documentation {
+    & p {
+      border-left: 2px solid map.get($colors, documentation);
+    }
+
     & textarea {
       font-family: map.get($theme, family)!important;
       color: map.get($colors, documentation)!important;

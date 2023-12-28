@@ -1,5 +1,9 @@
 @mixin documentation-theme($theme) {
   ndb-documentation {
+    & p {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+
     & mat-form-field {
       width: 100%;
 
@@ -11,5 +15,9 @@
 }
 
 @mixin documentation-color($theme) {
-
+  ndb-documentation {
+    & p {
+      background-color: rgba(0, 0, 0, 0.2);
+    }
+  }
 }
