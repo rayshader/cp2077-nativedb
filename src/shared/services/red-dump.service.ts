@@ -4,7 +4,6 @@ import {
   combineLatest,
   combineLatestWith,
   EMPTY,
-  filter,
   map,
   mergeAll,
   Observable,
@@ -77,18 +76,18 @@ export class RedDumpService {
       shareReplay(),
     );
     this.nodes$ = zip([
-      this.enums$.pipe(this.castMap<RedNodeAst[]>()),
-      this.bitfields$.pipe(this.castMap<RedNodeAst[]>()),
-      this.classes$.pipe(this.castMap<RedNodeAst[]>()),
-      this.structs$.pipe(this.castMap<RedNodeAst[]>()),
-      this.functions$.pipe(this.castMap<RedNodeAst[]>()),
+      this.enums$,
+      this.bitfields$,
+      this.classes$,
+      this.structs$,
+      this.functions$,
     ]).pipe(
       map((data) => [
-        ...data[0],
-        ...data[1],
-        ...data[2],
-        ...data[3],
-        ...data[4],
+        ...data[0] as RedNodeAst[],
+        ...data[1] as RedNodeAst[],
+        ...data[2] as RedNodeAst[],
+        ...data[3] as RedNodeAst[],
+        ...data[4] as RedNodeAst[],
       ]),
       shareReplay()
     );
@@ -200,12 +199,6 @@ export class RedDumpService {
   private findById<T extends RedNodeAst>(id: number): OperatorFunction<T[], T | undefined> {
     return pipe(
       map((objects) => objects.find((object) => object.id === id))
-    );
-  }
-
-  private castMap<T>(): OperatorFunction<any, T> {
-    return pipe(
-      map((value) => value as T),
     );
   }
 
