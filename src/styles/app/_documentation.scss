@@ -1,6 +1,7 @@
 @mixin documentation-theme($theme) {
   ndb-documentation {
     & p {
+      white-space: pre-wrap;
       background-color: rgba(0, 0, 0, 0.05);
 
       & a:hover {
