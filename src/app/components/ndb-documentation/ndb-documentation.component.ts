@@ -123,6 +123,9 @@ export class NDBDocumentationComponent {
   cancel(): void {
     this.input.setValue(this.body, {emitEvent: false});
     this.mode = 'view';
+    if (this.body.length === 0) {
+      this.closed.emit();
+    }
   }
 
   async save(): Promise<void> {
