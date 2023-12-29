@@ -23,6 +23,7 @@ export class NDBFormatDocumentationPipe implements PipeTransform {
     const matches: RegExpMatchArray[] = [...body.matchAll(NDBFormatDocumentationPipe.LINK_RULE)];
 
     body = body.replaceAll('\n', '<br>');
+    body = body.replaceAll(' ', '&nbsp;');
     matches.reverse();
     for (const match of matches) {
       const type: string = match.groups!['type'];
