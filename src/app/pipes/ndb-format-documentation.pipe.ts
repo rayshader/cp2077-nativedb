@@ -21,29 +21,33 @@ export class NDBFormatDocumentationPipe implements PipeTransform {
   }
 
   transform(body: string): SafeHtml {
+    body = body.replaceAll('\n', '<br>');
     const matches: RegExpMatchArray[] = [...body.matchAll(NDBFormatDocumentationPipe.LINK_RULE)];
 
-    body = body.replaceAll('\n', '<br>');
     matches.reverse();
     for (const match of matches) {
-      const isMember: boolean = match.groups!['member']?.includes('.');
-      const isLocal: boolean = match.groups!['local'] === 'this';
-      const memberOf: string = match.groups!['class'];
-      const type: string = match.groups!['type'];
-      let $link: string;
-
-      if (!isMember) {
-        $link = this.createLink(type);
-      } else {
-        if (isLocal) {
-          $link = this.createLocalLink(type);
-        } else {
-          $link = this.createMemberOfLink(type, memberOf);
-        }
-      }
-      body = body.replace(match[0], $link);
+      body = this.formatLinkRule(match, body);
     }
     return this.sanitizer.bypassSecurityTrustHtml(body);
+  }
+
+  private formatLinkRule(match: RegExpMatchArray, body: string): string {
+    const isMember: boolean = match.groups!['member']?.includes('.');
+    const isLocal: boolean = match.groups!['local'] === 'this';
+    const memberOf: string = match.groups!['class'];
+    const type: string = match.groups!['type'];
+    let $link: string;
+
+    if (!isMember) {
+      $link = this.createLink(type);
+    } else {
+      if (isLocal) {
+        $link = this.createLocalLink(type);
+      } else {
+        $link = this.createMemberOfLink(type, memberOf);
+      }
+    }
+    return body.replace(match[0], $link);
   }
 
   private createLink(type: string): string {
