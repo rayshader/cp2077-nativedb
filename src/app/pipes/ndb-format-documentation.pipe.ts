@@ -1,6 +1,7 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
 import {RedPrimitiveDef} from "../../shared/red-ast/red-definitions.ast";
+import {cyrb53} from "../../shared/string";
 
 @Pipe({
   name: 'ndbFormatDocumentation',
@@ -8,7 +9,7 @@ import {RedPrimitiveDef} from "../../shared/red-ast/red-definitions.ast";
 })
 export class NDBFormatDocumentationPipe implements PipeTransform {
 
-  private static readonly LINK_RULE: RegExp = RegExp(/\[(?<type>[A-Za-z_-]*)]/g);
+  private static readonly LINK_RULE: RegExp = RegExp(/\[(?<member>((?<local>this)|(?<class>[A-Za-z_]+))\.)?(?<type>[A-Za-z0-9_-]*)]/g);
   private static readonly PRIMITIVES: string[] = [];
 
   constructor(private readonly sanitizer: DomSanitizer) {
@@ -25,9 +26,21 @@ export class NDBFormatDocumentationPipe implements PipeTransform {
     body = body.replaceAll('\n', '<br>');
     matches.reverse();
     for (const match of matches) {
+      const isMember: boolean = match.groups!['member']?.includes('.');
+      const isLocal: boolean = match.groups!['local'] === 'this';
+      const memberOf: string = match.groups!['class'];
       const type: string = match.groups!['type'];
-      const $link: string = this.createLink(type);
+      let $link: string;
 
+      if (!isMember) {
+        $link = this.createLink(type);
+      } else {
+        if (isLocal) {
+          $link = this.createLocalLink(type);
+        } else {
+          $link = this.createMemberOfLink(type, memberOf);
+        }
+      }
       body = body.replace(match[0], $link);
     }
     return this.sanitizer.bypassSecurityTrustHtml(body);
@@ -40,6 +53,18 @@ export class NDBFormatDocumentationPipe implements PipeTransform {
       return `<span class="stx-type">${type}</span>`;
     }
     return `<a class="stx-type" title="Navigate to ${type}" data-route="/${type}">${type}</a>`;
+  }
+
+  private createLocalLink(type: string): string {
+    const uri: string = `${window.location.pathname}#${cyrb53(type)}`;
+
+    return `<a class="stx-type" title="Navigate to function ${type}" href="${uri}">${type}()</a>`;
+  }
+
+  private createMemberOfLink(type: string, memberOf: string): string {
+    const uri: string = `${memberOf}#${cyrb53(type)}`;
+
+    return `<a class="stx-type" title="Navigate to function ${type} of ${memberOf}" href="${uri}">${memberOf}.${type}()</a>`;
   }
 
 }
