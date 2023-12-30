@@ -58,13 +58,13 @@ export class NDBFormatDocumentationPipe implements PipeTransform {
   private createLocalLink(type: string): string {
     const uri: string = `${window.location.pathname}#${cyrb53(type)}`;
 
-    return `<a class="stx-type" title="Navigate to ${type}" href="${uri}">${type}</a>`;
+    return `<a class="stx-type" title="Navigate to ${type}" data-route="${uri}">${type}</a>`;
   }
 
   private createMemberOfLink(type: string, memberOf: string): string {
-    const uri: string = `${memberOf}#${cyrb53(type)}`;
+    const uri: string = `/${memberOf}#${cyrb53(type)}`;
 
-    return `<a class="stx-type" title="Navigate to ${type} of ${memberOf}" href="${uri}">${memberOf}.${type}</a>`;
+    return `<a class="stx-type" title="Navigate to ${type} of ${memberOf}" data-route="${uri}">${memberOf}.${type}</a>`;
   }
 
 }

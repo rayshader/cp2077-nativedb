@@ -26,7 +26,7 @@ export function vanillaRedirectGuard(next: ActivatedRouteSnapshot) {
         {fragment: fragment}
       );
 
-      return router.navigateByUrl(url, {replaceUrl: true});
+      return router.navigateByUrl(url);
     })
   );
 }

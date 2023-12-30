@@ -98,7 +98,12 @@ export class NDBDocumentationComponent {
     if (!route) {
       return;
     }
-    this.router.navigateByUrl(route);
+    const isLocal: boolean = route.startsWith(window.location.pathname);
+
+    if (isLocal) {
+      $element.scrollIntoView({block: 'center'});
+    }
+    this.router.navigateByUrl(route, {replaceUrl: isLocal});
   }
 
   openGuidelines(): void {
