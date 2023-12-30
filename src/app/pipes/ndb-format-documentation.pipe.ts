@@ -10,6 +10,7 @@ import {cyrb53} from "../../shared/string";
 export class NDBFormatDocumentationPipe implements PipeTransform {
 
   private static readonly LINK_RULE: RegExp = RegExp(/\[(?<member>((?<local>this)|(?<class>[A-Za-z_]+))\.)?(?<type>[A-Za-z0-9_-]*)]/g);
+  private static readonly URL_RULE: RegExp = RegExp(/\[(?<title>.*)]\((?<url>https:\/\/.*)\)/g);
   private static readonly PRIMITIVES: string[] = [];
 
   constructor(private readonly sanitizer: DomSanitizer) {
@@ -22,13 +23,26 @@ export class NDBFormatDocumentationPipe implements PipeTransform {
 
   transform(body: string): SafeHtml {
     body = body.replaceAll('\n', '<br>');
-    const matches: RegExpMatchArray[] = [...body.matchAll(NDBFormatDocumentationPipe.LINK_RULE)];
+    let matches: RegExpMatchArray[] = [...body.matchAll(NDBFormatDocumentationPipe.URL_RULE)];
 
+    matches.reverse();
+    for (const match of matches) {
+      body = this.formatUrlRule(match, body);
+    }
+    matches = [...body.matchAll(NDBFormatDocumentationPipe.LINK_RULE)];
     matches.reverse();
     for (const match of matches) {
       body = this.formatLinkRule(match, body);
     }
     return this.sanitizer.bypassSecurityTrustHtml(body);
+  }
+
+  private formatUrlRule(match: RegExpMatchArray, body: string): string {
+    const title: string = match.groups!['title'];
+    const url: string = match.groups!['url'];
+    const $link: string = `<a class="stx-lang" href="${url}" target="_blank">${title}</a>`;
+
+    return body.replace(match[0], $link);
   }
 
   private formatLinkRule(match: RegExpMatchArray, body: string): string {
