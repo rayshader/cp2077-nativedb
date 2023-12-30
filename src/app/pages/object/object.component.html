@@ -71,7 +71,10 @@
         </div>
 
         @for (prop of data.properties; track prop.name; let i = $index) {
-          <property-span [node]="prop" [badges]="data.badges"></property-span>
+          <property-span ndbHighlight
+                         [id]="prop.id"
+                         [node]="prop"
+                         [badges]="data.badges"></property-span>
           @if (data.isMobile && i + 1 < data.properties.length) {
             <mat-divider></mat-divider>
           }
@@ -90,7 +93,8 @@
         </div>
 
         @for (func of data.functions; track func.id; let i = $index) {
-          <function-span [id]="cyrb53(func.name)"
+          <function-span ndbHighlight
+                         [id]="cyrb53(func.name)"
                          [node]="func"
                          [memberOf]="data.object"
                          [documentation]="data.documentation"

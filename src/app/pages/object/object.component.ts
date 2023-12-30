@@ -26,6 +26,7 @@ import {MatDividerModule} from "@angular/material/divider";
 import {ClassDocumentation, DocumentationService} from "../../../shared/services/documentation.service";
 import {cyrb53} from "../../../shared/string";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
 
 interface ObjectData {
   readonly object: RedClassAst;
@@ -62,7 +63,8 @@ interface ObjectData {
     PropertySpanComponent,
     TypeSpanComponent,
     NDBAccordionItemComponent,
-    NDBTitleBarComponent
+    NDBTitleBarComponent,
+    NDBHighlightDirective
   ],
   templateUrl: './object.component.html',
   styleUrl: './object.component.scss'

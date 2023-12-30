@@ -14,7 +14,7 @@
 @use './app/badge' as *;
 @use './app/title-bar' as *;
 @use './app/documentation' as *;
-@use './app/function-span' as *;
+@use './app/object' as *;
 
 @mixin mat-component-themes($theme) {
   //@include mat.all-component-themes($theme);
@@ -63,7 +63,7 @@
   @include slide-toggle-theme($theme);
   @include title-bar-theme($theme);
   @include documentation-theme($theme);
-  @include function-span-theme($theme);
+  @include object-theme($theme);
 
   @include virtual-scroll-theme($theme);
 }
@@ -77,5 +77,5 @@
   @include slide-toggle-color($theme);
   @include title-bar-color($theme);
   @include documentation-color($theme);
-  @include function-span-color($theme);
+  @include object-color($theme);
 }

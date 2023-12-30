@@ -1,0 +1,49 @@
+@mixin object-theme($theme) {
+  %highlight {
+    position: relative;
+    top: -2px;
+    left: -4px;
+    height: 24px;
+    padding: 2px 4px;
+
+    border-radius: 4px;
+  }
+
+  object {
+    & property-span {
+      @extend %highlight;
+
+      &.highlight {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+    }
+
+    & function-span {
+      &.highlight {
+        & .content {
+          @extend %highlight;
+
+          background-color: rgba(0, 0, 0, 0.1);
+        }
+      }
+    }
+  }
+}
+
+@mixin object-color($theme) {
+  object {
+    & property-span {
+      &.highlight {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    & function-span {
+      &.highlight {
+        & .content {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+      }
+    }
+  }
+}

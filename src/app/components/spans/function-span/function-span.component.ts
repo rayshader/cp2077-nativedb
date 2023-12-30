@@ -1,4 +1,4 @@
-import {Component, HostBinding, HostListener, Input} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import {ArgumentSpanComponent} from "../argument-span/argument-span.component";
 import {TypeSpanComponent} from "../type-span/type-span.component";
 
@@ -13,8 +13,6 @@ import {ClassDocumentation} from "../../../../shared/services/documentation.serv
 import {SettingsService} from "../../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {BehaviorSubject, combineLatest, Observable} from "rxjs";
-import {ActivatedRoute, Router} from "@angular/router";
-import {cyrb53} from "../../../../shared/string";
 
 @Component({
   selector: 'function-span',
@@ -58,9 +56,7 @@ export class FunctionSpanComponent {
   private readonly documentationSubject: BehaviorSubject<ClassDocumentation | undefined> = new BehaviorSubject<ClassDocumentation | undefined>(undefined);
   private readonly documentation$: Observable<ClassDocumentation | undefined> = this.documentationSubject.asObservable();
 
-  constructor(private readonly settingsService: SettingsService,
-              private readonly route: ActivatedRoute,
-              private readonly router: Router) {
+  constructor(private readonly settingsService: SettingsService) {
     combineLatest([
       this.settingsService.showDocumentation$,
       this.documentation$
@@ -119,21 +115,6 @@ export class FunctionSpanComponent {
     const functions = this.documentation.functions ?? [];
 
     return functions.some((item) => item.id === this.node!.id);
-  }
-
-  @HostBinding('class.highlight')
-  get isHighlight(): boolean {
-    const fragment: number = parseInt(this.route.snapshot.fragment ?? '');
-
-    return fragment === cyrb53(this.node?.name ?? '');
-  }
-
-  @HostListener('mouseenter')
-  onHover(): void {
-    if (!this.isHighlight) {
-      return;
-    }
-    this.router.navigateByUrl(window.location.pathname, {replaceUrl: true});
   }
 
   toggleDocumentation(): void {
