@@ -7,6 +7,18 @@
     display: flex;
   }
 
+  &.highlight {
+    & .content {
+      position: relative;
+      top: -2px;
+      left: -4px;
+      height: 24px;
+      padding: 2px 4px;
+
+      border-radius: 4px;
+    }
+  }
+
   & .badges {
     display: flex;
 

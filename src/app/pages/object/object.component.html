@@ -90,7 +90,8 @@
         </div>
 
         @for (func of data.functions; track func.id; let i = $index) {
-          <function-span [node]="func"
+          <function-span [id]="cyrb53(func.name)"
+                         [node]="func"
                          [memberOf]="data.object"
                          [documentation]="data.documentation"
                          [canCopy]="true"

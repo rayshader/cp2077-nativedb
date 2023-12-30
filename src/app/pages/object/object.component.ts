@@ -24,6 +24,7 @@ import {RecentVisitService} from "../../../shared/services/recent-visit.service"
 import {ResponsiveService} from "../../../shared/services/responsive.service";
 import {MatDividerModule} from "@angular/material/divider";
 import {ClassDocumentation, DocumentationService} from "../../../shared/services/documentation.service";
+import {cyrb53} from "../../../shared/string";
 
 interface ObjectData {
   readonly object: RedClassAst;
@@ -76,6 +77,8 @@ export class ObjectComponent {
 
   protected readonly nativeOrigin: RedOriginDef = RedOriginDef.native;
   protected readonly importOnlyOrigin: RedOriginDef = RedOriginDef.importOnly;
+
+  protected readonly cyrb53 = cyrb53;
 
   constructor(private readonly dumpService: RedDumpService,
               private readonly documentationService: DocumentationService,
