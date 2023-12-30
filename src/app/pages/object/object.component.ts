@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {AfterViewInit, ApplicationRef, Component, DestroyRef, Input} from '@angular/core';
 import {AsyncPipe} from "@angular/common";
 import {CdkAccordionModule} from "@angular/cdk/accordion";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
@@ -6,7 +6,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {PropertySpanComponent} from "../../components/spans/property-span/property-span.component";
 import {NDBAccordionItemComponent} from "../../components/ndb-accordion-item/ndb-accordion-item.component";
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
-import {combineLatest, EMPTY, map, Observable, of, OperatorFunction, pipe, switchMap} from "rxjs";
+import {combineLatest, EMPTY, filter, first, map, Observable, of, OperatorFunction, pipe, switchMap} from "rxjs";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {RedNodeKind} from "../../../shared/red-ast/red-node.ast";
 import {ActivatedRoute} from "@angular/router";
@@ -25,6 +25,7 @@ import {ResponsiveService} from "../../../shared/services/responsive.service";
 import {MatDividerModule} from "@angular/material/divider";
 import {ClassDocumentation, DocumentationService} from "../../../shared/services/documentation.service";
 import {cyrb53} from "../../../shared/string";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 interface ObjectData {
   readonly object: RedClassAst;
@@ -66,7 +67,7 @@ interface ObjectData {
   templateUrl: './object.component.html',
   styleUrl: './object.component.scss'
 })
-export class ObjectComponent {
+export class ObjectComponent implements AfterViewInit {
 
   data$: Observable<ObjectData | undefined> = EMPTY;
 
@@ -86,13 +87,17 @@ export class ObjectComponent {
               private readonly recentVisitService: RecentVisitService,
               private readonly settingsService: SettingsService,
               private readonly responsiveService: ResponsiveService,
-              private readonly route: ActivatedRoute) {
+              private readonly app: ApplicationRef,
+              private readonly route: ActivatedRoute,
+              private readonly dr: DestroyRef) {
     this.kind = (this.route.snapshot.data as any).kind;
   }
 
   @Input()
   set id(id: string) {
-    this.pageService.restoreScroll();
+    if (this.route.fragment === null) {
+      this.pageService.restoreScroll();
+    }
     this.recentVisitService.pushLastVisit(+id);
     const object$ = of(this.kind).pipe(
       switchMap((kind) => {
@@ -151,6 +156,28 @@ export class ObjectComponent {
         };
       })
     );
+  }
+
+  ngAfterViewInit(): void {
+    this.app.isStable.pipe(
+      filter((stable: boolean) => stable),
+      first(),
+      takeUntilDestroyed(this.dr)
+    ).subscribe(this.onScrollToFragment.bind(this));
+  }
+
+  private onScrollToFragment() {
+    const fragment: string | null = this.route.snapshot.fragment;
+
+    if (!fragment) {
+      return;
+    }
+    const $element: HTMLElement | null = document.getElementById(fragment);
+
+    if (!$element) {
+      return;
+    }
+    $element.scrollIntoView({block: 'center'});
   }
 
   private getParents(): OperatorFunction<RedClassAst | undefined, RedTypeAst[]> {
