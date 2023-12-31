@@ -119,6 +119,10 @@ export class ObjectComponent implements AfterViewInit {
     const children$ = object$.pipe(this.getChildren());
     const documentation$ = object$.pipe(this.getDocumentation());
 
+    combineLatest([
+      this.settingsService.showDocumentation$,
+      documentation$,
+    ]).pipe(takeUntilDestroyed(this.dr)).subscribe(this.onShowDocumentation.bind(this));
     this.data$ = combineLatest([
       object$,
       parents$,
@@ -175,7 +179,14 @@ export class ObjectComponent implements AfterViewInit {
     this.showDocumentation = !this.showDocumentation;
   }
 
-  private onScrollToFragment() {
+  private onShowDocumentation([state, documentation]: [boolean, ClassDocumentation]): void {
+    if (!documentation.body) {
+      return;
+    }
+    this.showDocumentation = state;
+  }
+
+  private onScrollToFragment(): void {
     const fragment: string | null = this.route.snapshot.fragment;
 
     if (!fragment) {
