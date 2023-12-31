@@ -25,6 +25,9 @@ export class NDBTitleBarComponent {
   title: string = '';
 
   @Input()
+  hideDocumentation: boolean = false;
+
+  @Input()
   hidden: boolean = false;
 
   @Output()

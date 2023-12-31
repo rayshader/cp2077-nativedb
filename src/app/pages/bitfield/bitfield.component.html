@@ -1,5 +1,7 @@
 @if (bitfield$ | async; as bitfield) {
-  <ndb-title-bar [title]="bitfield.name" [node]="bitfield">
+  <ndb-title-bar [title]="bitfield.name"
+                 [node]="bitfield"
+                 [hideDocumentation]="true">
     <mat-icon class="badge-bitfield" svgIcon="bitfield"></mat-icon>
   </ndb-title-bar>
 

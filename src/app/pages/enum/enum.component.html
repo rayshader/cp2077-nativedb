@@ -1,5 +1,7 @@
 @if (enum$ | async; as enum) {
-  <ndb-title-bar [title]="enum.name" [node]="enum">
+  <ndb-title-bar [title]="enum.name"
+                 [node]="enum"
+                 [hideDocumentation]="true">
     <mat-icon class="badge-enum" svgIcon="enum"></mat-icon>
   </ndb-title-bar>
 
