@@ -14,6 +14,13 @@
 
   @if (_node !== undefined) {
     <button mat-icon-button
+            title="Documentation"
+            [class.stx-doc]="hasDocumentation"
+            (click)="toggleDocumentation.emit()">
+      <mat-icon>info_outline</mat-icon>
+    </button>
+
+    <button mat-icon-button
             [title]="isBookmarked ? 'Remove bookmark' : 'Add bookmark'"
             (click)="toggleBookmark()">
       @if (isBookmarked) {

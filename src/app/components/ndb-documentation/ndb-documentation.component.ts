@@ -18,6 +18,7 @@ import {Router} from "@angular/router";
 
 export interface DocumentationData {
   readonly documentation?: ClassDocumentation;
+  readonly main?: boolean;
   readonly node?: RedFunctionAst | RedPropertyAst;
 }
 
@@ -54,6 +55,7 @@ export class NDBDocumentationComponent {
   });
 
   private documentation?: ClassDocumentation;
+  private main: boolean = false;
   private node?: RedFunctionAst | RedPropertyAst;
 
   constructor(private readonly documentationService: DocumentationService,
@@ -67,16 +69,13 @@ export class NDBDocumentationComponent {
       return;
     }
     this.documentation = value.documentation;
+    this.main = value.main ?? false;
     this.node = value.node;
-    const member: MemberDocumentation | undefined = this.getFunction();
-
-    if (!member) {
-      this.mode = 'edit';
-      return;
+    if (this.documentation && this.main) {
+      this.loadMain();
+    } else {
+      this.loadMember();
     }
-    this.body = member.body;
-    this.input.setValue(this.body, {emitEvent: false});
-    this.documented.emit(true);
   }
 
   get isEmpty(): boolean {
@@ -111,7 +110,54 @@ export class NDBDocumentationComponent {
   }
 
   async delete(): Promise<void> {
-    if (!this.node || !this.documentation) {
+    if (!this.documentation) {
+      return;
+    }
+    if (this.main) {
+      await this.deleteMain();
+    } else if (this.node) {
+      await this.deleteMember();
+    }
+  }
+
+  cancel(): void {
+    this.input.setValue(this.body, {emitEvent: false});
+    this.mode = 'view';
+    if (this.body.length === 0) {
+      this.closed.emit();
+    }
+  }
+
+  async save(): Promise<void> {
+    if (!this.documentation) {
+      return;
+    }
+    if (this.main) {
+      await this.saveMain();
+    } else if (this.node) {
+      await this.saveMember();
+    }
+  }
+
+  private onChanged(value: string): void {
+    value = value.trim();
+    this.isChanged = value !== this.body;
+  }
+
+  private async deleteMain(): Promise<void> {
+    if (!this.documentation) {
+      return;
+    }
+    this.documentation.body = undefined;
+    await firstValueFrom(this.documentationService.update(this.documentation));
+    this.body = '';
+    this.input.setValue('');
+    this.documented.emit(false);
+    this.closed.emit();
+  }
+
+  private async deleteMember(): Promise<void> {
+    if (!this.documentation) {
       return;
     }
     const member: MemberDocumentation | undefined = this.getFunction();
@@ -125,16 +171,27 @@ export class NDBDocumentationComponent {
     this.closed.emit();
   }
 
-  cancel(): void {
-    this.input.setValue(this.body, {emitEvent: false});
-    this.mode = 'view';
-    if (this.body.length === 0) {
-      this.closed.emit();
+  private async saveMain(): Promise<void> {
+    if (!this.documentation) {
+      return;
+    }
+    try {
+      let body: string = this.input.value;
+
+      body = body.trim();
+      this.documentation.body = body;
+      await firstValueFrom(this.documentationService.update(this.documentation));
+      this.body = body;
+      this.documented.emit(true);
+      this.mode = 'view';
+    } catch (error) {
+      // TODO: show a toast!
+      console.error(error);
     }
   }
 
-  async save(): Promise<void> {
-    if (!this.node || !this.documentation) {
+  private async saveMember(): Promise<void> {
+    if (!this.documentation) {
       return;
     }
     try {
@@ -162,9 +219,29 @@ export class NDBDocumentationComponent {
     }
   }
 
-  private onChanged(value: string): void {
-    value = value.trim();
-    this.isChanged = value !== this.body;
+  private loadMain(): void {
+    if (!this.documentation) {
+      return;
+    }
+    if (!this.documentation.body) {
+      this.mode = 'edit';
+      return;
+    }
+    this.body = this.documentation.body ?? '';
+    this.input.setValue(this.body, {emitEvent: false});
+    this.documented.emit(true);
+  }
+
+  private loadMember(): void {
+    const member: MemberDocumentation | undefined = this.getFunction();
+
+    if (!member) {
+      this.mode = 'edit';
+      return;
+    }
+    this.body = member.body;
+    this.input.setValue(this.body, {emitEvent: false});
+    this.documented.emit(true);
   }
 
   private getFunction(): MemberDocumentation | undefined {

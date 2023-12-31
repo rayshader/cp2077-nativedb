@@ -1,5 +1,7 @@
 @if (data$ | async; as data) {
-  <ndb-title-bar [title]="data.object.name" [node]="data.object">
+  <ndb-title-bar [title]="data.object.name"
+                 [node]="data.object"
+                 (toggleDocumentation)="toggleDocumentation()">
     <mat-icon class="badge" [attr.data-scope]="data.scope" svgIcon="scope" [title]="data.scope"></mat-icon>
     @if (data.isAbstract) {
       <mat-icon class="badge" svgIcon="abstract" title="abstract"></mat-icon>
@@ -18,6 +20,10 @@
       <mat-icon class="badge-struct" svgIcon="struct" title="struct"></mat-icon>
     }
   </ndb-title-bar>
+
+  @if (showDocumentation) {
+    <ndb-documentation [data]="{documentation: data.documentation, main: true}"></ndb-documentation>
+  }
 
   <cdk-accordion multi="true">
     @if (data.showParents) {

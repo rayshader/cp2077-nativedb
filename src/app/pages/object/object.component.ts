@@ -27,6 +27,7 @@ import {ClassDocumentation, DocumentationService} from "../../../shared/services
 import {cyrb53} from "../../../shared/string";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
+import {NDBDocumentationComponent} from "../../components/ndb-documentation/ndb-documentation.component";
 
 interface ObjectData {
   readonly object: RedClassAst;
@@ -64,7 +65,8 @@ interface ObjectData {
     TypeSpanComponent,
     NDBAccordionItemComponent,
     NDBTitleBarComponent,
-    NDBHighlightDirective
+    NDBHighlightDirective,
+    NDBDocumentationComponent
   ],
   templateUrl: './object.component.html',
   styleUrl: './object.component.scss'
@@ -72,6 +74,7 @@ interface ObjectData {
 export class ObjectComponent implements AfterViewInit {
 
   data$: Observable<ObjectData | undefined> = EMPTY;
+  showDocumentation: boolean = false;
 
   protected readonly kind: RedNodeKind;
 
@@ -166,6 +169,10 @@ export class ObjectComponent implements AfterViewInit {
       first(),
       takeUntilDestroyed(this.dr)
     ).subscribe(this.onScrollToFragment.bind(this));
+  }
+
+  toggleDocumentation(): void {
+    this.showDocumentation = !this.showDocumentation;
   }
 
   private onScrollToFragment() {

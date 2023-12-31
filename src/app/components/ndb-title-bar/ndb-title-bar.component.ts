@@ -1,4 +1,4 @@
-import {Component, HostBinding, Input} from '@angular/core';
+import {Component, EventEmitter, HostBinding, Input, Output} from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {SettingsService} from "../../../shared/services/settings.service";
@@ -27,8 +27,12 @@ export class NDBTitleBarComponent {
   @Input()
   hidden: boolean = false;
 
+  @Output()
+  toggleDocumentation: EventEmitter<void> = new EventEmitter();
+
   isPinned: boolean = true;
   isBookmarked: boolean = false;
+  hasDocumentation: boolean = false;
 
   constructor(private readonly settingsService: SettingsService,
               private readonly bookmarkService: BookmarkService) {
