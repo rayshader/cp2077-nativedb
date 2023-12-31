@@ -9,8 +9,8 @@ import {cyrb53} from "../../shared/string";
 })
 export class NDBFormatDocumentationPipe implements PipeTransform {
 
-  private static readonly LINK_RULE: RegExp = RegExp(/\[(?<member>((?<local>this)|(?<class>[A-Za-z_]+))\.)?(?<type>[A-Za-z0-9_-]*)]/g);
-  private static readonly URL_RULE: RegExp = RegExp(/\[(?<title>.*)]\((?<url>https:\/\/.*)\)/g);
+  private static readonly LINK_RULE: RegExp = RegExp(/\[(?<member>((?<local>this)|(?<class>[A-Za-z_]+))\.)?(?<type>[A-Za-z0-9_-]+)]/g);
+  private static readonly URL_RULE: RegExp = RegExp(/\[(?<title>[^\]]+)]\((?<url>https:\/\/\S+\.[^()]+(?:\([^)]*\))*)\)/g);
   private static readonly PRIMITIVES: string[] = [];
 
   constructor(private readonly sanitizer: DomSanitizer) {
@@ -23,8 +23,9 @@ export class NDBFormatDocumentationPipe implements PipeTransform {
 
   transform(body: string): SafeHtml {
     body = body.replaceAll('\n', '<br>');
-    let matches: RegExpMatchArray[] = [...body.matchAll(NDBFormatDocumentationPipe.URL_RULE)];
+    let matches: RegExpMatchArray[];
 
+    matches = [...body.matchAll(NDBFormatDocumentationPipe.URL_RULE)];
     matches.reverse();
     for (const match of matches) {
       body = this.formatUrlRule(match, body);
