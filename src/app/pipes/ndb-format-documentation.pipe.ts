@@ -1,6 +1,6 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
-import {RedPrimitiveDef} from "../../shared/red-ast/red-definitions.ast";
+import {RedPrimitiveDef, RedTemplateDef} from "../../shared/red-ast/red-definitions.ast";
 import {cyrb53} from "../../shared/string";
 
 @Pipe({
@@ -15,8 +15,12 @@ export class NDBFormatDocumentationPipe implements PipeTransform {
 
   constructor(private readonly sanitizer: DomSanitizer) {
     if (NDBFormatDocumentationPipe.PRIMITIVES.length === 0) {
-      for (let i = RedPrimitiveDef.Void; i <= RedPrimitiveDef.Variant; i++) {
-        NDBFormatDocumentationPipe.PRIMITIVES.push(RedPrimitiveDef[i]);
+      for (let i = RedPrimitiveDef.Void; i <= RedTemplateDef.multiChannelCurve; i++) {
+        if (i <= RedPrimitiveDef.Variant) {
+          NDBFormatDocumentationPipe.PRIMITIVES.push(RedPrimitiveDef[i]);
+        } else {
+          NDBFormatDocumentationPipe.PRIMITIVES.push(RedTemplateDef[i]);
+        }
       }
     }
   }
