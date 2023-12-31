@@ -92,7 +92,7 @@ export class NDBDocumentationComponent {
     if ($element.tagName !== 'A') {
       return;
     }
-    const route: string | null = $element.getAttribute('data-route');
+    let route: string | null = $element.getAttribute('data-route');
 
     if (!route) {
       return;
@@ -101,6 +101,11 @@ export class NDBDocumentationComponent {
 
     if (isLocal) {
       $element.scrollIntoView({block: 'center'});
+    }
+    const nameOnly: boolean = $element.getAttribute('data-name') === 'only';
+
+    if (nameOnly) {
+      route += '?name=only';
     }
     this.router.navigateByUrl(route, {replaceUrl: isLocal});
   }

@@ -20,6 +20,7 @@ import {RedClassAst} from "../red-ast/red-class.ast";
 import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedPropertyAst} from "../red-ast/red-property.ast";
 import {SettingsService} from "./settings.service";
+import {cyrb53} from "../string";
 
 @Injectable({
   providedIn: 'root'
@@ -93,9 +94,15 @@ export class RedDumpService {
     );
   }
 
-  getById(id: number): Observable<RedNodeAst | undefined> {
+  getById(id: number, nameOnly?: boolean): Observable<RedNodeAst | undefined> {
+    nameOnly ??= false;
     return this.nodes$.pipe(
-      map((nodes) => nodes.find((node) => node.id === id))
+      map((nodes) => nodes.find((node) => {
+        if (nameOnly) {
+          return cyrb53(node.name) === id;
+        }
+        return node.id === id;
+      }))
     );
   }
 

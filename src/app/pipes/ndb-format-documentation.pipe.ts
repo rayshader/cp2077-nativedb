@@ -71,7 +71,7 @@ export class NDBFormatDocumentationPipe implements PipeTransform {
     if (isPrimitive) {
       return `<span class="stx-type">${type}</span>`;
     }
-    return `<a class="stx-type" title="Navigate to ${type}" data-route="/${type}">${type}</a>`;
+    return `<a class="stx-type" title="Navigate to ${type}" data-route="/${type}" data-name="only">${type}</a>`;
   }
 
   private createLocalLink(type: string): string {

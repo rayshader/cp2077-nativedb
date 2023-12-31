@@ -9,6 +9,7 @@ export function vanillaRedirectGuard(next: ActivatedRouteSnapshot) {
   const dumpService: RedDumpService = inject(RedDumpService);
   const router: Router = inject(Router);
   const name: string = next.paramMap.get('name') ?? '';
+  const nameOnly: boolean = (next.queryParamMap.get('name') ?? '') === 'only';
   const fragment: string | undefined = next.fragment ?? undefined;
 
   if (name.length === 0) {
@@ -16,7 +17,7 @@ export function vanillaRedirectGuard(next: ActivatedRouteSnapshot) {
   }
   const id: number = cyrb53(name);
 
-  return dumpService.getById(id).pipe(
+  return dumpService.getById(id, nameOnly).pipe(
     map((node: RedNodeAst | undefined) => {
       if (!node) {
         return router.createUrlTree([]);
