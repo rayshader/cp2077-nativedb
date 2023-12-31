@@ -6,7 +6,6 @@ import {map, Observable, switchMap} from "rxjs";
 export interface ClassDocumentation extends Entity {
   body?: string;
   functions?: MemberDocumentation[];
-  properties?: MemberDocumentation[];
 }
 
 export interface MemberDocumentation {
@@ -66,7 +65,7 @@ export class DocumentationService {
   }
 
   private canDelete(documentation: ClassDocumentation): boolean {
-    return !documentation.body && !documentation.functions && !documentation.properties;
+    return !documentation.body && !documentation.functions;
   }
 
 }

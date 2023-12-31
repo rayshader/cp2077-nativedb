@@ -1,7 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {MatIconModule} from "@angular/material/icon";
 import {TypeSpanComponent} from "../type-span/type-span.component";
-import {MatButtonModule} from "@angular/material/button";
 import {RedPropertyAst} from "../../../../shared/red-ast/red-property.ast";
 import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
 
@@ -10,8 +9,7 @@ import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
   standalone: true,
   imports: [
     MatIconModule,
-    TypeSpanComponent,
-    MatButtonModule,
+    TypeSpanComponent
   ],
   templateUrl: './property-span.component.html',
   styleUrl: './property-span.component.scss'

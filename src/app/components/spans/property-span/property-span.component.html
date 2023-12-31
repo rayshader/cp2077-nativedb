@@ -1,10 +1,7 @@
 @if (node) {
   <div class="badges">
     <div class="align-clipboard"></div>
-    <button mat-icon-button
-            class="badge"
-            title="Documentation"
-            [class.stx-doc]="!!documentation"><mat-icon>info_outline</mat-icon></button>
+    <div class="align" [style.width]="'40px'"></div>
     <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>
     @if (node.isPersistent) {
       <mat-icon class="badge" svgIcon="scope" title="persistent"></mat-icon>

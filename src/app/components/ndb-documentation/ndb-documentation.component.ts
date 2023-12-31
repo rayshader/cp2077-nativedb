@@ -12,14 +12,13 @@ import {
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {NDBFormatDocumentationPipe} from "../../pipes/ndb-format-documentation.pipe";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
-import {RedPropertyAst} from "../../../shared/red-ast/red-property.ast";
 import {firstValueFrom} from "rxjs";
 import {Router} from "@angular/router";
 
 export interface DocumentationData {
   readonly documentation?: ClassDocumentation;
   readonly main?: boolean;
-  readonly node?: RedFunctionAst | RedPropertyAst;
+  readonly node?: RedFunctionAst;
 }
 
 type Mode = 'view' | 'edit';
@@ -56,7 +55,7 @@ export class NDBDocumentationComponent {
 
   private documentation?: ClassDocumentation;
   private main: boolean = false;
-  private node?: RedFunctionAst | RedPropertyAst;
+  private node?: RedFunctionAst;
 
   constructor(private readonly documentationService: DocumentationService,
               private readonly router: Router) {
