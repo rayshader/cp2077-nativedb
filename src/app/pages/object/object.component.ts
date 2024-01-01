@@ -1,4 +1,4 @@
-import {AfterViewInit, ApplicationRef, Component, DestroyRef, Input} from '@angular/core';
+import {ApplicationRef, Component, DestroyRef, Input} from '@angular/core';
 import {AsyncPipe} from "@angular/common";
 import {CdkAccordionModule} from "@angular/cdk/accordion";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
@@ -71,7 +71,7 @@ interface ObjectData {
   templateUrl: './object.component.html',
   styleUrl: './object.component.scss'
 })
-export class ObjectComponent implements AfterViewInit {
+export class ObjectComponent {
 
   data$: Observable<ObjectData | undefined> = EMPTY;
   showDocumentation: boolean = false;
@@ -146,6 +146,11 @@ export class ObjectComponent implements AfterViewInit {
 
         properties.sort(RedPropertyAst.sort);
         functions.sort(RedFunctionAst.sort);
+        this.app.isStable.pipe(
+          filter((stable: boolean) => stable),
+          first(),
+          takeUntilDestroyed(this.dr)
+        ).subscribe(this.onScrollToFragment.bind(this));
         return <ObjectData>{
           object: object,
           scope: RedVisibilityDef[object.visibility],
@@ -165,14 +170,6 @@ export class ObjectComponent implements AfterViewInit {
         };
       })
     );
-  }
-
-  ngAfterViewInit(): void {
-    this.app.isStable.pipe(
-      filter((stable: boolean) => stable),
-      first(),
-      takeUntilDestroyed(this.dr)
-    ).subscribe(this.onScrollToFragment.bind(this));
   }
 
   toggleDocumentation(): void {
