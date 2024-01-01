@@ -1,4 +1,4 @@
-@mixin object-theme($theme) {
+@mixin highlight-theme($theme) {
   %highlight {
     position: relative;
     top: -2px;
@@ -7,6 +7,16 @@
     padding: 2px 4px;
 
     border-radius: 4px;
+  }
+
+  enum,
+  bitfield {
+    & .highlight {
+      position: relative;
+
+      background-color: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+    }
   }
 
   object {
@@ -30,7 +40,14 @@
   }
 }
 
-@mixin object-color($theme) {
+@mixin highlight-color($theme) {
+  enum,
+  bitfield {
+    & .highlight {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+
   object {
     & property-span {
       &.highlight {

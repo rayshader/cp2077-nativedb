@@ -8,6 +8,8 @@ import {RedBitfieldAst} from "../../../shared/red-ast/red-bitfield.ast";
 import {PageService} from "../../../shared/services/page.service";
 import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
 import {RecentVisitService} from "../../../shared/services/recent-visit.service";
+import {cyrb53} from "../../../shared/string";
+import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
 
 @Component({
   selector: 'bitfield',
@@ -16,7 +18,8 @@ import {RecentVisitService} from "../../../shared/services/recent-visit.service"
     MatButtonModule,
     MatIconModule,
     AsyncPipe,
-    NDBTitleBarComponent
+    NDBTitleBarComponent,
+    NDBHighlightDirective
   ],
   templateUrl: './bitfield.component.html',
   styleUrl: './bitfield.component.scss'
@@ -24,6 +27,8 @@ import {RecentVisitService} from "../../../shared/services/recent-visit.service"
 export class BitfieldComponent {
 
   bitfield$: Observable<RedBitfieldAst | undefined> = EMPTY;
+
+  protected readonly cyrb53 = cyrb53;
 
   constructor(private readonly dumpService: RedDumpService,
               private readonly pageService: PageService,

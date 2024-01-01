@@ -6,7 +6,9 @@
   </ndb-title-bar>
 
   @for (member of enum.members; track member.key) {
-    <p class="field stx">
+    <p class="field stx"
+       ndbHighlight
+       [id]="cyrb53(member.key)">
       <button mat-icon-button
               class="badge clipboard"
               (click)="copyClipboard(enum, member.key)"><mat-icon>content_copy</mat-icon></button>

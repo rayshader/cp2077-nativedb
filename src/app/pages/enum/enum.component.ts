@@ -8,6 +8,8 @@ import {RedEnumAst} from "../../../shared/red-ast/red-enum.ast";
 import {PageService} from "../../../shared/services/page.service";
 import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
 import {RecentVisitService} from "../../../shared/services/recent-visit.service";
+import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
+import {cyrb53} from "../../../shared/string";
 
 @Component({
   selector: 'enum',
@@ -16,7 +18,8 @@ import {RecentVisitService} from "../../../shared/services/recent-visit.service"
     MatButtonModule,
     MatIconModule,
     AsyncPipe,
-    NDBTitleBarComponent
+    NDBTitleBarComponent,
+    NDBHighlightDirective
   ],
   templateUrl: './enum.component.html',
   styleUrl: './enum.component.scss'
@@ -24,6 +27,8 @@ import {RecentVisitService} from "../../../shared/services/recent-visit.service"
 export class EnumComponent {
 
   enum$: Observable<RedEnumAst | undefined> = EMPTY;
+
+  protected readonly cyrb53 = cyrb53;
 
   constructor(private readonly dumpService: RedDumpService,
               private readonly pageService: PageService,
