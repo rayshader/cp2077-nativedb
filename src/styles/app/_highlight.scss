@@ -3,10 +3,13 @@
     position: relative;
     top: -2px;
     left: -4px;
-    height: 24px;
     padding: 2px 4px;
 
     border-radius: 4px;
+
+    @media (min-width: 1024px) {
+      height: 24px;
+    }
   }
 
   enum,

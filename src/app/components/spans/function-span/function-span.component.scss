@@ -5,6 +5,10 @@
 
   & .content {
     display: flex;
+
+    @media (max-width: 1025px) {
+      flex-flow: column;
+    }
   }
 
   & .badges {
@@ -43,9 +47,5 @@
 
   & .stx-function-fullname {
     text-decoration: underline dotted;
-  }
-
-  @media (max-width: 1025px) {
-    flex-flow: column;
   }
 }
