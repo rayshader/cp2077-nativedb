@@ -73,7 +73,7 @@ export class NDBFormatDocumentationPipe implements PipeTransform {
     const isPrimitive: boolean = NDBFormatDocumentationPipe.PRIMITIVES.some((primitive) => primitive === type);
 
     if (isPrimitive) {
-      return `<span class="stx-type">${type}</span>`;
+      return `<span class="stx-primitive-type">${type}</span>`;
     }
     return `<a class="stx-type" title="Navigate to ${type}" data-route="/${type}" data-name="only">${type}</a>`;
   }
