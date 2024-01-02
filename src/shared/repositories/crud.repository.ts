@@ -11,6 +11,25 @@ export abstract class CrudRepository<T extends Entity> {
                         private readonly store: string) {
   }
 
+  findAll(): Observable<T[]> {
+    return new Observable((observer) => {
+      const store: IDBObjectStore = this.read();
+      const request: IDBRequest = store.getAll();
+
+      request.onerror = (event) => {
+        observer.error();
+        observer.complete();
+      };
+      request.onsuccess = (event) => {
+        // @ts-ignore
+        const entities: T[] = event.target.result;
+
+        observer.next(entities);
+        observer.complete();
+      };
+    });
+  }
+
   findById(id: number): Observable<T | undefined> {
     return new Observable((observer) => {
       const store: IDBObjectStore = this.read();

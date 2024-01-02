@@ -22,6 +22,10 @@ export class DocumentationService {
   constructor(private readonly classRepository: ClassRepository) {
   }
 
+  getAll(): Observable<ClassDocumentation[]> {
+    return this.classRepository.findAll();
+  }
+
   getClassById(id: number): Observable<ClassDocumentation> {
     return this.classRepository.findById(id).pipe(
       map((documentation: ClassDocumentation | undefined) => {
