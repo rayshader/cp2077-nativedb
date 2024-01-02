@@ -24,6 +24,7 @@
 							"zone.js"
 						],
 						"tsConfig": "tsconfig.app.json",
+            "webWorkerTsConfig": "tsconfig.worker.json",
 						"assets": [
               "src/favicon.ico",
               "src/assets",
@@ -59,7 +60,7 @@
                 "inject": false
               }
             ],
-						"scripts": []
+            "scripts": []
 					},
 					"configurations": {
 						"production": {
@@ -113,6 +114,7 @@
 							"zone.js/testing"
 						],
 						"tsConfig": "tsconfig.spec.json",
+            "webWorkerTsConfig": "tsconfig.worker.json",
 						"assets": [
               "src/favicon.ico",
               "src/assets",
@@ -121,7 +123,7 @@
 						"styles": [
 							"src/styles.scss"
 						],
-						"scripts": []
+            "scripts": []
 					}
 				}
 			}
