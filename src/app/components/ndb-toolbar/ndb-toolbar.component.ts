@@ -11,6 +11,7 @@ import {NavigationEnd, Router, RouterLink} from "@angular/router";
 import {ResponsiveService} from "../../../shared/services/responsive.service";
 import {filter} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {NDBExportDocumentationComponent} from "../ndb-export-documentation/ndb-export-documentation.component";
 
 @Component({
   selector: 'ndb-toolbar',
@@ -24,7 +25,8 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
     MatToolbarModule,
     NDBIdeThemeComponent,
     NDBSearchComponent,
-    NDBThemeModeComponent
+    NDBThemeModeComponent,
+    NDBExportDocumentationComponent
   ],
   templateUrl: './ndb-toolbar.component.html',
   styleUrl: './ndb-toolbar.component.scss'

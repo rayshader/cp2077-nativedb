@@ -32,6 +32,7 @@
   @include mat.menu-theme($theme);
   @include mat.select-theme($theme);
   @include mat.slide-toggle-theme($theme);
+  @include mat.progress-spinner-theme($theme);
 }
 
 @mixin mat-component-colors($theme) {
@@ -50,6 +51,7 @@
   @include mat.menu-color($theme);
   @include mat.select-color($theme);
   @include mat.slide-toggle-color($theme);
+  @include mat.progress-spinner-color($theme);
 }
 
 @mixin rd-component-themes($theme) {

@@ -1,0 +1,22 @@
+@if (!isLoading) {
+  <button mat-icon-button
+          title="Import/Export documentation"
+          [matMenuTriggerFor]="menu"
+          [disabled]="isReady === false">
+    <mat-icon>import_export</mat-icon>
+  </button>
+} @else {
+  <mat-spinner diameter="24"></mat-spinner>
+}
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item routerLink="import">
+    <mat-icon>file_download</mat-icon> Import
+  </button>
+
+  <button mat-menu-item (click)="export()">
+    <mat-icon>file_upload</mat-icon> Export
+  </button>
+</mat-menu>
+
+<a #upload target="_blank" hidden></a>
