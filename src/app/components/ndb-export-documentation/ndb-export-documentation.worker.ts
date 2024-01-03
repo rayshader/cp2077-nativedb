@@ -33,8 +33,13 @@ addEventListener('message', (event: MessageEvent) => {
   handler.fn(message.data);
 });
 
-function importDocumentation(data: Uint8Array): void {
+function importDocumentation(buffer: Uint8Array): void {
+  const data: ClassDocumentation[] = parser.read(buffer);
 
+  postMessage(<NDBMessage>{
+    command: NDBCommand.import,
+    data: data
+  });
 }
 
 function exportDocumentation(data: ClassDocumentation[]): void {

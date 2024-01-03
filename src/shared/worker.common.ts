@@ -8,7 +8,7 @@ export enum NDBCommand {
 
 export interface NDBMessage {
   readonly command: NDBCommand;
-  readonly data: ClassDocumentation[] | Blob;
+  readonly data: ClassDocumentation[] | Blob | Uint8Array;
 }
 
 export interface NDBCommandHandler {

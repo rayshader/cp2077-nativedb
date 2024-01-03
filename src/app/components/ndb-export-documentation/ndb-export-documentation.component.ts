@@ -5,7 +5,7 @@ import {ClassDocumentation, DocumentationService} from "../../../shared/services
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {DocumentationParser} from "../../../shared/parsers/documentation.parser";
 import {MatMenuModule} from "@angular/material/menu";
-import {RouterLink} from "@angular/router";
+import {Router, RouterLink} from "@angular/router";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {NDBCommand, NDBCommandHandler, NDBMessage} from "../../../shared/worker.common";
 
@@ -24,6 +24,9 @@ import {NDBCommand, NDBCommandHandler, NDBMessage} from "../../../shared/worker.
 })
 export class NDBExportDocumentationComponent implements OnInit {
 
+  @ViewChild('download')
+  input?: ElementRef;
+
   @ViewChild('upload')
   link?: ElementRef;
 
@@ -34,11 +37,17 @@ export class NDBExportDocumentationComponent implements OnInit {
   private readonly commands: NDBCommandHandler[] = [
     {command: NDBCommand.ready, fn: this.onWorkerReady.bind(this)},
     {command: NDBCommand.export, fn: this.onWorkerExport.bind(this)},
+    {command: NDBCommand.import, fn: this.onWorkerImport.bind(this)},
   ];
 
   constructor(private readonly documentationService: DocumentationService,
               private readonly documentationParser: DocumentationParser,
+              private readonly router: Router,
               private readonly dr: DestroyRef) {
+  }
+
+  private get $input(): HTMLInputElement {
+    return this.input?.nativeElement;
   }
 
   private get $link(): HTMLAnchorElement {
@@ -49,8 +58,35 @@ export class NDBExportDocumentationComponent implements OnInit {
     await this.loadWorker();
   }
 
+  import(): void {
+    this.$input.click();
+  }
+
   export(): void {
     this.documentationService.getAll().pipe(takeUntilDestroyed(this.dr)).subscribe(this.onExport.bind(this));
+  }
+
+  async onImport(): Promise<void> {
+    if (!this.$input.files) {
+      return;
+    }
+    if (this.$input.files.length !== 1) {
+      return;
+    }
+    this.isLoading = true;
+    const file: File = this.$input.files[0];
+    const buffer: Uint8Array = new Uint8Array(await file.arrayBuffer());
+
+    if (this.isReady === 'sync') {
+      const data: ClassDocumentation[] = this.documentationParser.read(buffer);
+
+      this.onWorkerImport(data);
+      return;
+    }
+    this.worker!.postMessage(<NDBMessage>{
+      command: NDBCommand.import,
+      data: buffer
+    });
   }
 
   private onExport(data: ClassDocumentation[]): void {
@@ -102,5 +138,10 @@ export class NDBExportDocumentationComponent implements OnInit {
     this.$link.click();
     URL.revokeObjectURL(url);
     this.isLoading = false;
+  }
+
+  private onWorkerImport(data: ClassDocumentation[]): void {
+    this.isLoading = false;
+    this.router.navigate(['import'], {state: data, skipLocationChange: true});
   }
 }

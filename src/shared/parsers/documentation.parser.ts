@@ -22,6 +22,13 @@ export class DocumentationParser {
     return new Blob([buffer], {type: 'application/octet-stream'});
   }
 
+  read(buffer: ArrayBuffer): ClassDocumentation[] {
+    const json: string = this.brotliService.decompress(buffer as Uint8Array);
+    const data: any[] = JSON.parse(json);
+
+    return data.map(this.readClass.bind(this));
+  }
+
   private writeClass(object: ClassDocumentation): any {
     const json: any = {
       a: object.id
@@ -40,6 +47,27 @@ export class DocumentationParser {
     return {
       a: fn.id,
       b: fn.body
+    };
+  }
+
+  private readClass(object: any): ClassDocumentation {
+    const json: ClassDocumentation = {
+      id: object.a,
+    };
+
+    if (object.b) {
+      json.body = object.b;
+    }
+    if (object.c) {
+      json.functions = object.c.map(this.readFunction.bind(this));
+    }
+    return json;
+  }
+
+  private readFunction(fn: any): MemberDocumentation {
+    return {
+      id: fn.a,
+      body: fn.b,
     };
   }
 
