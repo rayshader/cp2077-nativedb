@@ -1,5 +1,5 @@
 @if (data$ | async; as data) {
-  <ndb-accordion-item>
+  <ndb-accordion-item expanded="true">
     <div header class="header">
       @if (!data.isStruct) {
         <mat-icon class="badge-class" svgIcon="class" title="class"></mat-icon>
@@ -7,17 +7,36 @@
         <mat-icon class="badge-struct" svgIcon="struct" title="struct"></mat-icon>
       }
       <p class="stx stx-type">{{data.name}}</p>
+
+      <div class="space"></div>
+
+      @if (additions > 0) {
+        <mat-chip highlighted class="success" title="Additions">{{additions}}</mat-chip>
+      }
+      @if (modifications > 0) {
+        <mat-chip highlighted color="primary" title="Modifications">{{modifications}}</mat-chip>
+      }
+      @if (deletions > 0) {
+        <mat-chip highlighted color="warn" title="Deletions">{{deletions}}</mat-chip>
+      }
     </div>
 
     @if (merge !== undefined) {
       @if (merge.body !== undefined) {
         <ndb-merge-body class="ndb-documentation"
-                        [body]="merge.body"></ndb-merge-body>
+                        [body]="merge.body"
+                        (updated)="updated.emit()"></ndb-merge-body>
+
+        <mat-divider></mat-divider>
       }
 
-      @for (member of merge.members; track member.id) {
+      @for (member of merge.members; track member.id; let i = $index) {
         <ndb-merge-function [object]="data"
-                            [member]="member"></ndb-merge-function>
+                            [member]="member"
+                            (updated)="updated.emit()"></ndb-merge-function>
+        @if (i + 1 < merge.members!.length) {
+          <mat-divider></mat-divider>
+        }
       }
     }
   </ndb-accordion-item>

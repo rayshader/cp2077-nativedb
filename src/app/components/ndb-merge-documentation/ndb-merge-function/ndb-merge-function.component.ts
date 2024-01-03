@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {MemberMergeOperation, MergeFrom, MergeOperation} from "../../../../shared/services/documentation.service";
 import {FunctionSpanComponent} from "../../spans/function-span/function-span.component";
 import {RedClassAst} from "../../../../shared/red-ast/red-class.ast";
@@ -21,6 +21,9 @@ export class NDBMergeFunctionComponent {
   @Input()
   member!: MemberMergeOperation;
 
+  @Output()
+  updated: EventEmitter<void> = new EventEmitter();
+
   protected readonly MergeFrom = MergeFrom;
   protected readonly MergeOperation = MergeOperation;
 
@@ -30,27 +33,31 @@ export class NDBMergeFunctionComponent {
 
   protected get title(): string {
     if (this.member.operation === MergeOperation.add) {
-      return 'New';
+      return 'Accept addition';
     } else if (this.member.operation === MergeOperation.update) {
-      return 'Updated';
+      return 'Accept modification';
     }
-    return 'Removed';
+    return 'Accept deletion';
   }
 
   pickBrowser(): void {
     if (this.member.from !== undefined) {
       this.member.from = undefined;
+      this.updated.emit();
       return;
     }
     this.member.from = MergeFrom.browser;
+    this.updated.emit();
   }
 
   pickFile(): void {
     if (this.member.from !== undefined) {
       this.member.from = undefined;
+      this.updated.emit();
       return;
     }
     this.member.from = MergeFrom.file;
+    this.updated.emit();
   }
 
 }

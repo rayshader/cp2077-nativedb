@@ -11,7 +11,15 @@
 @if (operations$ | async; as operations) {
   <cdk-accordion multi="true">
     @for (operation of operations; track operation.id) {
-      <ndb-merge-documentation [merge]="operation"></ndb-merge-documentation>
+      <ndb-merge-documentation [merge]="operation"
+                               (updated)="onUpdated()"></ndb-merge-documentation>
     }
   </cdk-accordion>
 }
+
+<button mat-raised-button
+        color="primary"
+        [disabled]="hasConflicts$ | async"
+        (click)="merge()">
+  MERGE
+</button>

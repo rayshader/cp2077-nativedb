@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {BodyMergeOperation, MergeFrom, MergeOperation} from "../../../../shared/services/documentation.service";
 
 @Component({
@@ -13,32 +13,39 @@ export class NDBMergeBodyComponent {
   @Input()
   body!: BodyMergeOperation;
 
+  @Output()
+  updated: EventEmitter<void> = new EventEmitter();
+
   protected readonly MergeOperation = MergeOperation;
   protected readonly MergeFrom = MergeFrom;
 
   protected get title(): string {
     if (this.body.operation === MergeOperation.add) {
-      return 'New';
+      return 'Accept addition';
     } else if (this.body.operation === MergeOperation.update) {
-      return 'Updated';
+      return 'Accept modification';
     }
-    return 'Removed';
+    return 'Accept deletion';
   }
 
   pickBrowser(): void {
     if (this.body.from !== undefined) {
       this.body.from = undefined;
+      this.updated.emit();
       return;
     }
     this.body.from = MergeFrom.browser;
+    this.updated.emit();
   }
 
   pickFile(): void {
     if (this.body.from !== undefined) {
       this.body.from = undefined;
+      this.updated.emit();
       return;
     }
     this.body.from = MergeFrom.file;
+    this.updated.emit();
   }
 
 }
