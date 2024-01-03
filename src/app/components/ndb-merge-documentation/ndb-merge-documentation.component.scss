@@ -1,0 +1,8 @@
+.header {
+  display: flex;
+  align-items: center;
+
+  & mat-icon {
+    margin-right: 8px;
+  }
+}

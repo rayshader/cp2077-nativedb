@@ -4,6 +4,7 @@ import {RedNodeKind} from "../shared/red-ast/red-node.ast";
 import {firstUsageGuard} from "./guards/first-usage.guard";
 import {RecentVisitsComponent} from "./pages/recent-visits/recent-visits.component";
 import {vanillaRedirectGuard} from "./guards/vanilla-redirect.guard";
+import {importRedirectGuard} from "./guards/import-redirect.guard";
 
 export const routes: Routes = [
   {path: '', component: RecentVisitsComponent, canActivate: [firstUsageGuard]},
@@ -12,6 +13,11 @@ export const routes: Routes = [
   {
     path: 'bookmarks',
     loadComponent: () => import('./pages/bookmarks/bookmarks.component').then(c => c.BookmarksComponent)
+  },
+  {
+    path: 'import',
+    canActivate: [importRedirectGuard],
+    loadComponent: () => import('./pages/import/import.component').then(c => c.ImportComponent)
   },
 
   {path: 'e/:id', loadComponent: () => import('./pages/enum/enum.component').then(c => c.EnumComponent)},

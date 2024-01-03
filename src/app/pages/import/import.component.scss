@@ -1,0 +1,10 @@
+.title {
+  display: flex;
+  gap: 24px;
+
+  & h2 {
+    display: inline-flex;
+    justify-content: center;
+    flex: 1;
+  }
+}

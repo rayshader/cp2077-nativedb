@@ -37,7 +37,8 @@
     background-color: map.get($colors, background);
   }
 
-  ndb-documentation {
+  ndb-documentation,
+  .ndb-documentation {
     & p {
       border-left: 2px solid map.get($colors, documentation);
     }

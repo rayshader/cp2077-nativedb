@@ -1,0 +1,17 @@
+@if (body.from === undefined || body.from === MergeFrom.browser) {
+  <p class="side stx stx-doc"
+     [class.disabled]="body.browser === undefined"
+     (click)="pickBrowser()">
+    {{body.browser ?? '&nbsp;'}}
+  </p>
+}
+
+@if (body.from === undefined || body.from === MergeFrom.file) {
+  <p class="side stx stx-doc"
+     [title]="title"
+     [class.update]="body.operation === MergeOperation.update"
+     [class.delete]="body.operation === MergeOperation.delete"
+     (click)="pickFile()">
+    {{body.file ?? '&nbsp;'}}
+  </p>
+}

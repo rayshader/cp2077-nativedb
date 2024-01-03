@@ -1,0 +1,24 @@
+@if (data$ | async; as data) {
+  <ndb-accordion-item>
+    <div header class="header">
+      @if (!data.isStruct) {
+        <mat-icon class="badge-class" svgIcon="class" title="class"></mat-icon>
+      } @else {
+        <mat-icon class="badge-struct" svgIcon="struct" title="struct"></mat-icon>
+      }
+      <p class="stx stx-type">{{data.name}}</p>
+    </div>
+
+    @if (merge !== undefined) {
+      @if (merge.body !== undefined) {
+        <ndb-merge-body class="ndb-documentation"
+                        [body]="merge.body"></ndb-merge-body>
+      }
+
+      @for (member of merge.members; track member.id) {
+        <ndb-merge-function [object]="data"
+                            [member]="member"></ndb-merge-function>
+      }
+    }
+  </ndb-accordion-item>
+}

@@ -1,8 +1,30 @@
+@use 'sass:map';
+@use 'sass:color';
+
 @mixin documentation-theme($theme) {
-  ndb-documentation {
+  $primary: map.get($theme, primary);
+  $warn: map.get($theme, warn);
+
+  ndb-documentation,
+  .ndb-documentation {
     & p {
       white-space: pre-wrap;
       background-color: rgba(0, 0, 0, 0.05);
+
+      &.disabled {
+        background-color: rgba(127, 127, 127, 0.2);
+        border-left-color: #7F7F7F!important;
+      }
+
+      &.update {
+        background-color: color.change(map.get($primary, 500), $alpha: 0.1)!important;
+        border-left-color: map.get($primary, 500)!important;
+      }
+
+      &.delete {
+        background-color: color.change(map.get($warn, 500), $alpha: 0.1)!important;
+        border-left-color: map.get($warn, 500)!important;
+      }
 
       & a {
         text-decoration: none;
@@ -25,7 +47,8 @@
 }
 
 @mixin documentation-color($theme) {
-  ndb-documentation {
+  ndb-documentation,
+  .ndb-documentation {
     & p {
       background-color: rgba(0, 0, 0, 0.2);
     }
