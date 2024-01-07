@@ -214,7 +214,7 @@ export class DocumentationService {
     });
     // Detect add operations
     file.forEach((fileMember) => {
-      const browserMember: MemberDocumentation | undefined = file.find((item) => item.id === fileMember.id);
+      const browserMember: MemberDocumentation | undefined = browser.find((item) => item.id === fileMember.id);
 
       if (browserMember) {
         return;
