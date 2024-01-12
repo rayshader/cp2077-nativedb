@@ -17,9 +17,24 @@
   </cdk-accordion>
 }
 
-<button mat-raised-button
-        color="primary"
-        [disabled]="hasConflicts$ | async"
-        (click)="merge()">
-  MERGE
-</button>
+@if (data$ | async; as data) {
+  @if (!data.isIdentical) {
+    <button mat-raised-button
+            color="primary"
+            [disabled]="data.hasConflicts"
+            (click)="merge()">
+      MERGE
+    </button>
+
+    <button mat-raised-button
+            (click)="replaceAll()">
+      REPLACE ALL
+    </button>
+  } @else {
+    <button mat-raised-button
+            color="primary"
+            routerLink="/">
+      NO CHANGES
+    </button>
+  }
+}

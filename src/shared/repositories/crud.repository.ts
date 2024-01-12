@@ -97,6 +97,30 @@ export abstract class CrudRepository<T extends Entity> {
     });
   }
 
+  deleteAll(): Observable<void> {
+    return new Observable<void>((observer) => {
+      const store: IDBObjectStore = this.write();
+      const request: IDBRequest = store.openCursor();
+
+      request.onerror = (event) => {
+        observer.error();
+        observer.complete();
+      }
+      request.onsuccess = (event) => {
+        // @ts-ignore
+        const cursor: IDBCursorWithValue | null = event.target.result;
+
+        if (cursor) {
+          cursor.delete();
+          cursor.continue();
+          return;
+        }
+        observer.next();
+        observer.complete();
+      }
+    });
+  }
+
   protected read(): IDBObjectStore {
     return this.db.read(this.store);
   }
