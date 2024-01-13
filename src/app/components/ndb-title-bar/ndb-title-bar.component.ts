@@ -28,6 +28,9 @@ export class NDBTitleBarComponent {
   hideDocumentation: boolean = false;
 
   @Input()
+  hasDocumentation: boolean = false;
+
+  @Input()
   hidden: boolean = false;
 
   @Output()
@@ -35,7 +38,6 @@ export class NDBTitleBarComponent {
 
   isPinned: boolean = true;
   isBookmarked: boolean = false;
-  hasDocumentation: boolean = false;
 
   constructor(private readonly settingsService: SettingsService,
               private readonly bookmarkService: BookmarkService) {

@@ -1,6 +1,7 @@
 @if (data$ | async; as data) {
   <ndb-title-bar [title]="data.object.name"
                  [node]="data.object"
+                 [hasDocumentation]="data.hasBodyDocumentation"
                  (toggleDocumentation)="toggleDocumentation()">
     <mat-icon class="badge" [attr.data-scope]="data.scope" svgIcon="scope" [title]="data.scope"></mat-icon>
     @if (data.isAbstract) {

@@ -42,6 +42,7 @@ interface ObjectData {
   readonly align: string;
 
   readonly documentation: ClassDocumentation;
+  readonly hasBodyDocumentation: boolean;
 
   readonly isMobile: boolean;
   readonly showParents: boolean;
@@ -163,6 +164,7 @@ export class ObjectComponent {
           align: `${72 + badges * 24 + 12 - 30}px`,
           isMobile: isMobile,
           documentation: documentation,
+          hasBodyDocumentation: documentation.body !== undefined,
           showParents: parents.length > 0 || showEmptyAccordion,
           showChildren: children.length > 0 || showEmptyAccordion,
           showProperties: properties.length > 0 || showEmptyAccordion,
