@@ -4,13 +4,35 @@
   $fg: map.get($theme, foreground);
 
   ndb-accordion-item {
-    & .header {
-      cursor: pointer;
+    &.sticky {
+      & .container {
+        z-index: 1;
+        position: sticky;
+        top: 0;
+      }
+    }
+
+    & .container {
+      position: relative;
       display: flex;
       align-items: center;
 
       & button {
+        cursor: pointer;
+
         margin-right: 12px;
+      }
+
+      & .header {
+        cursor: pointer;
+
+        display: flex;
+        flex: 1;
+      }
+
+      & .actions {
+        position: absolute;
+        left: 272px;
       }
     }
 
@@ -20,7 +42,7 @@
     }
 
     & .disabled {
-      & .header {
+      & .container {
         cursor: default;
         color: map.get($fg, disabled);
       }
@@ -83,7 +105,7 @@
 
   ndb-accordion-item {
     & .disabled {
-      & .header {
+      & .container {
         color: map.get($fg, disabled);
       }
     }

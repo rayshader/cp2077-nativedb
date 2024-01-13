@@ -4,8 +4,6 @@
 
 $ide-theme: vscode-theme();
 
-@include rd-ide-background($ide-theme, vscode);
-
 .ide-vscode-theme {
   @include rd-ide-typography($ide-theme);
   @include rd-ide-theme($ide-theme, light);
@@ -14,3 +12,5 @@ $ide-theme: vscode-theme();
     @include rd-ide-theme($ide-theme, dark);
   }
 }
+
+@include rd-ide-background($ide-theme, vscode);

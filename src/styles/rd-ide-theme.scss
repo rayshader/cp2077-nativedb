@@ -19,23 +19,21 @@
     &.ide-#{$name}-theme {
       background-color: map.get($light, background);
 
+      & .ide-background {
+        background-color: map.get($light, background);
+      }
+
       &.dark-theme {
         background-color: map.get($dark, background);
 
         .mat-toolbar {
           background-color: map.get($dark, toolbar);
         }
+
+        & .ide-background {
+          background-color: map.get($dark, background);
+        }
       }
-    }
-  }
-
-  .ide-background {
-    background-color: map.get($light, background);
-  }
-
-  .dark-theme {
-    .ide-background {
-      background-color: map.get($dark, background);
     }
   }
 }

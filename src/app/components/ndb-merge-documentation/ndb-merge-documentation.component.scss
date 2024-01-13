@@ -1,7 +1,7 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
 
-.header {
+[header] {
   display: flex;
   align-items: center;
   flex: 1;

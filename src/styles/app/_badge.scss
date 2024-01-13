@@ -1,4 +1,5 @@
 @use 'sass:map';
+@use 'sass:color';
 
 @mixin badge-theme($theme) {
   $badges: map.get($theme, badges);
@@ -6,12 +7,24 @@
   .badge {
     color: map.get($badges, primary);
 
+    &.disabled {
+      color: color.change(map.get($badges, primary), $lightness: 33%, $saturation: 33%);
+    }
+
     &[data-scope="protected"] {
       color: map.get($badges, protected);
+
+      &.disabled {
+        color: color.change(map.get($badges, protected), $lightness: 33%, $saturation: 33%);
+      }
     }
 
     &[data-scope="private"] {
       color: map.get($badges, private);
+
+      &.disabled {
+        color: color.change(map.get($badges, private), $lightness: 33%, $saturation: 33%);
+      }
     }
   }
 

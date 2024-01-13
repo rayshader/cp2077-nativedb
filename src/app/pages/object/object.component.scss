@@ -2,7 +2,7 @@
   display: flex;
   flex-flow: column;
 
-  & .header {
+  & [header] {
     display: inline-flex;
     align-items: center;
 
@@ -13,6 +13,30 @@
 
     & mat-chip {
       margin-left: 12px;
+    }
+  }
+
+  & [actions] {
+    display: flex;
+
+    & .badge {
+      cursor: pointer;
+
+      &[data-scope="private"] {
+        margin-right: 24px;
+      }
+    }
+
+    & mat-icon:last-child {
+      cursor: pointer;
+      margin-left: 24px;
+
+      color: black;
+
+      &.disabled {
+        cursor: default;
+        color: #7F7F7F;
+      }
     }
   }
 
@@ -47,6 +71,20 @@
 
     & .skt-rect {
       margin: 3px;
+    }
+  }
+}
+
+.dark-theme {
+  :host {
+    & [actions] {
+      & mat-icon:last-child {
+        color: white;
+
+        &.disabled {
+          color: #7F7F7F;
+        }
+      }
     }
   }
 }

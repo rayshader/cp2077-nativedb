@@ -2,16 +2,24 @@
                     [class.disabled]="disabled"
                     [expanded]="expanded"
                     [disabled]="disabled">
-  <div class="header" (click)="item.toggle()">
-    <button mat-icon-button [disabled]="disabled">
+  <div class="container ide-background">
+    <button mat-icon-button
+            [disabled]="disabled"
+            (click)="item.toggle()">
       @if (!item.expanded) {
         <mat-icon>keyboard_arrow_down</mat-icon>
       } @else {
         <mat-icon>keyboard_arrow_up</mat-icon>
       }
     </button>
-    <ng-content select="[header]"></ng-content>
-    <ng-content select="[actions]"></ng-content>
+
+    <div class="header" (click)="item.toggle()">
+      <ng-content select="[header]"></ng-content>
+    </div>
+
+    <div class="actions">
+      <ng-content select="[actions]"></ng-content>
+    </div>
   </div>
 
   <mat-divider></mat-divider>
