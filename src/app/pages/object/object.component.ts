@@ -178,6 +178,7 @@ export class ObjectComponent {
 
   private onShowDocumentation([state, documentation]: [boolean, ClassDocumentation]): void {
     if (!documentation.body) {
+      this.showDocumentation = false;
       return;
     }
     this.showDocumentation = state;
