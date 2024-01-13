@@ -38,6 +38,10 @@
         color: #7F7F7F;
       }
     }
+
+    @media (max-width: 1024px) {
+      margin-bottom: 8px;
+    }
   }
 
   & .inheritance {

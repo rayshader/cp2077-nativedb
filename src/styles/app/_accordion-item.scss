@@ -17,22 +17,36 @@
       display: flex;
       align-items: center;
 
-      & button {
-        cursor: pointer;
-
-        margin-right: 12px;
-      }
-
-      & .header {
-        cursor: pointer;
-
+      & .wrapper {
         display: flex;
-        flex: 1;
+
+        & button {
+          cursor: pointer;
+
+          margin-right: 12px;
+        }
+
+        & .header {
+          cursor: pointer;
+
+          display: flex;
+          flex: 1;
+        }
       }
 
       & .actions {
         position: absolute;
         left: 272px;
+
+        @media (max-width: 1024px) {
+          position: unset;
+          left: unset;
+        }
+      }
+
+      @media (max-width: 1024px) {
+        flex-flow: column;
+        align-items: start;
       }
     }
 
