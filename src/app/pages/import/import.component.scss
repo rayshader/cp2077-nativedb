@@ -1,3 +1,19 @@
+.field {
+  display: flex;
+
+  & .field-description {
+    display: flex;
+    flex-flow: column;
+    flex: 2;
+  }
+
+  & mat-form-field {
+    flex: 1;
+    height: fit-content;
+    margin-left: 24px;
+  }
+}
+
 .title {
   display: flex;
   gap: 24px;
@@ -7,6 +23,12 @@
     justify-content: center;
     flex: 1;
   }
+}
+
+.actions {
+  position: sticky;
+  bottom: -23px;
+  display: flex;
 }
 
 button {

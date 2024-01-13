@@ -3,6 +3,13 @@ import {Entity} from "../repositories/crud.repository";
 import {ClassRepository} from "../repositories/class.repository";
 import {map, mergeAll, Observable, switchMap, zip, zipAll} from "rxjs";
 
+export enum MergeBehavior {
+  manually,
+  add,
+  addAndUpdate,
+  addAndDelete
+}
+
 export interface ClassDocumentation extends Entity {
   body?: string;
   functions?: MemberDocumentation[];
@@ -105,7 +112,7 @@ export class DocumentationService {
     return this.classRepository.update(documentation);
   }
 
-  prepareMerge(file: ClassDocumentation[]): Observable<ClassMergeOperation[]> {
+  prepareMerge(file: ClassDocumentation[], behavior: MergeBehavior): Observable<ClassMergeOperation[]> {
     return this.getAll().pipe(
       map((browser: ClassDocumentation[]) => {
         const operations: ClassMergeOperation[] = [];
@@ -121,18 +128,24 @@ export class DocumentationService {
               body: {
                 id: browserObject.id,
                 operation: MergeOperation.delete,
-                browser: browserObject.body
+                browser: browserObject.body,
+                from: (behavior === MergeBehavior.addAndDelete) ? MergeFrom.file : undefined
               },
               members: browserObject.functions?.map((member) => <MemberMergeOperation>{
                 id: member.id,
                 operation: MergeOperation.delete,
-                browser: member.body
+                browser: member.body,
+                from: (behavior === MergeBehavior.addAndDelete) ? MergeFrom.file : undefined
               })
             });
             return;
           }
-          const body: BodyMergeOperation | undefined = this.mergeClassBody(browserObject, fileObject);
-          const members: MemberMergeOperation[] = this.mergeClassMembers(browserObject.functions ?? [], fileObject.functions ?? []);
+          const body: BodyMergeOperation | undefined = this.mergeClassBody(browserObject, fileObject, behavior);
+          const members: MemberMergeOperation[] = this.mergeClassMembers(
+            browserObject.functions ?? [],
+            fileObject.functions ?? [],
+            behavior
+          );
 
           if (body === undefined && members.length === 0) {
             return;
@@ -158,7 +171,7 @@ export class DocumentationService {
               id: fileObject.id,
               operation: MergeOperation.add,
               file: fileObject.body,
-              from: MergeFrom.file
+              from: (behavior === MergeBehavior.manually) ? undefined : MergeFrom.file
             };
           }
           const members: MemberMergeOperation[] | undefined = fileObject.functions?.map((func) => {
@@ -166,7 +179,7 @@ export class DocumentationService {
               id: func.id,
               operation: MergeOperation.add,
               file: func.body,
-              from: MergeFrom.file
+              from: (behavior === MergeBehavior.manually) ? undefined : MergeFrom.file
             };
           });
 
@@ -210,29 +223,43 @@ export class DocumentationService {
     return !documentation.body && !documentation.functions;
   }
 
-  private mergeClassBody(browser: ClassDocumentation, file: ClassDocumentation): BodyMergeOperation | undefined {
+  private mergeClassBody(browser: ClassDocumentation,
+                         file: ClassDocumentation,
+                         behavior: MergeBehavior): BodyMergeOperation | undefined {
     if (browser.body === file.body) {
       return undefined;
     }
     let operation: MergeOperation;
+    let from: MergeFrom | undefined;
 
     if (browser.body && file.body) {
       operation = MergeOperation.update;
+      if (behavior === MergeBehavior.addAndUpdate) {
+        from = MergeFrom.file;
+      }
     } else if (browser.body && !file.body) {
       operation = MergeOperation.delete;
+      if (behavior === MergeBehavior.addAndDelete) {
+        from = MergeFrom.file;
+      }
     } else {
       operation = MergeOperation.add;
+      if (behavior !== MergeBehavior.manually) {
+        from = MergeFrom.file;
+      }
     }
     return {
       id: browser.id,
       operation: operation,
       browser: browser.body,
       file: file.body,
-      from: operation === MergeOperation.add ? MergeFrom.file : undefined
+      from: from
     };
   }
 
-  private mergeClassMembers(browser: MemberDocumentation[], file: MemberDocumentation[]): MemberMergeOperation[] {
+  private mergeClassMembers(browser: MemberDocumentation[],
+                            file: MemberDocumentation[],
+                            behavior: MergeBehavior): MemberMergeOperation[] {
     const operations: MemberMergeOperation[] = [];
 
     // Detect delete / update operations.
@@ -243,7 +270,8 @@ export class DocumentationService {
         operations.push({
           id: browserMember.id,
           operation: MergeOperation.delete,
-          browser: browserMember.body
+          browser: browserMember.body,
+          from: (behavior === MergeBehavior.addAndDelete) ? MergeFrom.file : undefined
         });
         return;
       }
@@ -254,7 +282,8 @@ export class DocumentationService {
         id: browserMember.id,
         operation: MergeOperation.update,
         browser: browserMember.body,
-        file: fileMember.body
+        file: fileMember.body,
+        from: (behavior === MergeBehavior.addAndUpdate) ? MergeFrom.file : undefined
       });
     });
     // Detect add operations
@@ -268,7 +297,7 @@ export class DocumentationService {
         id: fileMember.id,
         operation: MergeOperation.add,
         file: fileMember.body,
-        from: MergeFrom.file
+        from: (behavior === MergeBehavior.manually) ? undefined : MergeFrom.file
       });
     });
     return operations;

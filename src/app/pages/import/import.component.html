@@ -2,6 +2,37 @@
 
 <mat-divider></mat-divider>
 
+<form [formGroup]="form">
+  <p>You can import the entire file to replace the documentation of your browser with the button "Replace all".</p>
+
+  <div class="field">
+    <div class="field-description">
+      <p>
+        You can choose to accept additions / modifications / deletions from the browser or from the file. Select a
+        default behavior to let the tool pre-merge differences from the file:
+      </p>
+
+      <ul>
+        <li>Manually: to merge all differences by yourself.</li>
+        <li>Additions: accept all additions, manually merge modifications / deletions.</li>
+        <li>Additions and modifications: accept all additions and modifications, manually merge deletions.</li>
+        <li>Additions and deletions: accept all additions and deletions, manually merge modifications.</li>
+      </ul>
+    </div>
+
+    <mat-form-field>
+      <mat-label>Pre-merge behavior</mat-label>
+      <mat-select formControlName="behavior">
+        @for (behavior of behaviors; track behavior.value) {
+          <mat-option [value]="behavior.value">{{behavior.text}}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+</form>
+
+<mat-divider></mat-divider>
+
 <div class="title">
   <h2>Browser</h2>
 
@@ -17,24 +48,39 @@
   </cdk-accordion>
 }
 
-@if (data$ | async; as data) {
-  @if (!data.isIdentical) {
-    <button mat-raised-button
-            color="primary"
-            [disabled]="data.hasConflicts"
-            (click)="merge()">
-      MERGE
-    </button>
+<div class="actions ide-background">
+  @if (data$ | async; as data) {
+      @if (!data.isIdentical) {
+        <button mat-raised-button
+                color="primary"
+                [disabled]="data.hasConflicts"
+                (click)="merge()">
+          MERGE
+        </button>
 
-    <button mat-raised-button
-            (click)="replaceAll()">
-      REPLACE ALL
-    </button>
+        <button mat-raised-button
+                color="primary"
+                (click)="replaceAll()">
+          REPLACE ALL
+        </button>
+      } @else {
+        <button mat-raised-button
+                color="primary"
+                routerLink="/">
+          NO CHANGES
+        </button>
+      }
   } @else {
     <button mat-raised-button
             color="primary"
-            routerLink="/">
-      NO CHANGES
+            (click)="replaceAll()">
+      REPLACE ALL
     </button>
   }
-}
+
+  <button mat-raised-button
+          color="primary"
+          routerLink="/">
+    CANCEL
+  </button>
+</div>

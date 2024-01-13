@@ -4,10 +4,11 @@ import {
   ClassDocumentation,
   ClassMergeOperation,
   DocumentationService,
-  MemberMergeOperation
+  MemberMergeOperation,
+  MergeBehavior
 } from "../../../shared/services/documentation.service";
 import {Router, RouterLink} from "@angular/router";
-import {BehaviorSubject, combineLatest, EMPTY, map, Observable, shareReplay, switchMap} from "rxjs";
+import {BehaviorSubject, combineLatest, map, Observable, OperatorFunction, pipe, shareReplay, switchMap} from "rxjs";
 import {AsyncPipe} from "@angular/common";
 import {CdkAccordionModule} from "@angular/cdk/accordion";
 import {
@@ -16,10 +17,18 @@ import {
 import {MatButtonModule} from "@angular/material/button";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {MatSnackBar} from "@angular/material/snack-bar";
+import {MatFormFieldModule} from "@angular/material/form-field";
+import {MatSelectModule} from "@angular/material/select";
+import {FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
 
 interface ActionsData {
   readonly isIdentical: boolean;
   readonly hasConflicts: boolean;
+}
+
+interface BehaviorItem {
+  readonly value: MergeBehavior;
+  readonly text: string;
 }
 
 @Component({
@@ -27,19 +36,34 @@ interface ActionsData {
   standalone: true,
   imports: [
     AsyncPipe,
-    CdkAccordionModule,
-    MatDividerModule,
-    NDBMergeDocumentationComponent,
+    RouterLink,
+    MatSelectModule,
     MatButtonModule,
-    RouterLink
+    MatDividerModule,
+    MatFormFieldModule,
+    CdkAccordionModule,
+    ReactiveFormsModule,
+    NDBMergeDocumentationComponent
   ],
   templateUrl: './import.component.html',
   styleUrl: './import.component.scss'
 })
 export class ImportComponent implements OnDestroy {
 
+  readonly behaviors: BehaviorItem[] = [
+    {value: MergeBehavior.manually, text: 'Manually'},
+    {value: MergeBehavior.add, text: 'Accept additions'},
+    {value: MergeBehavior.addAndUpdate, text: 'Accept additions and modifications'},
+    {value: MergeBehavior.addAndDelete, text: 'Accept additions and deletions'},
+  ];
+  readonly form: FormGroup = new FormGroup({
+    behavior: new FormControl<MergeBehavior | null>(null)
+  });
+
   readonly operations$: Observable<ClassMergeOperation[]>;
-  readonly data$: Observable<ActionsData> = EMPTY;
+  readonly data$: Observable<ActionsData>;
+
+  isUpdated: boolean = false;
 
   private readonly file: ClassDocumentation[];
   private readonly isIdentical$: Observable<boolean>;
@@ -47,24 +71,19 @@ export class ImportComponent implements OnDestroy {
   private readonly updatedSubject: BehaviorSubject<void> = new BehaviorSubject<void>(undefined);
   private readonly updated$: Observable<void> = this.updatedSubject.asObservable();
 
+  private get behavior$(): Observable<MergeBehavior> {
+    return this.form.get('behavior')!.valueChanges;
+  }
+
   constructor(private readonly documentationService: DocumentationService,
               private readonly toast: MatSnackBar,
               private readonly router: Router,
               private readonly dr: DestroyRef) {
     this.file = this.router.getCurrentNavigation()!.extras.state as ClassDocumentation[];
-    this.operations$ = this.documentationService.prepareMerge(this.file).pipe(shareReplay());
-    this.isIdentical$ = this.operations$.pipe(map(this.isIdentical.bind(this)));
-    this.hasConflicts$ = combineLatest([
-      this.operations$,
-      this.updated$
-    ]).pipe(
-      map(([operations,]) => operations.some(this.hasClassConflict.bind(this)))
-    );
-    this.data$ = combineLatest([
-      this.isIdentical$,
-      this.hasConflicts$
-    ]).pipe(map(this.buildData.bind(this)));
-    this.updatedSubject.next();
+    this.operations$ = this.behavior$.pipe(this.buildMergeOperations());
+    this.isIdentical$ = this.operations$.pipe(this.isIdentical());
+    this.hasConflicts$ = combineLatest([this.operations$, this.updated$]).pipe(this.hasConflicts());
+    this.data$ = combineLatest([this.isIdentical$, this.hasConflicts$]).pipe(this.buildData());
   }
 
   ngOnDestroy(): void {
@@ -98,6 +117,11 @@ export class ImportComponent implements OnDestroy {
 
   onUpdated(): void {
     this.updatedSubject.next();
+    if (this.isUpdated) {
+      return;
+    }
+    this.isUpdated = true;
+    this.form.get('behavior')!.disable({emitEvent: false});
   }
 
   private onMerged(): void {
@@ -118,15 +142,34 @@ export class ImportComponent implements OnDestroy {
     this.router.navigate(['']);
   }
 
-  private buildData([isIdentical, hasConflicts]: [boolean, boolean]): ActionsData {
-    return {
-      isIdentical: isIdentical,
-      hasConflicts: hasConflicts
-    };
+  private buildData(): OperatorFunction<[boolean, boolean], ActionsData> {
+    return pipe(
+      map(([isIdentical, hasConflicts]) => {
+        return {
+          isIdentical: isIdentical,
+          hasConflicts: hasConflicts
+        };
+      })
+    );
   }
 
-  private isIdentical(operations: ClassMergeOperation[]): boolean {
-    return operations.length === 0;
+  private isIdentical(): OperatorFunction<ClassMergeOperation[], boolean> {
+    return pipe(
+      map((operations) => operations.length === 0)
+    );
+  }
+
+  private hasConflicts(): OperatorFunction<[ClassMergeOperation[], void], boolean> {
+    return pipe(
+      map(([operations,]) => operations.some(this.hasClassConflict.bind(this)))
+    );
+  }
+
+  private buildMergeOperations(): OperatorFunction<MergeBehavior, ClassMergeOperation[]> {
+    return pipe(
+      switchMap((behavior) => this.documentationService.prepareMerge(this.file, behavior)),
+      shareReplay()
+    );
   }
 
   private hasClassConflict(object: ClassMergeOperation): boolean {

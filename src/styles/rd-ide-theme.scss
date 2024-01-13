@@ -28,6 +28,16 @@
       }
     }
   }
+
+  .ide-background {
+    background-color: map.get($light, background);
+  }
+
+  .dark-theme {
+    .ide-background {
+      background-color: map.get($dark, background);
+    }
+  }
 }
 
 @mixin rd-ide-theme($theme, $mode) {
