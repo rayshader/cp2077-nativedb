@@ -58,6 +58,8 @@ interface ObjectData {
   readonly hasBodyDocumentation: boolean;
 
   readonly isMobile: boolean;
+  readonly isPinned: boolean;
+
   readonly showParents: boolean;
   readonly showChildren: boolean;
   readonly showProperties: boolean;
@@ -156,7 +158,7 @@ export class ObjectComponent {
   protected readonly cyrb53 = cyrb53;
 
   private readonly filterBadgesSubject: BehaviorSubject<void> = new BehaviorSubject<void>(undefined);
-  private readonly filterFunctions$: Observable<void> = this.filterBadgesSubject.asObservable();
+  private readonly filterBadges$: Observable<void> = this.filterBadgesSubject.asObservable();
 
   constructor(private readonly dumpService: RedDumpService,
               private readonly documentationService: DocumentationService,
@@ -204,9 +206,9 @@ export class ObjectComponent {
       children$,
       documentation$,
       this.dumpService.badges$,
-      this.settingsService.showEmptyAccordion$,
+      this.settingsService.settings$,
       this.responsiveService.mobile$,
-      this.filterFunctions$
+      this.filterBadges$
     ]).pipe(
       map(([
              object,
@@ -214,11 +216,12 @@ export class ObjectComponent {
              children,
              documentation,
              badges,
-             showEmptyAccordion,
+             settings,
              isMobile
            ]) => {
-        let properties = object.properties;
-        let functions = object.functions;
+        const showEmptyAccordion: boolean = settings.showEmptyAccordion;
+        let properties: RedPropertyAst[] = object.properties;
+        let functions: RedFunctionAst[] = object.functions;
 
         if (this.isPropertiesFiltered) {
           properties = properties.filter(this.hasPropertyFlag.bind(this));
@@ -243,9 +246,10 @@ export class ObjectComponent {
           functions: functions,
           badges: badges,
           align: `${72 + badges * 24 + 12 - 30}px`,
-          isMobile: isMobile,
           documentation: documentation,
           hasBodyDocumentation: documentation.body !== undefined,
+          isMobile: isMobile,
+          isPinned: settings.isBarPinned,
           showParents: parents.length > 0 || showEmptyAccordion,
           showChildren: children.length > 0 || showEmptyAccordion,
           showProperties: properties.length > 0 || showEmptyAccordion || this.isPropertiesFiltered,

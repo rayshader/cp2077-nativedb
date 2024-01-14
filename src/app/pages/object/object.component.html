@@ -68,7 +68,7 @@
     }
 
     @if (data.showProperties) {
-      <ndb-accordion-item class="sticky"
+      <ndb-accordion-item [class.sticky]="data.isPinned"
                           [expanded]="data.properties.length > 0"
                           [disabled]="data.properties.length === 0">
         <div header>
@@ -107,7 +107,7 @@
     }
 
     @if (data.showFunctions) {
-      <ndb-accordion-item class="sticky"
+      <ndb-accordion-item [class.sticky]="data.isPinned"
                           [expanded]="data.functions.length > 0"
                           [disabled]="data.functions.length === 0">
         <div header>
