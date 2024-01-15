@@ -37,7 +37,7 @@ export class RedscriptFormatter extends CodeFormatter {
   protected override formatArguments(args: RedArgumentAst[], selfName?: string): CodeVariableFormat[] {
     return args.map((arg: RedArgumentAst) => {
       const type: string = RedTypeAst.toString(arg.type);
-      const optional: string = arg.isOptional ? ' # Optional' : '';
+      const optional: string = arg.isOptional ? ' // Optional' : '';
 
       return {
         prefix: 'let ',
