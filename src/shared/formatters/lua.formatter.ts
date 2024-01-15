@@ -1,108 +1,93 @@
 import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
-import {CodeFormatter} from "./formatter";
+import {CodeFormatter, CodeVariableFormat} from "./formatter";
 import {RedTypeAst} from "../red-ast/red-type.ast";
 import {RedArgumentAst} from "../red-ast/red-argument.ast";
-import {RedPrimitiveDef, RedTemplateDef} from "../red-ast/red-definitions.ast";
 
-export class LuaFormatter implements CodeFormatter {
+export class LuaFormatter extends CodeFormatter {
 
-  formatCode(node: RedFunctionAst, memberOf?: RedClassAst): string {
-    let data: string = '';
-    let hasReturn: boolean = node.returnType !== undefined;
-
-    if (memberOf && !node.isStatic) {
-      data += `local ${memberOf.name.toLowerCase()} = nil\n`;
-    }
-    for (let i: number = 0; i < node.arguments.length; i++) {
-      const arg: RedArgumentAst = node.arguments[i];
-
-      if (!memberOf || (memberOf.name === 'ScriptGameInstance' && i > 0)) {
-        data += `${this.formatArgument(arg)}\n`;
-      }
-    }
-    if (hasReturn) {
-      data += `local ${this.formatResultName(node.name)} = ${this.formatType(node.returnType!)}\n`;
-    }
-    if (memberOf || hasReturn || node.arguments.length > 0) {
-      data += '\n';
-    }
-    if (hasReturn) {
-      data += `${this.formatResultName(node.name)} = `;
-    }
-    if (memberOf) {
-      data += (!node.isStatic) ? memberOf.name.toLowerCase() : this.formatAlias(memberOf);
-      data += (!node.isStatic) ? ':' : '.';
-    }
-    if (node.name === node.fullName) {
-      data += node.name;
-    } else {
-      data += `['${node.fullName}']`;
-    }
-    data += '(';
-    data += node.arguments
-      .filter((argument, i) => !memberOf || (memberOf.name === 'ScriptGameInstance' && i > 0))
-      .map((argument) => argument.name)
-      .join(', ');
-    data += ');';
-    return data;
+  constructor() {
+    super(false);
   }
 
-  private formatArgument(argument: RedArgumentAst): string {
-    return `local ${argument.name} = ${this.formatType(argument.type)}`;
+  protected override formatSelf(func: RedFunctionAst, memberOf?: RedClassAst): CodeVariableFormat | undefined {
+    if (func.isStatic || !memberOf) {
+      return undefined;
+    }
+    const name: string = memberOf.name;
+
+    return {
+      prefix: 'local ',
+      name: name.toLowerCase(),
+      suffix: ` -- ${name}`
+    };
   }
 
-  private formatType(type: RedTypeAst, isReturnType?: boolean): string {
-    if (type.flag === undefined) {
-      return type.name;
+  protected override formatReturn(func: RedFunctionAst): CodeVariableFormat | undefined {
+    if (!func.returnType) {
+      return undefined;
     }
-    if (type.flag === RedPrimitiveDef.Bool) {
-      return 'false';
-    } else if (type.flag >= RedPrimitiveDef.Int8 && type.flag <= RedPrimitiveDef.Uint64) {
-      return '0';
-    } else if (type.flag === RedPrimitiveDef.Float || type.flag === RedPrimitiveDef.Double) {
-      return '0.0';
-    } else if (type.flag === RedPrimitiveDef.String) {
-      return '""';
-    } else if (type.flag === RedPrimitiveDef.CName) {
-      return 'CName.new("name")';
-    }
-    if (type.flag === RedTemplateDef.array) {
-      return `[] -- ${type.innerType!.name}`;
-    } else if (type.flag == RedTemplateDef.ref || type.flag === RedTemplateDef.wref) {
-      return `nil -- ${type.innerType!.name}`;
-    }
-    return type.name;
+    const type: string = RedTypeAst.toString(func.returnType);
+
+    return {
+      prefix: 'local ',
+      name: this.formatReturnName(func),
+      suffix: ` -- ${type}`
+    };
   }
 
-  private formatResultName(name: string): string {
-    let lowName: string = name.toLowerCase();
-    let offset: number = -1;
+  protected override formatArguments(args: RedArgumentAst[], selfName?: string): CodeVariableFormat[] {
+    const argVars: CodeVariableFormat[] = args.filter((arg: RedArgumentAst) => {
+      return arg.name !== 'self';
+    }).map((arg: RedArgumentAst) => {
+      const type: string = RedTypeAst.toString(arg.type);
+      const optional: string = arg.isOptional ? ', optional' : '';
 
-    if (lowName.startsWith('get') || lowName.startsWith('has')) {
-      offset = 3;
-    } else if (lowName.startsWith('is')) {
-      offset = 2;
-    } else if (lowName.startsWith('find')) {
-      let by: number = lowName.indexOf('by');
+      return {
+        prefix: 'local ',
+        name: this.formatArgumentName(arg.name),
+        suffix: ` -- ${type}${optional}`
+      };
+    });
 
-      offset = 4;
-      if (by !== -1) {
-        name = name.substring(0, by);
-      }
+    if (selfName) {
+      argVars.splice(0, 0, {
+        prefix: '',
+        name: selfName,
+        suffix: ''
+      });
     }
-    if (offset !== -1) {
-      name = name.substring(offset);
-      name = `${name[0].toLowerCase()}${name.substring(1)}`;
-    }
-    return name;
+    return argVars;
   }
 
-  private formatAlias(memberOf: RedClassAst): string {
-    if (memberOf.name === 'ScriptGameInstance') {
+  protected override formatMemberStaticCall(func: RedFunctionAst, memberOf: RedClassAst): string {
+    const name: string = this.formatAlias(memberOf.name);
+    const hasFullName: boolean = func.name !== func.fullName;
+
+    if (!hasFullName) {
+      return `${name}.${func.name}`;
+    }
+    return `${name}['${func.fullName}']`;
+  }
+
+  protected override formatMemberCall(selfVar: CodeVariableFormat, func: RedFunctionAst): string {
+    const hasFullName: boolean = func.name !== func.fullName;
+
+    if (!hasFullName) {
+      return `${selfVar.name}:${func.name}`;
+    }
+    return `${selfVar.name}['${func.fullName}']`;
+  }
+
+  protected override formatStaticCall(func: RedFunctionAst): string {
+    return `Game.${func.name}`;
+  }
+
+  private formatAlias(name: string): string {
+    if (name === 'ScriptGameInstance') {
       return 'Game';
     }
-    return memberOf.name;
+    return name;
   }
 
 }

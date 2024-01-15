@@ -1,37 +1,62 @@
 import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
 import {RedTypeAst} from "../red-ast/red-type.ast";
-import {CodeFormatter} from "./formatter";
+import {CodeFormatter, CodeVariableFormat} from "./formatter";
+import {RedArgumentAst} from "../red-ast/red-argument.ast";
 
-export class RedscriptFormatter implements CodeFormatter {
+export class RedscriptFormatter extends CodeFormatter {
 
-  formatCode(node: RedFunctionAst, memberOf?: RedClassAst): string {
-    let data: string = '';
-    let hasReturn: boolean = node.returnType !== undefined;
+  constructor() {
+    super(true);
+  }
 
-    if (memberOf && !node.isStatic) {
-      data += `let ${memberOf.name.toLowerCase()}: ${memberOf.name};\n`;
+  protected override formatSelf(func: RedFunctionAst, memberOf?: RedClassAst): CodeVariableFormat | undefined {
+    if (func.isStatic || !memberOf) {
+      return undefined;
     }
-    for (const arg of node.arguments) {
-      data += `let ${arg.name}: ${RedTypeAst.toString(arg.type)};\n`;
+    return {
+      prefix: 'let ',
+      name: memberOf.name.toLowerCase(),
+      suffix: `: ${memberOf.name};`
+    };
+  }
+
+  protected override formatReturn(func: RedFunctionAst): CodeVariableFormat | undefined {
+    if (!func.returnType) {
+      return undefined;
     }
-    if (hasReturn) {
-      data += `let result: ${RedTypeAst.toString(node.returnType!)};\n`;
-    }
-    if (memberOf || hasReturn || node.arguments.length > 0) {
-      data += '\n';
-    }
-    if (hasReturn) {
-      data += 'result = ';
-    }
-    if (memberOf) {
-      data += (!node.isStatic) ? memberOf.name.toLowerCase() : memberOf.name;
-      data += '.';
-    }
-    data += `${node.name}(`;
-    data += node.arguments.map((argument) => argument.name).join(', ');
-    data += ');';
-    return data;
+    const type: string = RedTypeAst.toString(func.returnType);
+
+    return {
+      prefix: 'let ',
+      name: this.formatReturnName(func),
+      suffix: `: ${type};`
+    };
+  }
+
+  protected override formatArguments(args: RedArgumentAst[], selfName?: string): CodeVariableFormat[] {
+    return args.map((arg: RedArgumentAst) => {
+      const type: string = RedTypeAst.toString(arg.type);
+      const optional: string = arg.isOptional ? ' # Optional' : '';
+
+      return {
+        prefix: 'let ',
+        name: this.formatArgumentName(arg.name),
+        suffix: `: ${type};${optional}`
+      };
+    });
+  }
+
+  protected override formatMemberStaticCall(func: RedFunctionAst, memberOf: RedClassAst): string {
+    return `${memberOf.name}.${func.name}`;
+  }
+
+  protected override formatMemberCall(selfVar: CodeVariableFormat, func: RedFunctionAst): string {
+    return `${selfVar.name}.${func.name}`;
+  }
+
+  protected override formatStaticCall(func: RedFunctionAst): string {
+    return func.name;
   }
 
 }

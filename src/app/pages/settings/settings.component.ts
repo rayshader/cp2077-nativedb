@@ -33,7 +33,6 @@ export class SettingsComponent implements OnInit {
   readonly clipboardOptions: AItem<CodeSyntax>[] = [
     {value: CodeSyntax.redscript, name: 'Red · Scripts', disabled: false},
     {value: CodeSyntax.lua, name: 'Lua · CET', disabled: false},
-    {value: CodeSyntax.cppRED4ext, name: 'C++ · RED4ext', disabled: true},
     {value: CodeSyntax.cppRedLib, name: 'C++ · RedLib', disabled: true},
   ];
 
