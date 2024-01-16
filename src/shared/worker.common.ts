@@ -1,5 +1,3 @@
-import {ClassDocumentation} from "./services/documentation.service";
-
 export enum NDBCommand {
   ready,
   import,
@@ -8,7 +6,7 @@ export enum NDBCommand {
 
 export interface NDBMessage {
   readonly command: NDBCommand;
-  readonly data: ClassDocumentation[] | Blob | Uint8Array;
+  readonly data: any;
 }
 
 export interface NDBCommandHandler {
