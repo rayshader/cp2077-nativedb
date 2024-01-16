@@ -10,7 +10,7 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {NDBCommand, NDBCommandHandler, NDBMessage} from "../../../shared/worker.common";
 
 @Component({
-  selector: 'ndb-export-documentation',
+  selector: 'ndb-sync-documentation',
   standalone: true,
   imports: [
     RouterLink,
@@ -19,10 +19,10 @@ import {NDBCommand, NDBCommandHandler, NDBMessage} from "../../../shared/worker.
     MatButtonModule,
     MatProgressSpinnerModule
   ],
-  templateUrl: './ndb-export-documentation.component.html',
-  styleUrl: './ndb-export-documentation.component.scss'
+  templateUrl: './ndb-sync-documentation.component.html',
+  styleUrl: './ndb-sync-documentation.component.scss'
 })
-export class NDBExportDocumentationComponent implements OnInit {
+export class NDBSyncDocumentationComponent implements OnInit {
 
   @ViewChild('download')
   input?: ElementRef;
