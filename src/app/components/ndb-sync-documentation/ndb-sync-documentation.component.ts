@@ -111,7 +111,7 @@ export class NDBSyncDocumentationComponent implements OnInit {
       console.info('WebWorker not supported, falling back to blocking operations.');
       return;
     }
-    this.worker = new Worker(new URL('./ndb-export-documentation.worker', import.meta.url));
+    this.worker = new Worker(new URL('./ndb-sync-documentation.worker', import.meta.url));
     this.worker.onmessage = this.onMessage.bind(this);
   }
 
