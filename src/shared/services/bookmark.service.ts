@@ -18,17 +18,17 @@ export class BookmarkService {
     return this.bookmarks;
   }
 
-  isBookmarked(node: RedNodeAst): boolean {
-    return this.bookmarks.find((id) => id === node.id) !== undefined;
+  isBookmarked(id: number): boolean {
+    return this.bookmarks.find((bookmarkId) => bookmarkId === id) !== undefined;
   }
 
-  toggleBookmark(node: RedNodeAst): void {
-    let bookmark: boolean = this.isBookmarked(node);
+  toggleBookmark(id: number): void {
+    let bookmark: boolean = this.isBookmarked(id);
 
     if (!bookmark) {
-      this.bookmarks.push(node.id);
+      this.bookmarks.push(id);
     } else {
-      const i: number = this.bookmarks.indexOf(node.id);
+      const i: number = this.bookmarks.indexOf(id);
 
       if (i >= 0) {
         this.bookmarks.splice(i, 1);

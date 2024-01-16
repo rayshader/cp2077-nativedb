@@ -49,7 +49,7 @@ export class NDBTitleBarComponent {
   @Input()
   set node(value: RedNodeAst) {
     this._node = value;
-    this.isBookmarked = this.bookmarkService.isBookmarked(value);
+    this.isBookmarked = this.bookmarkService.isBookmarked(value.id);
   }
 
   @HostBinding('class.pin')
@@ -67,7 +67,7 @@ export class NDBTitleBarComponent {
       return;
     }
     this.isBookmarked = !this.isBookmarked;
-    this.bookmarkService.toggleBookmark(this._node);
+    this.bookmarkService.toggleBookmark(this._node.id);
   }
 
   copyUrl(): void {
