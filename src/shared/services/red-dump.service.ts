@@ -46,17 +46,17 @@ export class RedDumpService {
       map((json: any) => json.map(RedBitfieldAst.fromJson)),
       shareReplay()
     );
-    const classes$ = this.http.get(`/assets/reddump/classes.json`).pipe(
+    const classes$: Observable<RedClassAst[]> = this.http.get(`/assets/reddump/classes.json`).pipe(
       map((json: any) => json.map(RedClassAst.fromJson)),
       shareReplay()
     );
 
     this.classes$ = classes$.pipe(
-      map((json: any) => json.filter((item: RedClassAst) => !item.isStruct)),
+      map((objects) => objects.filter((object) => !object.isStruct)),
       shareReplay()
     );
     this.structs$ = classes$.pipe(
-      map((json: any) => json.filter((item: RedClassAst) => item.isStruct)),
+      map((objects) => objects.filter((object: RedClassAst) => object.isStruct)),
       shareReplay()
     );
     this.functions$ = this.http.get(`/assets/reddump/globals.json`).pipe(
