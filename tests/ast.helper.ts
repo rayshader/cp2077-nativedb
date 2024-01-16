@@ -10,6 +10,8 @@ import {RedTypeAst} from "../src/shared/red-ast/red-type.ast";
 import {RedArgumentAst} from "../src/shared/red-ast/red-argument.ast";
 import {cyrb53} from "../src/shared/string";
 import {RedClassAst} from "../src/shared/red-ast/red-class.ast";
+import {RedEnumAst, RedEnumMemberAst} from "../src/shared/red-ast/red-enum.ast";
+import {RedBitfieldAst, RedBitfieldMemberAst} from "../src/shared/red-ast/red-bitfield.ast";
 
 export class AstHelper {
 
@@ -21,6 +23,24 @@ export class AstHelper {
     return this.buildPrimitive(RedPrimitiveDef.Float);
   }
 
+  static buildEnum(name: string, members: RedEnumMemberAst[] = []): RedEnumAst {
+    return {
+      kind: RedNodeKind.enum,
+      id: cyrb53(name),
+      name: name,
+      members: members
+    };
+  }
+
+  static buildBitfield(name: string, members: RedBitfieldMemberAst[] = []): RedBitfieldAst {
+    return {
+      kind: RedNodeKind.bitfield,
+      id: cyrb53(name),
+      name: name,
+      members: members
+    };
+  }
+
   static buildClass(name: string): RedClassAst {
     return {
       kind: RedNodeKind.class,
@@ -30,6 +50,20 @@ export class AstHelper {
       visibility: RedVisibilityDef.public,
       isAbstract: false,
       isStruct: false,
+      functions: [],
+      properties: []
+    };
+  }
+
+  static buildStruct(name: string): RedClassAst {
+    return {
+      kind: RedNodeKind.struct,
+      id: cyrb53(name),
+      name: name,
+      origin: RedOriginDef.native,
+      visibility: RedVisibilityDef.public,
+      isAbstract: false,
+      isStruct: true,
       functions: [],
       properties: []
     };
