@@ -15,6 +15,9 @@
     "preset": "jest-preset-angular",
     "setupFilesAfterEnv": [
       "./tests/setup-jest.ts"
+    ],
+    "coveragePathIgnorePatterns": [
+      "tests/"
     ]
   },
   "dependencies": {
