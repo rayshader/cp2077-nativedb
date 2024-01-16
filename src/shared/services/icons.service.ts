@@ -17,7 +17,7 @@ export class IconsService {
     'scope',
 
     // Flags
-    'abstract', 'callback', 'const', 'final', 'importonly', 'native', 'quest', 'replicated', 'static', 'timer'
+    'abstract', 'callback', 'const', 'final', 'importonly', 'native', 'script', 'quest', 'replicated', 'static', 'timer'
   ];
 
   constructor(private readonly iconRegistry: MatIconRegistry,

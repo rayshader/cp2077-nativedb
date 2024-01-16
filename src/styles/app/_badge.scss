@@ -26,6 +26,10 @@
         color: color.change(map.get($badges, private), $lightness: 33%, $saturation: 33%);
       }
     }
+
+    &[data-origin="script"] {
+      color: map.get($badges, script);
+    }
   }
 
   .skt-circle {

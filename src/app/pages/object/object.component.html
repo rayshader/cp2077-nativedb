@@ -14,6 +14,8 @@
       <mat-icon class="badge" svgIcon="native" title="native"></mat-icon>
     } @else if (data.object.origin === importOnlyOrigin) {
       <mat-icon class="badge" svgIcon="importonly" title="importonly"></mat-icon>
+    } @else {
+      <mat-icon class="badge" data-origin="script" svgIcon="script" title="redscript"></mat-icon>
     }
     @if (!data.object.isStruct) {
       <mat-icon class="badge-class" svgIcon="class" title="class"></mat-icon>
