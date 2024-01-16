@@ -12,7 +12,10 @@
   },
   "private": true,
   "jest": {
-    "preset": "jest-preset-angular"
+    "preset": "jest-preset-angular",
+    "setupFilesAfterEnv": [
+      "./tests/setup-jest.ts"
+    ]
   },
   "dependencies": {
     "@angular/animations": "^17.0.9",
