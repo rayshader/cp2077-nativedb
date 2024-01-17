@@ -23,7 +23,7 @@ export class CodeFormatterService {
     {syntax: CodeSyntax.cppRedLib, fmt: new CppRedLibFormatter()},
   ];
 
-  private syntax: CodeSyntax = CodeSyntax.redscript;
+  private syntax: CodeSyntax = CodeSyntax.lua;
 
   constructor(private readonly settingsService: SettingsService) {
     this.settingsService.clipboard$.subscribe(this.onClipboardChanged.bind(this));

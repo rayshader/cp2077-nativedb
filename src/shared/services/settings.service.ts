@@ -39,7 +39,7 @@ export class SettingsService {
   private readonly mergeObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private readonly tabsWidthSubject: BehaviorSubject<number> = new BehaviorSubject<number>(320);
   private readonly isBarPinnedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  private readonly clipboardSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
+  private readonly clipboardSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.lua);
   private readonly codeSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.vanilla);
 
   /**
@@ -115,7 +115,7 @@ export class SettingsService {
     const mergeObject: boolean = (localStorage.getItem('merge-object') ?? 'false') === 'true';
     const tabsWidth: number = +(localStorage.getItem('tabs-width') ?? '320');
     const isBarPinned: boolean = (localStorage.getItem('is-bar-pinned') ?? 'true') === 'true';
-    const clipboard: string = localStorage.getItem('clipboard-syntax') ?? CodeSyntax.redscript.toString();
+    const clipboard: string = localStorage.getItem('clipboard-syntax') ?? CodeSyntax.lua.toString();
     const code: string = localStorage.getItem('code-syntax') ?? CodeSyntax.vanilla.toString();
 
     this.ignoreDuplicateSubject.next(ignoreDuplicate);
