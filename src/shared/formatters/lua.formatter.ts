@@ -36,8 +36,8 @@ export class LuaFormatter extends CodeFormatter {
     };
   }
 
-  protected override formatArguments(args: RedArgumentAst[], selfName?: string): CodeVariableFormat[] {
-    const argVars: CodeVariableFormat[] = args.filter((arg: RedArgumentAst) => {
+  protected override formatArguments(func: RedFunctionAst, selfName?: string): CodeVariableFormat[] {
+    const argVars: CodeVariableFormat[] = func.arguments.filter((arg: RedArgumentAst) => {
       return arg.name !== 'self';
     }).map((arg: RedArgumentAst) => {
       const type: string = RedTypeAst.toString(arg.type);

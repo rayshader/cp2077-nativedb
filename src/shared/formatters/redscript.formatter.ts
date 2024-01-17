@@ -34,8 +34,8 @@ export class RedscriptFormatter extends CodeFormatter {
     };
   }
 
-  protected override formatArguments(args: RedArgumentAst[], selfName?: string): CodeVariableFormat[] {
-    return args.map((arg: RedArgumentAst) => {
+  protected override formatArguments(func: RedFunctionAst, selfName?: string): CodeVariableFormat[] {
+    return func.arguments.map((arg: RedArgumentAst) => {
       const type: string = RedTypeAst.toString(arg.type);
       const optional: string = arg.isOptional ? ' // Optional' : '';
 

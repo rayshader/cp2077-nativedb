@@ -8,9 +8,12 @@ export interface CodeVariableFormat {
   readonly suffix: string;
 }
 
+export type ParenthesisRule = 'open-close' | 'close-only';
+
 export abstract class CodeFormatter {
 
-  protected constructor(private readonly withSemiColon: boolean) {
+  protected constructor(private readonly withSemiColon: boolean,
+                        private readonly withParenthesis: ParenthesisRule = 'open-close') {
 
   }
 
@@ -24,7 +27,7 @@ export abstract class CodeFormatter {
     const hasFullName: boolean = func.name !== func.fullName;
     const selfVar: CodeVariableFormat | undefined = this.formatSelf(func, memberOf);
     const selfName: string | undefined = (hasFullName && selfVar && !func.isStatic) ? selfVar.name : undefined;
-    const argVars: CodeVariableFormat[] = this.formatArguments(func.arguments, selfName);
+    const argVars: CodeVariableFormat[] = this.formatArguments(func, selfName);
     const returnVar: CodeVariableFormat | undefined = this.formatReturn(func);
     let code: string = '';
 
@@ -53,7 +56,9 @@ export abstract class CodeFormatter {
     } else if (func.isStatic) {
       code += this.formatStaticCall(func);
     }
-    code += '(';
+    if (this.withParenthesis !== 'close-only') {
+      code += '(';
+    }
     code += argVars.map((argVar) => argVar.name).join(', ');
     code += ')';
     if (this.withSemiColon) {
@@ -93,7 +98,7 @@ export abstract class CodeFormatter {
 
   protected abstract formatReturn(func: RedFunctionAst): CodeVariableFormat | undefined;
 
-  protected abstract formatArguments(args: RedArgumentAst[], selfName?: string): CodeVariableFormat[];
+  protected abstract formatArguments(func: RedFunctionAst, selfName?: string): CodeVariableFormat[];
 
   protected abstract formatMemberStaticCall(func: RedFunctionAst, memberOf: RedClassAst): string;
 
