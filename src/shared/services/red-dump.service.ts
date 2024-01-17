@@ -48,6 +48,14 @@ export class RedDumpService {
     );
     const classes$: Observable<RedClassAst[]> = this.http.get(`/assets/reddump/classes.json`).pipe(
       map((json: any) => json.map(RedClassAst.fromJson)),
+      map((objects: RedClassAst[]) => {
+        objects.sort(RedClassAst.sort);
+        objects.forEach((object) => {
+          object.properties.sort(RedPropertyAst.sort);
+          object.functions.sort(RedFunctionAst.sort);
+        });
+        return objects;
+      }),
       shareReplay()
     );
 
@@ -61,6 +69,10 @@ export class RedDumpService {
     );
     this.functions$ = this.http.get(`/assets/reddump/globals.json`).pipe(
       map((json: any) => json.map(RedFunctionAst.fromJson)),
+      map((functions) => {
+        functions.sort(RedFunctionAst.sort);
+        return functions;
+      }),
       shareReplay(),
       this.ignoreDuplicate(),
     );

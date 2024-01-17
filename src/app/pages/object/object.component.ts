@@ -226,11 +226,9 @@ export class ObjectComponent {
         if (this.isPropertiesFiltered) {
           properties = properties.filter(this.hasPropertyFlag.bind(this));
         }
-        properties.sort(RedPropertyAst.sort);
         if (this.isFunctionsFiltered) {
           functions = functions.filter(this.hasFunctionFlag.bind(this));
         }
-        functions.sort(RedFunctionAst.sort);
         this.app.isStable.pipe(
           filter((stable: boolean) => stable),
           first(),
