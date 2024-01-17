@@ -30,11 +30,13 @@ import {MatChipsModule} from "@angular/material/chips";
 export class ReadmeComponent implements OnInit {
 
   readonly getGameInstance$: Observable<RedFunctionAst | undefined>;
+  readonly addFact$: Observable<RedFunctionAst | undefined>;
   readonly id: number = cyrb53('ScriptGameInstance');
 
   constructor(private readonly dumpService: RedDumpService,
               private readonly pageService: PageService) {
     this.getGameInstance$ = this.dumpService.functions$.pipe(this.getGameInstance());
+    this.addFact$ = this.dumpService.functions$.pipe(this.getAddFact());
   }
 
   ngOnInit(): void {
@@ -45,6 +47,14 @@ export class ReadmeComponent implements OnInit {
     return pipe(
       map((functions) => {
         return functions.find((func) => func.name === 'GetGameInstance');
+      })
+    );
+  }
+
+  private getAddFact(): OperatorFunction<RedFunctionAst[], RedFunctionAst | undefined> {
+    return pipe(
+      map((functions) => {
+        return functions.find((func) => func.name === 'AddFact');
       })
     );
   }

@@ -88,11 +88,23 @@
 
   <p>
     Properties and functions are sorted by visibility first (public > protected > private) and then alphabetically.
-    <!-- TODO: enable/disable sorting to show in the default order of the RTTI dump. -->
   </p>
 
   <p>
-    You can customize your navigation in the settings.
+    Functions are defined with a (short) name and a full name. Most of the times, both are equivalent, but not always.
+    When a function is defined with a different full name, it will be
+    <span class="stx stx-function stx-function-fullname">highlighted</span>. This is useful if you are writing a mod
+    with C++ or Lua. In both languages, you must use the full name when it is different. You can get it by clicking on
+    a function's name to copy the full name to your clipboard. When you use the <em>Grab code</em> feature (see below),
+    it will automatically use the full name when it is required. Here an example:
+  </p>
+
+  @if (addFact$ | async; as func) {
+    <function-span [node]="func" [canCopy]="false"></function-span>
+  }
+
+  <p>
+    Finally, you can customize other behaviors of your navigation in the settings.
   </p>
 </article>
 
