@@ -52,7 +52,8 @@
       <div class="group">
         <span class="stx-function"
               [class.stx-function-fullname]="hasFullName"
-              [title]="hasFullName ? node.fullName : ''">{{node.name}}</span>
+              [title]="hasFullName ? 'Click to copy full name' : ''"
+              (click)="copyFullName()">{{node.name}}</span>
         <span class="stx-parenthesis">(</span>
       </div>
 

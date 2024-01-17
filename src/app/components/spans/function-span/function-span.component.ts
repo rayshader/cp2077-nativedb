@@ -125,6 +125,13 @@ export class FunctionSpanComponent {
     this.isVisible = false;
   }
 
+  async copyFullName(): Promise<void> {
+    if (!this.node || this.node.fullName === this.node.name) {
+      return;
+    }
+    await navigator.clipboard.writeText(this.node.fullName);
+  }
+
   protected async copyToClipboard(): Promise<void> {
     if (!this.node) {
       return;
