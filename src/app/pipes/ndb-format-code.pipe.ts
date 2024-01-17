@@ -27,6 +27,7 @@ export class NDBFormatCodePipe implements PipeTransform {
       case CodeSyntax.redscript:
         return type.name;
       case CodeSyntax.cppRED4ext:
+      case CodeSyntax.cppRedLib:
         if (type.flag === RedTemplateDef.ref) {
           return 'Handle';
         } else if (type.flag === RedTemplateDef.wref) {
