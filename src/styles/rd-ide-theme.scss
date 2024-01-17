@@ -84,6 +84,10 @@
 
   .stx-function {
     color: map.get($colors, function);
+
+    &.stx-function-fullname {
+      text-decoration: underline dotted;
+    }
   }
 
   .stx-arg {
