@@ -1,5 +1,12 @@
 import Mock = jest.Mock;
 
+export function mockLocation(path: string): void {
+  // @ts-ignore
+  delete window.location;
+  // @ts-ignore
+  window.location = new URL(`https://nativedb.com${path}`);
+}
+
 export interface MatchMediaMock {
   mediaQuery: Mock<MediaQueryList>;
   listener?: Function;
