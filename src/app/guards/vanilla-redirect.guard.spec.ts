@@ -63,7 +63,7 @@ describe('vanillaRedirectGuard', () => {
     harness.detectChanges();
 
     // THEN
-    expect(router.url).toEqual(`/c/${cyrb53('Test')}`);
+    expect(router.url).toBe(`/c/${cyrb53('Test')}`);
   });
 
   it('given route /Test?name=only then get node by id and name only', async () => {
@@ -99,7 +99,7 @@ describe('vanillaRedirectGuard', () => {
     // THEN
     const id: number = cyrb53('Test');
 
-    expect(router.url).toEqual(`/c/${id}#42`);
+    expect(router.url).toBe(`/c/${id}#42`);
   });
 
 });

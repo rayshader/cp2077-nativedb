@@ -40,7 +40,7 @@ describe('firstUsageGuard', () => {
 
     // THEN
     expect(settingsMock.toggleFirstUsage).toHaveBeenCalled();
-    expect(router.url).toEqual('/readme');
+    expect(router.url).toBe('/readme');
   });
 
   it('should allow next route when it is not the first usage', async () => {
@@ -55,7 +55,7 @@ describe('firstUsageGuard', () => {
 
     // THEN
     expect(settingsMock.toggleFirstUsage).not.toHaveBeenCalled();
-    expect(router.url).toEqual('/test');
+    expect(router.url).toBe('/test');
   });
 
 });
