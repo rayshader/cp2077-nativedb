@@ -44,4 +44,8 @@
       overflow-x: auto;
     }
   }
+
+  @media (max-width: 1025px) {
+    margin: 12px 0;
+  }
 }
