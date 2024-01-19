@@ -16,4 +16,8 @@ mat-divider {
   & mat-icon {
     margin-right: 12px;
   }
+
+  @media (max-width: 1025px) {
+    height: 48px;
+  }
 }
