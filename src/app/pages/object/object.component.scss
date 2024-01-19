@@ -83,6 +83,29 @@
   }
 }
 
+.actions {
+  display: flex;
+
+  & .skt-circle {
+    width: 24px;
+    height: 24px;
+    margin: 36px 12px 12px;
+
+    background-color: var(--mat-divider-color);
+  }
+
+  @media (min-width: 1025px) {
+    position: absolute;
+    right: 40px;
+  }
+
+  @media (max-width: 1024px) {
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+  }
+}
+
 .dark-theme {
   :host {
     & [actions] {
