@@ -25,7 +25,9 @@
   </ndb-title-bar>
 
   @if (showDocumentation) {
-    <ndb-documentation [data]="{documentation: data.documentation, main: true}"></ndb-documentation>
+    <ndb-documentation [data]="{documentation: data.documentation, main: true}"
+                       (documented)="changeDocumentation($event)"
+                       (closed)="toggleDocumentation()"></ndb-documentation>
   }
 
   <cdk-accordion multi="true">

@@ -159,6 +159,9 @@ export class ObjectComponent {
 
   protected readonly cyrb53 = cyrb53;
 
+  private readonly isDocumentedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private readonly isDocumented$: Observable<boolean> = this.isDocumentedSubject.asObservable();
+
   private readonly filterBadgesSubject: BehaviorSubject<void> = new BehaviorSubject<void>(undefined);
   private readonly filterBadges$: Observable<void> = this.filterBadgesSubject.asObservable();
 
@@ -207,6 +210,7 @@ export class ObjectComponent {
       parents$,
       children$,
       documentation$,
+      this.isDocumented$,
       this.dumpService.badges$,
       this.settingsService.settings$,
       this.responsiveService.mobile$,
@@ -217,6 +221,7 @@ export class ObjectComponent {
              parents,
              children,
              documentation,
+             isDocumented,
              badges,
              settings,
              isMobile
@@ -273,6 +278,10 @@ export class ObjectComponent {
 
   protected get isPropertiesFiltered(): boolean {
     return this.badgesProperty.filter((badge) => badge.isEnabled).length === 1;
+  }
+
+  changeDocumentation(isDocumented: boolean): void {
+    this.isDocumentedSubject.next(isDocumented);
   }
 
   toggleDocumentation(): void {
