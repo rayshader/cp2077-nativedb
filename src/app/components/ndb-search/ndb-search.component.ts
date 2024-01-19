@@ -8,6 +8,7 @@ import {FilterBy, SearchService} from "../../../shared/services/search.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {MatButtonModule} from "@angular/material/button";
 import {MatMenuModule} from "@angular/material/menu";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 interface FilterItem {
   value: FilterBy;
@@ -18,12 +19,13 @@ interface FilterItem {
   selector: 'ndb-search',
   standalone: true,
   imports: [
-    MatInputModule,
-    MatFormFieldModule,
     MatIconModule,
-    ReactiveFormsModule,
+    MatMenuModule,
+    MatInputModule,
     MatButtonModule,
-    MatMenuModule
+    MatTooltipModule,
+    MatFormFieldModule,
+    ReactiveFormsModule
   ],
   templateUrl: './ndb-search.component.html',
   styleUrl: './ndb-search.component.scss'

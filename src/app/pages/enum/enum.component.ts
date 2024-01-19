@@ -15,9 +15,9 @@ import {cyrb53} from "../../../shared/string";
   selector: 'enum',
   standalone: true,
   imports: [
-    MatButtonModule,
-    MatIconModule,
     AsyncPipe,
+    MatIconModule,
+    MatButtonModule,
     NDBTitleBarComponent,
     NDBHighlightDirective
   ],

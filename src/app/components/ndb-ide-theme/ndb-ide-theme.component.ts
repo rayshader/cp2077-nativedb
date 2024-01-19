@@ -4,6 +4,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatMenuModule} from "@angular/material/menu";
 import {IDETheme, IDEThemeChanged, IDEThemeService} from "../../../shared/services/ide-theme.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 interface ThemeItem {
   isSelected: boolean;
@@ -15,9 +16,10 @@ interface ThemeItem {
   selector: 'ndb-ide-theme',
   standalone: true,
   imports: [
-    MatButtonModule,
     MatIconModule,
-    MatMenuModule
+    MatMenuModule,
+    MatButtonModule,
+    MatTooltipModule
   ],
   templateUrl: './ndb-ide-theme.component.html',
   styleUrl: './ndb-ide-theme.component.scss'

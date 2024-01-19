@@ -11,6 +11,7 @@ import {RouterLink} from "@angular/router";
 import {cyrb53} from "../../../shared/string";
 import {PageService} from "../../../shared/services/page.service";
 import {MatChipsModule} from "@angular/material/chips";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 @Component({
   selector: 'readme',
@@ -19,9 +20,10 @@ import {MatChipsModule} from "@angular/material/chips";
     AsyncPipe,
     RouterLink,
     MatIconModule,
-    MatDividerModule,
-    MatButtonModule,
     MatChipsModule,
+    MatButtonModule,
+    MatDividerModule,
+    MatTooltipModule,
     FunctionSpanComponent
   ],
   templateUrl: './readme.component.html',

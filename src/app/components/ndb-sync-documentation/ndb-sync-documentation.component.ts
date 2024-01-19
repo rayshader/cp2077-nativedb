@@ -8,6 +8,7 @@ import {MatMenuModule} from "@angular/material/menu";
 import {Router, RouterLink} from "@angular/router";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {NDBCommand, NDBCommandHandler, NDBMessage} from "../../../shared/worker.common";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 @Component({
   selector: 'ndb-sync-documentation',
@@ -17,6 +18,7 @@ import {NDBCommand, NDBCommandHandler, NDBMessage} from "../../../shared/worker.
     MatIconModule,
     MatMenuModule,
     MatButtonModule,
+    MatTooltipModule,
     MatProgressSpinnerModule
   ],
   templateUrl: './ndb-sync-documentation.component.html',

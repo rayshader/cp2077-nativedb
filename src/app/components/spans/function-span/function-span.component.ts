@@ -13,6 +13,7 @@ import {ClassDocumentation} from "../../../../shared/services/documentation.serv
 import {SettingsService} from "../../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {BehaviorSubject, combineLatest, Observable} from "rxjs";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 @Component({
   selector: 'function-span',
@@ -20,8 +21,9 @@ import {BehaviorSubject, combineLatest, Observable} from "rxjs";
   imports: [
     MatIconModule,
     MatButtonModule,
-    ArgumentSpanComponent,
+    MatTooltipModule,
     TypeSpanComponent,
+    ArgumentSpanComponent,
     NDBDocumentationComponent
   ],
   templateUrl: './function-span.component.html',

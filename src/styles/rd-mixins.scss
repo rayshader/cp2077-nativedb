@@ -34,6 +34,7 @@
   @include mat.slide-toggle-theme($theme);
   @include mat.progress-spinner-theme($theme);
   @include mat.snack-bar-theme($theme);
+  @include mat.tooltip-theme($theme);
 }
 
 @mixin mat-component-colors($theme) {
@@ -54,6 +55,7 @@
   @include mat.slide-toggle-color($theme);
   @include mat.progress-spinner-color($theme);
   @include mat.snack-bar-color($theme);
+  @include mat.tooltip-color($theme);
 }
 
 @mixin rd-component-themes($theme) {

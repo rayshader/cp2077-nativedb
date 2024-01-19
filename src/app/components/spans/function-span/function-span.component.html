@@ -9,41 +9,41 @@
       @if (canCopy) {
         <button mat-icon-button
                 class="badge clipboard"
-                title="Copy to clipboard"
+                matTooltip="Copy to clipboard"
                 (click)="copyToClipboard()"><mat-icon>content_copy</mat-icon></button>
       }
       <button mat-icon-button
               class="badge"
-              title="Documentation"
+              matTooltip="Documentation"
               [class.stx-doc]="hasDocumentation"
               (click)="toggleDocumentation()"
               [disabled]="documentation === undefined">
         <mat-icon>info_outline</mat-icon>
       </button>
-      <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>
+      <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" [matTooltip]="scope"></mat-icon>
       @if (node.isNative) {
-        <mat-icon class="badge" svgIcon="native" title="native"></mat-icon>
+        <mat-icon class="badge" svgIcon="native" matTooltip="native"></mat-icon>
       }
       @if (node.isStatic) {
-        <mat-icon class="badge" svgIcon="static" title="static"></mat-icon>
+        <mat-icon class="badge" svgIcon="static" matTooltip="static"></mat-icon>
       }
       @if (node.isFinal) {
-        <mat-icon class="badge" svgIcon="final" title="final"></mat-icon>
+        <mat-icon class="badge" svgIcon="final" matTooltip="final"></mat-icon>
       }
       @if (node.isThreadSafe) {
-        <mat-icon class="badge" svgIcon="timer" title="threadsafe"></mat-icon>
+        <mat-icon class="badge" svgIcon="timer" matTooltip="threadsafe"></mat-icon>
       }
       @if (node.isCallback) {
-        <mat-icon class="badge" svgIcon="callback" title="callback"></mat-icon>
+        <mat-icon class="badge" svgIcon="callback" matTooltip="callback"></mat-icon>
       }
       @if (node.isConst) {
-        <mat-icon class="badge" svgIcon="const" title="const"></mat-icon>
+        <mat-icon class="badge" svgIcon="const" matTooltip="const"></mat-icon>
       }
       @if (node.isQuest) {
-        <mat-icon class="badge" svgIcon="quest" title="quest"></mat-icon>
+        <mat-icon class="badge" svgIcon="quest" matTooltip="quest"></mat-icon>
       }
       @if (node.isTimer) {
-        <mat-icon class="badge" svgIcon="timer" title="timer"></mat-icon>
+        <mat-icon class="badge" svgIcon="timer" matTooltip="timer"></mat-icon>
       }
       <div [style.width]="align"></div>
     </div>
@@ -52,7 +52,7 @@
       <div class="group">
         <span class="stx-function"
               [class.stx-function-fullname]="hasFullName"
-              [title]="hasFullName ? 'Click to copy full name' : ''"
+              [matTooltip]="hasFullName ? 'Click to copy full name' : ''"
               (click)="copyFullName()">{{node.name}}</span>
         <span class="stx-parenthesis">(</span>
       </div>

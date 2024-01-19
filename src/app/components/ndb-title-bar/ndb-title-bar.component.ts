@@ -7,14 +7,16 @@ import {take} from "rxjs";
 import {RedNodeAst} from "../../../shared/red-ast/red-node.ast";
 import {BookmarkService} from "../../../shared/services/bookmark.service";
 import {AsyncPipe} from "@angular/common";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 @Component({
   selector: 'ndb-title-bar',
   standalone: true,
   imports: [
-    MatButtonModule,
+    AsyncPipe,
     MatIconModule,
-    AsyncPipe
+    MatButtonModule,
+    MatTooltipModule
   ],
   templateUrl: './ndb-title-bar.component.html',
   styleUrl: './ndb-title-bar.component.scss'

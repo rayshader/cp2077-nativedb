@@ -9,6 +9,7 @@ import {CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport} fr
 import {MatDividerModule} from "@angular/material/divider";
 import {SettingsService} from "../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 export interface TabItemNode {
   readonly id: number;
@@ -27,15 +28,16 @@ interface TabItem {
   selector: 'ndb-tabs',
   standalone: true,
   imports: [
-    MatTabsModule,
-    MatIconModule,
-    NgTemplateOutlet,
     AsyncPipe,
     RouterLink,
-    CdkVirtualScrollViewport,
-    CdkFixedSizeVirtualScroll,
+    NgTemplateOutlet,
     CdkVirtualForOf,
-    MatDividerModule
+    CdkFixedSizeVirtualScroll,
+    CdkVirtualScrollViewport,
+    MatIconModule,
+    MatTabsModule,
+    MatDividerModule,
+    MatTooltipModule
   ],
   templateUrl: './ndb-tabs.component.html',
   styleUrl: './ndb-tabs.component.scss'

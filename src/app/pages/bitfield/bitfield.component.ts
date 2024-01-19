@@ -15,9 +15,9 @@ import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
   selector: 'bitfield',
   standalone: true,
   imports: [
-    MatButtonModule,
-    MatIconModule,
     AsyncPipe,
+    MatIconModule,
+    MatButtonModule,
     NDBTitleBarComponent,
     NDBHighlightDirective
   ],

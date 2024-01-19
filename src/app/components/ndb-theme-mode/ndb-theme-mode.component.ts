@@ -3,13 +3,15 @@ import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {Theme, ThemeService} from "../../../shared/services/theme.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 @Component({
   selector: 'ndb-theme-mode',
   standalone: true,
   imports: [
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    MatTooltipModule
   ],
   templateUrl: './ndb-theme-mode.component.html',
   styleUrl: './ndb-theme-mode.component.scss'

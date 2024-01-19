@@ -2,21 +2,21 @@
   <div class="badges">
     <div class="align-clipboard"></div>
     <div class="align" [style.width]="'40px'"></div>
-    <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" title="{{scope}}"></mat-icon>
+    <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" [matTooltip]="scope"></mat-icon>
     @if (node.isPersistent) {
-      <mat-icon class="badge" svgIcon="scope" title="persistent"></mat-icon>
+      <mat-icon class="badge" svgIcon="scope" matTooltip="persistent"></mat-icon>
     }<!--
     @if (node.isReplicated) {
-      <mat-icon class="badge" svgIcon="replicated" title="replicated"></mat-icon>
+      <mat-icon class="badge" svgIcon="replicated" matTooltip="replicated"></mat-icon>
     }
     @if (node.isInline) {
-      <mat-icon class="badge" svgIcon="importonly" title="inline"></mat-icon>
+      <mat-icon class="badge" svgIcon="importonly" matTooltip="inline"></mat-icon>
     }
     @if (node.isEdit) {
-      <mat-icon class="badge" svgIcon="enum" title="edit"></mat-icon>
+      <mat-icon class="badge" svgIcon="enum" matTooltip="edit"></mat-icon>
     }
     @if (node.isConst) {
-      <mat-icon class="badge" svgIcon="const" title="const"></mat-icon>
+      <mat-icon class="badge" svgIcon="const" matTooltip="const"></mat-icon>
     }-->
     <div class="align" [style.width]="align"></div>
   </div>

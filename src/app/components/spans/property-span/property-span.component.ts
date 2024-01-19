@@ -3,12 +3,14 @@ import {MatIconModule} from "@angular/material/icon";
 import {TypeSpanComponent} from "../type-span/type-span.component";
 import {RedPropertyAst} from "../../../../shared/red-ast/red-property.ast";
 import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 @Component({
   selector: 'property-span',
   standalone: true,
   imports: [
     MatIconModule,
+    MatTooltipModule,
     TypeSpanComponent
   ],
   templateUrl: './property-span.component.html',

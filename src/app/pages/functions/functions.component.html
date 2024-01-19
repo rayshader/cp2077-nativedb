@@ -1,6 +1,6 @@
 @if (data$ | async; as data) {
   <ndb-title-bar title="Global functions">
-    <mat-icon class="badge-function" svgIcon="function" title="Global function"></mat-icon>
+    <mat-icon class="badge-function" svgIcon="function"></mat-icon>
   </ndb-title-bar>
 
   @for (func of data.functions; track func.id; let i = $index) {

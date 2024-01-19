@@ -7,6 +7,7 @@ import {AsyncPipe} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
 import {MatDividerModule} from "@angular/material/divider";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 interface BookmarkItem {
   readonly node: RedNodeAst;
@@ -20,6 +21,7 @@ interface BookmarkItem {
   imports: [
     AsyncPipe,
     MatIconModule,
+    MatTooltipModule,
     TypeSpanComponent,
     MatDividerModule
   ],

@@ -1,6 +1,7 @@
 <mat-toolbar>
   <button mat-icon-button
           class="n-lg"
+          [matTooltip]="isTabsOpen ? 'Close menu' : 'Open menu'"
           (click)="toggleTabs()">
     @if (isTabsOpen) {
       <mat-icon>close</mat-icon>
@@ -11,20 +12,20 @@
 
   <span class="home" routerLink="">NativeDB</span>
 
-  <mat-chip class="lg version" title="game's version" [disableRipple]="true">v2.10</mat-chip>
+  <mat-chip class="lg version" matTooltip="game's version" [disableRipple]="true">v2.10</mat-chip>
 
   <div class="lg space"></div>
 
   <button mat-icon-button
           class="lg"
-          title="Recent visits"
+          matTooltip="Recent visits"
           routerLink="">
     <mat-icon>history</mat-icon>
   </button>
 
   <button mat-icon-button
           class="lg"
-          title="Bookmarks"
+          matTooltip="Bookmarks"
           routerLink="bookmarks">
     <mat-icon>bookmarks</mat-icon>
   </button>
@@ -43,14 +44,14 @@
 
   <button mat-icon-button
           class="lg"
-          title="Settings"
+          matTooltip="Settings"
           routerLink="settings">
     <mat-icon>settings</mat-icon>
   </button>
 
   <button mat-icon-button
           class="lg"
-          title="Readme"
+          matTooltip="Readme"
           routerLink="readme">
     <mat-icon>help</mat-icon>
   </button>

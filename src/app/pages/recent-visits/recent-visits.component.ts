@@ -8,6 +8,7 @@ import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {RecentVisitItem, RecentVisitService} from "../../../shared/services/recent-visit.service";
 import {MatButtonModule} from "@angular/material/button";
 import {MatDividerModule} from "@angular/material/divider";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 interface RecentVisitData {
   readonly node: RedNodeAst;
@@ -21,9 +22,10 @@ interface RecentVisitData {
   imports: [
     AsyncPipe,
     MatIconModule,
-    TypeSpanComponent,
     MatButtonModule,
-    MatDividerModule
+    MatDividerModule,
+    MatTooltipModule,
+    TypeSpanComponent
   ],
   templateUrl: './recent-visits.component.html',
   styleUrl: './recent-visits.component.scss'

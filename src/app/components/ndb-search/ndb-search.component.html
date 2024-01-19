@@ -4,14 +4,14 @@
   @if (query.value?.length ?? 0 > 0) {
     <button matSuffix
             mat-icon-button
-            title="Clear search query"
+            matTooltip="Clear search query"
             (click)="clear()">
       <mat-icon>close</mat-icon>
     </button>
   }
   <button matSuffix
           mat-icon-button
-          title="Search by..."
+          matTooltip="Search by..."
           [matMenuTriggerFor]="menu">
     <mat-icon>tune</mat-icon>
   </button>

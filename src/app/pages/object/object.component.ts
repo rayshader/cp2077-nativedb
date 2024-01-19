@@ -41,6 +41,7 @@ import {cyrb53} from "../../../shared/string";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
 import {NDBDocumentationComponent} from "../../components/ndb-documentation/ndb-documentation.component";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 interface ObjectData {
   readonly object: RedClassAst;
@@ -85,6 +86,7 @@ interface BadgeFilterItem<T> {
     MatChipsModule,
     MatButtonModule,
     MatDividerModule,
+    MatTooltipModule,
     FunctionSpanComponent,
     PropertySpanComponent,
     TypeSpanComponent,

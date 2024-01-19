@@ -12,19 +12,21 @@ import {ResponsiveService} from "../../../shared/services/responsive.service";
 import {filter} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {NDBSyncDocumentationComponent} from "../ndb-sync-documentation/ndb-sync-documentation.component";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 @Component({
   selector: 'ndb-toolbar',
   standalone: true,
   imports: [
     RouterLink,
-    MatButtonModule,
-    MatChipsModule,
     MatIconModule,
+    MatChipsModule,
+    MatButtonModule,
     MatSidenavModule,
     MatToolbarModule,
-    NDBIdeThemeComponent,
+    MatTooltipModule,
     NDBSearchComponent,
+    NDBIdeThemeComponent,
     NDBThemeModeComponent,
     NDBSyncDocumentationComponent
   ],

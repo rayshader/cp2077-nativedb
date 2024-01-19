@@ -7,7 +7,7 @@
 
 <div class="actions">
   <button mat-icon-button
-          title="Copy URL to clipboard"
+          matTooltip="Copy URL to clipboard"
           (click)="copyUrl()">
     <mat-icon>share</mat-icon>
   </button>
@@ -15,7 +15,7 @@
   @if (_node !== undefined) {
     @if (!hideDocumentation) {
       <button mat-icon-button
-              title="Documentation"
+              matTooltip="Documentation"
               [class.stx-doc]="hasDocumentation"
               (click)="toggleDocumentation.emit()">
         <mat-icon>info_outline</mat-icon>
@@ -23,7 +23,7 @@
     }
 
     <button mat-icon-button
-            [title]="isBookmarked ? 'Remove bookmark' : 'Add bookmark'"
+            [matTooltip]="isBookmarked ? 'Remove bookmark' : 'Add bookmark'"
             (click)="toggleBookmark()">
       @if (isBookmarked) {
         <mat-icon>bookmark</mat-icon>
@@ -36,7 +36,7 @@
   @if (!hidden) {
     <button mat-icon-button
             class="pin"
-            [title]="isPinned ? 'Unpin title when scrolling' : 'Pin title to the top when scrolling'"
+            [matTooltip]="isPinned ? 'Unpin title when scrolling' : 'Pin title to the top when scrolling'"
             (click)="togglePin()">
       <mat-icon [svgIcon]="isPinned ? 'pin-off' : 'pin'"></mat-icon>
     </button>

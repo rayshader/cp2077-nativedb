@@ -4,11 +4,11 @@
       <mat-tab [disabled]="tab.nodes.length === 0">
         <ng-template mat-tab-label class="mat-tab-label">
           @if (tab.icon.length > 0) {
-            <mat-icon class="badge-{{tab.icon}}" [svgIcon]="tab.icon" [title]="tab.alt"></mat-icon>
+            <mat-icon class="badge-{{tab.icon}}" [svgIcon]="tab.icon" [matTooltip]="tab.alt"></mat-icon>
           } @else {
             <div>
-              <mat-icon class="badge-class" svgIcon="class" title="Classes"></mat-icon>
-              <mat-icon class="badge-struct" svgIcon="struct" title="Structs"></mat-icon>
+              <mat-icon class="badge-class" svgIcon="class" matTooltip="Classes"></mat-icon>
+              <mat-icon class="badge-struct" svgIcon="struct" matTooltip="Structs"></mat-icon>
             </div>
           }
           <span class="count">{{tab.nodes.length}}</span>
