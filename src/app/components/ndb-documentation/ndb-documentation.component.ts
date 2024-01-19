@@ -81,8 +81,16 @@ export class NDBDocumentationComponent {
     return this.body.length === 0;
   }
 
-  private get input(): AbstractControl<string> {
+  protected get input(): AbstractControl<string> {
     return this.form.get('input')!;
+  }
+
+  protected get saveDisabled(): boolean {
+    let body: string = this.input.value;
+
+    body ??= '';
+    body = body.trim();
+    return !this.isChanged || body.length === 0;
   }
 
   onLinkClicked(event: Event): void {
@@ -126,6 +134,7 @@ export class NDBDocumentationComponent {
 
   cancel(): void {
     this.input.setValue(this.body, {emitEvent: false});
+    this.isChanged = false;
     this.mode = 'view';
     if (this.body.length === 0) {
       this.closed.emit();
@@ -141,6 +150,7 @@ export class NDBDocumentationComponent {
     } else if (this.node) {
       await this.saveMember();
     }
+    this.isChanged = false;
   }
 
   private onChanged(value: string): void {
