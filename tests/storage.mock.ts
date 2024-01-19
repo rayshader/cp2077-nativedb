@@ -4,6 +4,15 @@ export const StorageMock = {
   removeItem: jest.spyOn(Storage.prototype, 'removeItem'),
   clear: jest.spyOn(Storage.prototype, 'clear'),
 
+  mockItems(items: {[key: string]: any}): void {
+    this.getItem.mockImplementation((key: string): string | null => {
+      if (key in items) {
+        return items[key].toString();
+      }
+      return null;
+    });
+  },
+
   mockResetAll: () => {
     StorageMock.getItem.mockReset();
     StorageMock.setItem.mockReset();
