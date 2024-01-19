@@ -1,19 +1,27 @@
 import {Component} from '@angular/core';
 import {RedDumpService} from "../../../shared/services/red-dump.service";
-import {Observable} from "rxjs";
+import {combineLatest, map, Observable} from "rxjs";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {AsyncPipe} from "@angular/common";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
 import {MatIconModule} from "@angular/material/icon";
 import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
+import {MatDividerModule} from "@angular/material/divider";
+import {ResponsiveService} from "../../../shared/services/responsive.service";
+
+interface FunctionsData {
+  readonly functions: RedFunctionAst[];
+  readonly isMobile: boolean;
+}
 
 @Component({
   selector: 'functions',
   standalone: true,
   imports: [
     AsyncPipe,
-    FunctionSpanComponent,
     MatIconModule,
+    MatDividerModule,
+    FunctionSpanComponent,
     NDBTitleBarComponent
   ],
   templateUrl: './functions.component.html',
@@ -21,7 +29,7 @@ import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar
 })
 export class FunctionsComponent {
 
-  readonly functions$: Observable<RedFunctionAst[]>;
+  readonly data$: Observable<FunctionsData>;
 
   readonly skeletons: string[] = [
     'AIInstantiateObject() → Void',
@@ -43,8 +51,19 @@ export class FunctionsComponent {
     'ArraySortInts() → Void'
   ];
 
-  constructor(private readonly dumpService: RedDumpService) {
-    this.functions$ = this.dumpService.functions$;
+  constructor(private readonly dumpService: RedDumpService,
+              private readonly responsiveService: ResponsiveService) {
+    this.data$ = combineLatest([
+      this.dumpService.functions$,
+      this.responsiveService.mobile$
+    ]).pipe(
+      map(([functions, isMobile]) => {
+        return {
+          functions,
+          isMobile
+        };
+      })
+    );
   }
 
 }

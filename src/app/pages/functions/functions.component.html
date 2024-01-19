@@ -1,10 +1,13 @@
-@if (functions$ | async; as functions) {
+@if (data$ | async; as data) {
   <ndb-title-bar title="Global functions">
     <mat-icon class="badge-function" svgIcon="function" title="Global function"></mat-icon>
   </ndb-title-bar>
 
-  @for (func of functions; track func.id) {
+  @for (func of data.functions; track func.id; let i = $index) {
     <function-span [node]="func" [canCopy]="true"></function-span>
+    @if (data.isMobile && i + 1 < data.functions.length) {
+      <mat-divider></mat-divider>
+    }
   }
 } @else {
   <div class="title">
