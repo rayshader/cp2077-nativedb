@@ -66,6 +66,15 @@ a {
     color: transparent!important;
 
     border-radius: 4px;
+  }
 
+  @media (max-width: 1025px) {
+    padding-top: 14px;
+    padding-bottom: 14px;
+
+    &.skt {
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
   }
 }
