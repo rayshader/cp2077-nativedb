@@ -63,6 +63,10 @@
       font-size: 18px;
       margin-right: 12px;
     }
+
+    @media (max-width: 1025px) {
+      min-height: 48px;
+    }
   }
 }
 
