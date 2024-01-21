@@ -1,7 +1,7 @@
 @if (node) {
   <div class="badges">
     <div class="align-clipboard"></div>
-    <div class="align" [style.width]="'40px'"></div>
+    <div class="align"></div>
     <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" [matTooltip]="scope"></mat-icon>
     @if (node.isPersistent) {
       <mat-icon class="badge" svgIcon="scope" matTooltip="persistent"></mat-icon>

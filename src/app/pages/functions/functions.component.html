@@ -4,7 +4,7 @@
   </ndb-title-bar>
 
   @for (func of data.functions; track func.id; let i = $index) {
-    <function-span [node]="func" [canCopy]="true"></function-span>
+    <function-span [node]="func" [canCopy]="true" [canShare]="false"></function-span>
     @if (data.isMobile && i + 1 < data.functions.length) {
       <mat-divider></mat-divider>
     }

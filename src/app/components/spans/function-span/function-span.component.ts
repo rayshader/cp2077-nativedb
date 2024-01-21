@@ -14,11 +14,14 @@ import {SettingsService} from "../../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {BehaviorSubject, combineLatest, Observable} from "rxjs";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {RouterLink} from "@angular/router";
+import {cyrb53} from "../../../../shared/string";
 
 @Component({
   selector: 'function-span',
   standalone: true,
   imports: [
+    RouterLink,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
@@ -61,6 +64,12 @@ export class FunctionSpanComponent {
    */
   @Input()
   canDocument: boolean = false;
+
+  /**
+   * Whether share feature can be used?
+   */
+  @Input()
+  canShare: boolean = true;
 
   documentation?: ClassDocumentation;
 
@@ -173,6 +182,16 @@ export class FunctionSpanComponent {
     data += this.node.arguments.map((argument) => argument.name).join(', ');
     data += ');';
 
+    await navigator.clipboard.writeText(data);
+  }
+
+  protected async copyUrlToClipboard(): Promise<void> {
+    if (!this.node) {
+      return;
+    }
+    let data: string = window.location.href;
+
+    data += `#${cyrb53(this.node.name)}`
     await navigator.clipboard.writeText(data);
   }
 

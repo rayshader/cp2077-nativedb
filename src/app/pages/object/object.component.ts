@@ -254,7 +254,7 @@ export class ObjectComponent {
           properties: properties,
           functions: functions,
           badges: badges,
-          align: `${72 + badges * 24 + 12 - 30}px`,
+          align: `${104 + badges * 24 + 12 - 30}px`,
           documentation: documentation,
           hideDocumentation: isMobile,
           hasBodyDocumentation: !isMobile && documentation.body !== undefined,

@@ -33,4 +33,12 @@ export class NDBHighlightDirective {
     this.router.navigateByUrl(window.location.pathname, {replaceUrl: true});
   }
 
+  @HostListener('click')
+  onTap(): void {
+    if (!this.isHighlight) {
+      return;
+    }
+    this.router.navigateByUrl(window.location.pathname, {replaceUrl: true});
+  }
+
 }

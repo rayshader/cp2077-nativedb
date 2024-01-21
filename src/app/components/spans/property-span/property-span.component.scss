@@ -16,6 +16,8 @@
     }
 
     & .align {
+      width: 72px;
+
       @media (max-width: 1025px) {
         display: none;
       }

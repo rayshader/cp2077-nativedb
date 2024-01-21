@@ -22,6 +22,13 @@
           <mat-icon>info_outline</mat-icon>
         </button>
       }
+      @if (canShare) {
+        <button mat-icon-button
+                class="badge"
+                (click)="copyUrlToClipboard()">
+          <mat-icon>share</mat-icon>
+        </button>
+      }
       <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" [matTooltip]="scope"></mat-icon>
       @if (node.isNative) {
         <mat-icon class="badge" svgIcon="native" matTooltip="native"></mat-icon>
