@@ -11,7 +11,7 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {SwUpdate, VersionEvent, VersionReadyEvent} from "@angular/service-worker";
 import {MatDialog} from "@angular/material/dialog";
-import {UpdateDialogComponent} from "./components/update-dialog/update-dialog.component";
+import {NDBUpdateDialogComponent} from "./components/ndb-update-dialog/ndb-update-dialog.component";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from "@angular/material/form-field";
 import {MatSidenavModule} from "@angular/material/sidenav";
@@ -21,7 +21,7 @@ import {debounceTime, filter} from "rxjs";
 import {ResponsiveService} from "../shared/services/responsive.service";
 import {DocumentationDatabase} from "../shared/repositories/documentation.database";
 
-interface AppData {
+export interface AppData {
   appVersion: string;
   gameVersion: string;
 }
@@ -128,10 +128,10 @@ export class AppComponent implements OnInit {
       const current: AppData = readyEvent.currentVersion.appData as AppData;
       const latest: AppData = readyEvent.latestVersion.appData as AppData;
 
-      this.dialog.open(UpdateDialogComponent, {
+      this.dialog.open(NDBUpdateDialogComponent, {
         data: {
-          current: current.gameVersion,
-          latest: latest.gameVersion
+          current: current,
+          latest: latest
         }
       }).afterClosed().pipe(takeUntilDestroyed(this.dr)).subscribe(this.onRefresh.bind(this));
     }

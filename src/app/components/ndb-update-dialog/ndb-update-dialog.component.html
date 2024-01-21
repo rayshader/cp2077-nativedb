@@ -1,0 +1,17 @@
+<h1 mat-dialog-title>Update</h1>
+
+<div mat-dialog-content>
+  @if (canUpdateApp) {
+    <p>A new version of this webapp is available (v{{data.current.appVersion}} to v{{data.latest.appVersion}}).</p>
+  }
+  @if (canUpdateGame) {
+    <p>A new version of the RTTI dump is available (v{{data.current.gameVersion}} to v{{data.latest.gameVersion}}).</p>
+  }
+  <p>Click on "update" or reload this page to install and use the latest version.</p>
+  <p>Make sure to close all browser's tabs which runs this webapp to proceed.</p>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button mat-button [mat-dialog-close]="false">IGNORE</button>
+  <button mat-button [mat-dialog-close]="true">UPDATE</button>
+</div>
