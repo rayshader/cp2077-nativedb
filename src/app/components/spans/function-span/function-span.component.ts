@@ -50,10 +50,19 @@ export class FunctionSpanComponent {
   @Input()
   memberOf?: RedClassAst;
 
-  documentation?: ClassDocumentation;
-
+  /**
+   * Whether grab code feature can be used?
+   */
   @Input()
   canCopy: boolean = true;
+
+  /**
+   * Whether documentation feature can be used?
+   */
+  @Input()
+  canDocument: boolean = false;
+
+  documentation?: ClassDocumentation;
 
   private readonly documentationSubject: BehaviorSubject<ClassDocumentation | undefined> = new BehaviorSubject<ClassDocumentation | undefined>(undefined);
   private readonly documentation$: Observable<ClassDocumentation | undefined> = this.documentationSubject.asObservable();

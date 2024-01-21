@@ -145,6 +145,7 @@
                          [memberOf]="data.object"
                          [documentation]="data.documentation"
                          [canCopy]="true"
+                         [canDocument]="!data.hideDocumentation"
                          [badges]="data.badges"></function-span>
           @if (data.isMobile && i + 1 < data.functions.length) {
             <mat-divider></mat-divider>

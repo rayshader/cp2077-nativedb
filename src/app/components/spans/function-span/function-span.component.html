@@ -1,5 +1,5 @@
 @if (node) {
-  @if (isVisible) {
+  @if (canDocument && isVisible) {
     <ndb-documentation [data]="{documentation: documentation, node: node}"
                        (closed)="hideDocumentation()"></ndb-documentation>
   }
@@ -12,14 +12,16 @@
                 matTooltip="Copy to clipboard"
                 (click)="copyToClipboard()"><mat-icon>content_copy</mat-icon></button>
       }
-      <button mat-icon-button
-              class="badge"
-              matTooltip="Documentation"
-              [class.stx-doc]="hasDocumentation"
-              (click)="toggleDocumentation()"
-              [disabled]="documentation === undefined">
-        <mat-icon>info_outline</mat-icon>
-      </button>
+      @if (canDocument) {
+        <button mat-icon-button
+                class="badge"
+                matTooltip="Documentation"
+                [class.stx-doc]="hasDocumentation"
+                (click)="toggleDocumentation()"
+                [disabled]="documentation === undefined">
+          <mat-icon>info_outline</mat-icon>
+        </button>
+      }
       <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" [matTooltip]="scope"></mat-icon>
       @if (node.isNative) {
         <mat-icon class="badge" svgIcon="native" matTooltip="native"></mat-icon>
