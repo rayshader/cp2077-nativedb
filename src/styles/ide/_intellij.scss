@@ -1,39 +1,47 @@
-/*
- * IDE theme palette of IntelliJ dracula theme.
- */
-@function intellij-theme() {
-  @return (
-    family: #{'JetBrains Mono', monospace},
-    size: 1rem,
+@use 'sass:color';
 
-    light: (
-      background: white,
+@mixin ide-intellij-theme($is-light: true) {
+  @if $is-light {
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap');
 
-      documentation: #6D6D6D,
-      text: black,
-      comma: black,
-      parenthesis: black,
-      language: #0033B3,
-      function: #00627A,
-      argument: black,
-      number: #1750EB,
-      type: black,
-      primitive-type: #0033B3
-    ),
-    dark: (
-      background: #2B2B2B,
-      toolbar: #3C3F41,
+    .ide-intellij-theme {
+      --ndb-ide-typography-family: #{'JetBrains Mono', monospace};
+      --ndb-ide-typography-size: 1rem;
 
-      documentation: #629755,
-      text: #A9B7C6,
-      comma: #CC7832,
-      parenthesis: #A9B7C6,
-      language: #CC7832,
-      function: #FFC66D,
-      argument: #A9B7C6,
-      number: #6897BB,
-      type: #A9B7C6,
-      primitive-type: #CC7832
-    )
-  );
+      --ndb-ide-background: white;
+
+      --ndb-ide-documentation: #6D6D6D;
+      --ndb-ide-text: black;
+      --ndb-ide-comma: var(--ndb-ide-text);
+      --ndb-ide-parenthesis: var(--ndb-ide-text);
+      --ndb-ide-language: #0033B3;
+      --ndb-ide-function: #00627A;
+      --ndb-ide-argument: var(--ndb-ide-text);
+      --ndb-ide-number: #1750EB;
+      --ndb-ide-type: var(--ndb-ide-text);
+      --ndb-ide-type-disabled: #{darken(black, 15%)};
+      --ndb-ide-type-skeleton: #{color.change(black, $alpha: 0.5)};
+      --ndb-ide-primitive-type: var(--ndb-ide-language);
+    }
+  } @else {
+    .ide-intellij-theme {
+      &.dark-theme {
+        --ndb-ide-background: #2B2B2B;
+        --ndb-ide-toolbar: #3C3F41;
+
+        --ndb-ide-documentation: #629755;
+        --ndb-ide-text: #A9B7C6;
+        --ndb-ide-comma: #CC7832;
+        //--ndb-ide-parenthesis: var(--ndb-ide-text);
+        --ndb-ide-language: var(--ndb-ide-comma);
+        --ndb-ide-function: #FFC66D;
+        //--ndb-ide-argument: var(--ndb-ide-text);
+        --ndb-ide-number: #6897BB;
+        //--ndb-ide-type: var(--ndb-ide-text);
+        --ndb-ide-type-disabled: #{darken(#A9B7C6, 15%)};
+        --ndb-ide-type-skeleton: #{color.change(#A9B7C6, $alpha: 0.5)};
+        //--ndb-ide-primitive-type: var(--ndb-ide-language);
+      }
+    }
+  }
 }

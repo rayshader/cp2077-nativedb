@@ -1,0 +1,101 @@
+@use 'sass:map';
+@use 'sass:color';
+
+@mixin rd-ide-typography() {
+  .stx {
+    font-family: var(--ndb-ide-typography-family);
+
+    &:not(h1) {
+      font-size: var(--ndb-ide-typography-size);
+    }
+  }
+}
+
+@mixin rd-ide-background() {
+  .mat-app-background {
+    background-color: var(--ndb-ide-background)!important;
+
+    .mat-toolbar {
+      background-color: var(--ndb-ide-toolbar)!important;
+    }
+
+    & .ide-background {
+      background-color: var(--ndb-ide-background)!important;
+    }
+  }
+}
+
+@mixin rd-ide-theme() {
+  ndb-title-bar {
+    background-color: var(--ndb-ide-background);
+  }
+
+  ndb-documentation,
+  .ndb-documentation {
+    & p {
+      border-left: 2px solid var(--ndb-ide-documentation);
+    }
+
+    & textarea {
+      font-family: var(--ndb-ide-typography-family)!important;
+      color: var(--ndb-ide-documentation)!important;
+      caret-color: var(--ndb-ide-documentation)!important;
+    }
+  }
+
+  .stx-doc {
+    color: var(--ndb-ide-documentation);
+
+    & mat-icon {
+      color: var(--ndb-ide-documentation);
+    }
+  }
+
+  .stx-text {
+    color: var(--ndb-ide-text);
+  }
+
+  .stx-comma {
+    color: var(--ndb-ide-comma);
+  }
+
+  .stx-parenthesis {
+    color: var(--ndb-ide-parenthesis);
+  }
+
+  .stx-lang {
+    color: var(--ndb-ide-language);
+  }
+
+  .stx-function {
+    color: var(--ndb-ide-function);
+
+    &.stx-function-fullname {
+      text-decoration: underline dotted;
+    }
+  }
+
+  .stx-arg {
+    color: var(--ndb-ide-argument);
+  }
+
+  .stx-number {
+    color: var(--ndb-ide-number);
+  }
+
+  .stx-type {
+    color: var(--ndb-ide-type);
+
+    &.disabled {
+      color: var(--ndb-ide-type-disabled);
+    }
+
+    &.skt {
+      background-color: var(--ndb-ide-type-skeleton);
+    }
+  }
+
+  .stx-primitive-type {
+    color: var(--ndb-ide-primitive-type);
+  }
+}

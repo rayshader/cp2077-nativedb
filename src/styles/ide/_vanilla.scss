@@ -1,39 +1,48 @@
-/*
- * IDE theme palette of vanilla theme.
- */
-@function vanilla-theme() {
-  @return (
-    family: #{'Fira Code', monospace},
-    size: 1rem,
+@use 'sass:color';
 
-    light: (
-      background: #F3F4F6,
+@mixin ide-vanilla-theme($is-light: true) {
+  @if $is-light {
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
 
-      documentation: #6D6D6D,
-      text: black,
-      comma: black,
-      parenthesis: black,
-      language: #D32939,
-      function: #6F42C1,
-      argument: black,
-      number: #005CC5,
-      type: #BB4E03,
-      primitive-type: #D32939
-    ),
-    dark: (
-      background: #2B2B2B,
-      toolbar: #161B22,
+    .ide-vanilla-theme {
+      --ndb-ide-typography-family: #{'Fira Code', monospace};
+      --ndb-ide-typography-size: 1rem;
 
-      documentation: #629755,
-      text: #C8C8C8,
-      comma: #C8C8C8,
-      parenthesis: #C8C8C8,
-      language: #FF5667,
-      function: #AF84FF,
-      argument: #C8C8C8,
-      number: #005CC5,
-      type: #FF822E,
-      primitive-type: #FF5667
-    )
-  );
+      --ndb-ide-background: #F3F4F6;
+      --ndb-ide-toolbar: #{darken(#F3F4F6, 10%)};
+
+      --ndb-ide-documentation: #6D6D6D;
+      --ndb-ide-text: black;
+      --ndb-ide-comma: var(--ndb-ide-text);
+      --ndb-ide-parenthesis: var(--ndb-ide-text);
+      --ndb-ide-language: #D32939;
+      --ndb-ide-function: #6F42C1;
+      --ndb-ide-argument: var(--ndb-ide-text);
+      --ndb-ide-number: #005CC5;
+      --ndb-ide-type: #BB4E03;
+      --ndb-ide-type-disabled: #{darken(#BB4E03, 15%)};
+      --ndb-ide-type-skeleton: #{color.change(#BB4E03, $alpha: 0.5)};
+      --ndb-ide-primitive-type: var(--ndb-ide-language);
+    }
+  } @else {
+    .ide-vanilla-theme {
+      &.dark-theme {
+        --ndb-ide-background: #2B2B2B;
+        --ndb-ide-toolbar: #161B22;
+
+        --ndb-ide-documentation: #629755;
+        --ndb-ide-text: #C8C8C8;
+        //--ndb-ide-comma: var(--ndb-ide-text);
+        //--ndb-ide-parenthesis: var(--ndb-ide-text);
+        --ndb-ide-language: #FF5667;
+        --ndb-ide-function: #AF84FF;
+        //--ndb-ide-argument: var(--ndb-ide-text);
+        --ndb-ide-number: #3F99FF;
+        --ndb-ide-type: #FF822E;
+        --ndb-ide-type-disabled: #{darken(#FF822E, 15%)};
+        --ndb-ide-type-skeleton: #{color.change(#FF822E, $alpha: 0.5)};
+        //--ndb-ide-primitive-type: var(--ndb-ide-language);
+      }
+    }
+  }
 }

@@ -1,39 +1,47 @@
-/*
- * IDE theme palette of VS Code modern theme.
- */
-@function vscode-theme() {
-  @return (
-    family: #{Consolas, 'Inconsolata', monospace},
-    size: 1rem,
+@use 'sass:color';
 
-    light: (
-      background: white,
+@mixin ide-vscode-theme($is-light: true) {
+  @if $is-light {
+    @import url('https://fonts.googleapis.com/css2?family=Inconsolata&display=swap');
 
-      documentation: #008000,
-      text: black,
-      comma: black,
-      parenthesis: #31A0AF,
-      language: #0000FF,
-      function: #795E26,
-      argument: #001080,
-      number: #098658,
-      type: #267F99,
-      primitive-type: #267F99
-    ),
-    dark: (
-      background: #1F1F1F,
-      toolbar: #181818,
+    .ide-vscode-theme {
+      --ndb-ide-typography-family: #{Consolas, 'Inconsolata', monospace};
+      --ndb-ide-typography-size: 1rem;
 
-      documentation: #6A9955,
-      text: #C8C8C8,
-      comma: #C8C8C8,
-      parenthesis: #DA5583,
-      language: #569CD6,
-      function: #DCDCAA,
-      argument: #9CDCFE,
-      number: #B5CEA8,
-      type: #4EC9B0,
-      primitive-type: #4EC9B0
-    )
-  );
+      --ndb-ide-background: white;
+
+      --ndb-ide-documentation: #008000;
+      --ndb-ide-text: black;
+      --ndb-ide-comma: var(--ndb-ide-text);
+      --ndb-ide-parenthesis: #31A0AF;
+      --ndb-ide-language: #0000FF;
+      --ndb-ide-function: #795E26;
+      --ndb-ide-argument: #001080;
+      --ndb-ide-number: #098658;
+      --ndb-ide-type: #267F99;
+      --ndb-ide-type-disabled: #{darken(#267F99, 15%)};
+      --ndb-ide-type-skeleton: #{color.change(#267F99, $alpha: 0.5)};
+      --ndb-ide-primitive-type: var(--ndb-ide-type);
+    }
+  } @else {
+    .ide-vscode-theme {
+      &.dark-theme {
+        --ndb-ide-background: #1F1F1F;
+        --ndb-ide-toolbar: #181818;
+
+        --ndb-ide-documentation: #6A9955;
+        --ndb-ide-text: #C8C8C8;
+        //--ndb-ide-comma: var(--ndb-ide-text);
+        --ndb-ide-parenthesis: #DA5583;
+        --ndb-ide-language: #569CD6;
+        --ndb-ide-function: #DCDCAA;
+        --ndb-ide-argument: #9CDCFE;
+        --ndb-ide-number: #B5CEA8;
+        --ndb-ide-type: #4EC9B0;
+        --ndb-ide-type-disabled: #{darken(#4EC9B0, 15%)};
+        --ndb-ide-type-skeleton: #{color.change(#4EC9B0, $alpha: 0.5)};
+        //--ndb-ide-primitive-type: var(--ndb-ide-type);
+      }
+    }
+  }
 }

@@ -1,7 +1,8 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {LazyLoaderService} from "./lazy-loader.service";
+import {Theme, ThemeService} from "./theme.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {LazyLoaderService} from "./lazy-loader.service";
 
 export enum IDETheme {
   vanilla,
@@ -14,51 +15,29 @@ export interface IDEThemeChanged {
   current: IDETheme;
 }
 
-interface IDEItem {
-  theme: IDETheme;
-  isLoaded: boolean;
-  font?: string;
-}
-
 @Injectable({
   providedIn: 'root'
 })
 export class IDEThemeService {
   private theme: BehaviorSubject<IDEThemeChanged> = new BehaviorSubject<IDEThemeChanged>({
-    old: IDETheme.vscode,
-    current: IDETheme.vscode,
+    old: IDETheme.vanilla,
+    current: IDETheme.vanilla,
   });
-  private currentTheme: IDETheme = IDETheme.vscode;
+  private currentTheme: IDETheme = IDETheme.vanilla;
+  private isDarkLoaded: boolean = false;
 
-  private readonly themes: IDEItem[] = [
-    {
-      theme: IDETheme.vanilla,
-      isLoaded: false,
-      font: 'https://fonts.googleapis.com/css2?family=Fira+Code&display=swap'
-    },
-    {
-      theme: IDETheme.vscode,
-      isLoaded: false,
-      font: 'https://fonts.googleapis.com/css2?family=Inconsolata&display=swap'
-    },
-    {
-      theme: IDETheme.intellij,
-      isLoaded: false,
-      font: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap'
-    }
-  ];
-
-  constructor(private readonly lazyLoaderService: LazyLoaderService) {
-    this.onThemeChanged.pipe(takeUntilDestroyed()).subscribe(this.load.bind(this));
+  constructor(private readonly themeService: ThemeService,
+              private readonly lazyLoaderService: LazyLoaderService) {
     const localIdeTheme: string | null = localStorage.getItem('ide-theme');
     let ideTheme: IDETheme;
 
     if (!localIdeTheme) {
-      ideTheme = IDETheme.vscode;
+      ideTheme = IDETheme.vanilla;
     } else {
       ideTheme = +localIdeTheme;
     }
     this.updateTheme(ideTheme);
+    this.themeService.onThemeChanged.pipe(takeUntilDestroyed()).subscribe(this.onThemeModeChanged.bind(this));
   }
 
   public get onThemeChanged(): Observable<IDEThemeChanged> {
@@ -66,7 +45,7 @@ export class IDEThemeService {
   }
 
   /**
-   * Update IDE theme and emit it. Lazy load IDE theme when required.
+   * Update IDE theme and emit changes with old and new value.
    */
   public updateTheme(theme: IDETheme): void {
     const oldTheme: IDETheme = this.currentTheme;
@@ -79,19 +58,11 @@ export class IDEThemeService {
     localStorage.setItem('ide-theme', `${theme}`);
   }
 
-  private load(event: IDEThemeChanged): void {
-    const item: IDEItem | undefined = this.themes.find((item) => item.theme === event.current);
-
-    if (!item) {
+  private onThemeModeChanged(theme: Theme): void {
+    if (theme === 'light-theme' || this.isDarkLoaded) {
       return;
     }
-    if (item.isLoaded) {
-      return;
-    }
-    this.lazyLoaderService.loadStylesheet(`ide-${IDETheme[item.theme]}-theme`)
-    if (item.font) {
-      this.lazyLoaderService.loadFont(item.font);
-    }
-    item.isLoaded = true;
+    this.lazyLoaderService.loadStylesheet('dark-ide-theme');
+    this.isDarkLoaded = true;
   }
 }

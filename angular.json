@@ -40,23 +40,17 @@
                 "bundleName": "light-theme"
               },
               {
+                "input": "src/styles/rd-light-ide-theme.scss",
+                "bundleName": "light-ide-theme"
+              },
+              {
                 "input": "src/styles/rd-dark-theme.scss",
                 "bundleName": "dark-theme",
                 "inject": false
               },
               {
-                "input": "src/styles/rd-vscode-theme.scss",
-                "bundleName": "ide-vscode-theme",
-                "inject": false
-              },
-              {
-                "input": "src/styles/rd-intellij-theme.scss",
-                "bundleName": "ide-intellij-theme",
-                "inject": false
-              },
-              {
-                "input": "src/styles/rd-vanilla-theme.scss",
-                "bundleName": "ide-vanilla-theme",
+                "input": "src/styles/rd-dark-ide-theme.scss",
+                "bundleName": "dark-ide-theme",
                 "inject": false
               }
             ],
