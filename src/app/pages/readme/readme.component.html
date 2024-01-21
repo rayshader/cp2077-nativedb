@@ -63,7 +63,7 @@
   </p>
 
   @if (getGameInstance$ | async; as func) {
-    <function-span [node]="func" [canCopy]="false"></function-span>
+    <function-span [node]="func" [canCopy]="false" [canShare]="false"></function-span>
   }
 
   <p>
@@ -101,7 +101,7 @@
   </p>
 
   @if (addFact$ | async; as func) {
-    <function-span [node]="func" [canCopy]="false"></function-span>
+    <function-span [node]="func" [canCopy]="false" [canShare]="false"></function-span>
   }
 
   <p>
@@ -119,7 +119,7 @@
 
   <p>
     You can reference any part of this database using the URL in your browser. All URIs are unique and will always point
-    to the same content.
+    to the same content. You can also directly reference a function of a class/struct.
   </p>
 </article>
 
