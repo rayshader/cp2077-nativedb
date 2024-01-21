@@ -1,24 +1,20 @@
 @mixin highlight-theme($theme) {
-  %highlight {
-    position: relative;
-    top: -2px;
-    left: -4px;
-    padding: 2px 4px;
+  $color: rgba(0, 0, 0, 0.1);
 
+  %highlight {
     border-radius: 4px;
 
     @media (min-width: 1024px) {
-      height: 24px;
+      min-height: 24px;
     }
   }
 
   enum,
   bitfield {
     & .highlight {
-      position: relative;
+      @extend %highlight;
 
-      background-color: rgba(0, 0, 0, 0.1);
-      border-radius: 4px;
+      background-color: $color;
     }
   }
 
@@ -27,7 +23,7 @@
       @extend %highlight;
 
       &.highlight {
-        background-color: rgba(0, 0, 0, 0.1);
+        background-color: $color;
       }
     }
 
@@ -36,7 +32,7 @@
         & .content {
           @extend %highlight;
 
-          background-color: rgba(0, 0, 0, 0.1);
+          background-color: $color;
         }
       }
     }
@@ -44,24 +40,26 @@
 }
 
 @mixin highlight-color($theme) {
+  $color: rgba(255, 255, 255, 0.1);
+
   enum,
   bitfield {
     & .highlight {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: $color;
     }
   }
 
   object {
     & property-span {
       &.highlight {
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: $color;
       }
     }
 
     & function-span {
       &.highlight {
         & .content {
-          background-color: rgba(255, 255, 255, 0.1);
+          background-color: $color;
         }
       }
     }
