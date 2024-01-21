@@ -1,6 +1,7 @@
 @if (data$ | async; as data) {
   <ndb-title-bar [title]="data.object.name"
                  [node]="data.object"
+                 [hideDocumentation]="data.hideDocumentation"
                  [hasDocumentation]="data.hasBodyDocumentation"
                  (toggleDocumentation)="toggleDocumentation()">
     <mat-icon class="badge" [attr.data-scope]="data.scope" svgIcon="scope" [matTooltip]="data.scope"></mat-icon>
@@ -155,7 +156,10 @@
 } @else {
   <div class="actions">
     <span class="skt-circle"></span>
-    <span class="skt-circle"></span>
+    @if (isMobile$ | async; as isMobile) {
+    } @else {
+      <span class="skt-circle"></span>
+    }
     <span class="skt-circle"></span>
     <span class="skt-circle"></span>
   </div>

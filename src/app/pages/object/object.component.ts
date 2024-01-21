@@ -56,6 +56,7 @@ interface ObjectData {
   readonly align: string;
 
   readonly documentation: ClassDocumentation;
+  readonly hideDocumentation: boolean;
   readonly hasBodyDocumentation: boolean;
 
   readonly isMobile: boolean;
@@ -149,6 +150,8 @@ export class ObjectComponent {
   data$: Observable<ObjectData | undefined> = EMPTY;
   showDocumentation: boolean = false;
 
+  protected readonly isMobile$: Observable<boolean>;
+
   protected readonly kind: RedNodeKind;
 
   protected readonly classKind: RedNodeKind = RedNodeKind.class;
@@ -175,6 +178,7 @@ export class ObjectComponent {
               private readonly route: ActivatedRoute,
               private readonly dr: DestroyRef) {
     this.kind = (this.route.snapshot.data as any).kind;
+    this.isMobile$ = this.responsiveService.mobile$;
   }
 
   @Input()
@@ -252,7 +256,8 @@ export class ObjectComponent {
           badges: badges,
           align: `${72 + badges * 24 + 12 - 30}px`,
           documentation: documentation,
-          hasBodyDocumentation: documentation.body !== undefined,
+          hideDocumentation: isMobile,
+          hasBodyDocumentation: !isMobile && documentation.body !== undefined,
           isMobile: isMobile,
           isPinned: settings.isBarPinned,
           showParents: parents.length > 0 || showEmptyAccordion,
