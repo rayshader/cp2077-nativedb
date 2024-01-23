@@ -1,6 +1,6 @@
 @if (mode == 'view') {
   <p class="stx stx-doc"
-     title="Double-click to edit"
+     matTooltip="Double-click to edit"
      (click)="onLinkClicked($event)"
      (dblclick)="mode = 'edit'"
      [innerHTML]="body | ndbFormatDocumentation"></p>
@@ -16,7 +16,7 @@
 
   <div class="actions">
     <button mat-icon-button
-            title="Guidelines"
+            matTooltip="Guidelines"
             (click)="openGuidelines()">
       <mat-icon>help_outline</mat-icon>
     </button>
@@ -24,21 +24,21 @@
     @if (!isEmpty) {
       <button mat-icon-button
               color="warn"
-              title="Delete"
+              [matTooltip]="deleteTitle"
               (click)="delete()">
         <mat-icon>delete</mat-icon>
       </button>
     }
 
     <button mat-icon-button
-            title="Cancel"
+            matTooltip="Cancel"
             (click)="cancel()">
       <mat-icon>clear</mat-icon>
     </button>
 
     <button mat-icon-button
             color="primary"
-            title="Save"
+            matTooltip="Save"
             (click)="save()"
             [disabled]="saveDisabled">
       <mat-icon>check</mat-icon>

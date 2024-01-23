@@ -14,6 +14,7 @@ import {NDBFormatDocumentationPipe} from "../../pipes/ndb-format-documentation.p
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {firstValueFrom} from "rxjs";
 import {Router} from "@angular/router";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 export interface DocumentationData {
   readonly documentation?: ClassDocumentation;
@@ -31,6 +32,7 @@ type Mode = 'view' | 'edit';
     MatIconModule,
     MatInputModule,
     MatButtonModule,
+    MatTooltipModule,
     MatFormFieldModule,
     NDBFormatDocumentationPipe
   ],
