@@ -26,7 +26,11 @@
               color="warn"
               [matTooltip]="deleteTitle"
               (click)="delete()">
-        <mat-icon>delete</mat-icon>
+        @if (deleteStatus) {
+          <mat-icon svgIcon="delete-empty"></mat-icon>
+        } @else {
+          <mat-icon>delete</mat-icon>
+        }
       </button>
     }
 

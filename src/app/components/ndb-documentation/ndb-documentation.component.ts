@@ -50,6 +50,7 @@ export class NDBDocumentationComponent {
   mode: Mode = 'view';
   body: string = '';
   isChanged: boolean = false;
+  deleteStatus: boolean = false;
 
   readonly form: FormGroup = new FormGroup({
     input: new FormControl('')
@@ -85,6 +86,10 @@ export class NDBDocumentationComponent {
 
   protected get input(): AbstractControl<string> {
     return this.form.get('input')!;
+  }
+
+  protected get deleteTitle(): string {
+    return this.deleteStatus ? 'Confirm' : 'Delete';
   }
 
   protected get saveDisabled(): boolean {
@@ -127,16 +132,22 @@ export class NDBDocumentationComponent {
     if (!this.documentation) {
       return;
     }
+    if (!this.deleteStatus) {
+      this.deleteStatus = true;
+      return;
+    }
     if (this.main) {
       await this.deleteMain();
     } else if (this.node) {
       await this.deleteMember();
     }
+    this.deleteStatus = false;
   }
 
   cancel(): void {
     this.input.setValue(this.body, {emitEvent: false});
     this.isChanged = false;
+    this.deleteStatus = false;
     this.mode = 'view';
     if (this.body.length === 0) {
       this.closed.emit();
@@ -153,6 +164,7 @@ export class NDBDocumentationComponent {
       await this.saveMember();
     }
     this.isChanged = false;
+    this.deleteStatus = false;
   }
 
   private onChanged(value: string): void {
