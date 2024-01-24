@@ -36,7 +36,7 @@ describe('SettingsService', () => {
       tabsWidth: 320,
       isBarPinned: true,
       clipboardSyntax: CodeSyntax.redscript,
-      codeSyntax: CodeSyntax.redscript
+      codeSyntax: CodeSyntax.vanilla
     });
   });
 
@@ -53,7 +53,7 @@ describe('SettingsService', () => {
       'tabs-width': 400,
       'is-bar-pinned': false,
       'clipboard-syntax': CodeSyntax.lua,
-      'code-syntax': CodeSyntax.vanilla
+      'code-syntax': CodeSyntax.redscript
     });
 
     // WHEN
@@ -73,7 +73,7 @@ describe('SettingsService', () => {
       tabsWidth: 400,
       isBarPinned: false,
       clipboardSyntax: CodeSyntax.lua,
-      codeSyntax: CodeSyntax.vanilla
+      codeSyntax: CodeSyntax.redscript
     });
   });
 
