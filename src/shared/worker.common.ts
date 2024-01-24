@@ -1,7 +1,10 @@
 export enum NDBCommand {
   ready,
   import,
-  export
+  export,
+
+  importError,
+  exportError
 }
 
 export interface NDBMessage {

@@ -34,19 +34,33 @@ addEventListener('message', (event: MessageEvent) => {
 });
 
 function importDocumentation(buffer: Uint8Array): void {
-  const data: ClassDocumentation[] = parser.read(buffer);
+  try {
+    const data: ClassDocumentation[] = parser.read(buffer);
 
-  postMessage(<NDBMessage>{
-    command: NDBCommand.import,
-    data: data
-  });
+    postMessage(<NDBMessage>{
+      command: NDBCommand.import,
+      data: data
+    });
+  } catch (error) {
+    postMessage(<NDBMessage>{
+      command: NDBCommand.importError,
+      data: error
+    });
+  }
 }
 
 function exportDocumentation(data: ClassDocumentation[]): void {
-  const file: Blob = parser.write(data);
+  try {
+    const file: Blob = parser.write(data);
 
-  postMessage(<NDBMessage>{
-    command: NDBCommand.export,
-    data: file
-  });
+    postMessage(<NDBMessage>{
+      command: NDBCommand.export,
+      data: file
+    });
+  } catch (error) {
+    postMessage(<NDBMessage>{
+      command: NDBCommand.exportError,
+      data: error
+    });
+  }
 }

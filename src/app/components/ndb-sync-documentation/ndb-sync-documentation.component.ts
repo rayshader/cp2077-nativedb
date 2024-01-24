@@ -9,6 +9,7 @@ import {Router, RouterLink} from "@angular/router";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {NDBCommand, NDBCommandHandler, NDBMessage} from "../../../shared/worker.common";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {MatSnackBar} from "@angular/material/snack-bar";
 
 @Component({
   selector: 'ndb-sync-documentation',
@@ -40,10 +41,14 @@ export class NDBSyncDocumentationComponent implements OnInit {
     {command: NDBCommand.ready, fn: this.onWorkerReady.bind(this)},
     {command: NDBCommand.export, fn: this.onWorkerExport.bind(this)},
     {command: NDBCommand.import, fn: this.onWorkerImport.bind(this)},
+
+    {command: NDBCommand.importError, fn: this.onWorkerImportFailed.bind(this)},
+    {command: NDBCommand.exportError, fn: this.onWorkerExportFailed.bind(this)},
   ];
 
   constructor(private readonly documentationService: DocumentationService,
               private readonly documentationParser: DocumentationParser,
+              private readonly toast: MatSnackBar,
               private readonly router: Router,
               private readonly dr: DestroyRef) {
   }
@@ -80,9 +85,13 @@ export class NDBSyncDocumentationComponent implements OnInit {
     const buffer: Uint8Array = new Uint8Array(await file.arrayBuffer());
 
     if (this.isReady === 'sync') {
-      const data: ClassDocumentation[] = this.documentationParser.read(buffer);
+      try {
+        const data: ClassDocumentation[] = this.documentationParser.read(buffer);
 
-      this.onWorkerImport(data);
+        this.onWorkerImport(data);
+      } catch (error) {
+        this.onWorkerImportFailed(error);
+      }
       return;
     }
     this.worker!.postMessage(<NDBMessage>{
@@ -94,9 +103,13 @@ export class NDBSyncDocumentationComponent implements OnInit {
   private onExport(data: ClassDocumentation[]): void {
     this.isLoading = true;
     if (this.isReady === 'sync') {
-      const file: Blob = this.documentationParser.write(data);
+      try {
+        const file: Blob = this.documentationParser.write(data);
 
-      this.onWorkerExport(file);
+        this.onWorkerExport(file);
+      } catch (error) {
+        this.onWorkerExportFailed(error);
+      }
       return;
     }
     this.worker!.postMessage(<NDBMessage>{
@@ -145,5 +158,24 @@ export class NDBSyncDocumentationComponent implements OnInit {
   private onWorkerImport(data: ClassDocumentation[]): void {
     this.isLoading = false;
     this.router.navigate(['import'], {state: data, skipLocationChange: true});
+  }
+
+  private onWorkerExportFailed(error: any): void {
+    let message: string = 'Failed to export your documentation. Please report this issue.';
+
+    this.toast.open(message, undefined, {duration: 3000});
+    this.isLoading = false;
+  }
+
+  private onWorkerImportFailed(error: any): void {
+    let message: string = 'Failed to import this file. Please report this issue with your file in attachment.';
+
+    if (typeof error === 'string' && error.includes('kind: UnexpectedEof')) {
+      message = 'Failed to import this file. Unable to decompress with Brotli.';
+    } else if (error instanceof SyntaxError) {
+      message = 'Failed to import this file. Unable to read JSON data.';
+    }
+    this.toast.open(message, undefined, {duration: 3000});
+    this.isLoading = false;
   }
 }
