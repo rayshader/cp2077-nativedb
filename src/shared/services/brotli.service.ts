@@ -2,7 +2,6 @@ import {Injectable} from "@angular/core";
 
 interface Brotli {
   compress(buffer: Uint8Array): Uint8Array;
-
   decompress(buffer: Uint8Array): Uint8Array;
 }
 
