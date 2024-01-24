@@ -10,12 +10,14 @@ import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar
 import {RecentVisitService} from "../../../shared/services/recent-visit.service";
 import {cyrb53} from "../../../shared/string";
 import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
+import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
   selector: 'bitfield',
   standalone: true,
   imports: [
     AsyncPipe,
+    MatTooltip,
     MatIconModule,
     MatButtonModule,
     NDBTitleBarComponent,

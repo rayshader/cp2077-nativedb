@@ -8,6 +8,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
 import {MatDividerModule} from "@angular/material/divider";
 import {ResponsiveService} from "../../../shared/services/responsive.service";
+import {MatTooltip} from "@angular/material/tooltip";
 
 interface FunctionsData {
   readonly functions: RedFunctionAst[];
@@ -19,6 +20,7 @@ interface FunctionsData {
   standalone: true,
   imports: [
     AsyncPipe,
+    MatTooltip,
     MatIconModule,
     MatDividerModule,
     FunctionSpanComponent,
