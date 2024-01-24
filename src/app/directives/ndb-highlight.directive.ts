@@ -22,7 +22,7 @@ export class NDBHighlightDirective {
   get isHighlight(): boolean {
     const fragment: number = parseInt(this.route.snapshot.fragment ?? '-1');
 
-    return fragment === this.id ?? -1;
+    return fragment === this.id;
   }
 
   @HostListener('mouseenter')
