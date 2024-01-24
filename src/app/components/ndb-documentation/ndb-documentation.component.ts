@@ -14,6 +14,8 @@ import {NDBFormatDocumentationPipe} from "../../pipes/ndb-format-documentation.p
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {firstValueFrom} from "rxjs";
 import {Router} from "@angular/router";
+import {MatDialog} from "@angular/material/dialog";
+import {NDBGuidelinesDialogComponent} from "../ndb-guidelines-dialog/ndb-guidelines-dialog.component";
 import {MatTooltipModule} from "@angular/material/tooltip";
 
 export interface DocumentationData {
@@ -61,6 +63,7 @@ export class NDBDocumentationComponent {
   private node?: RedFunctionAst;
 
   constructor(private readonly documentationService: DocumentationService,
+              private readonly dialog: MatDialog,
               private readonly router: Router) {
     this.input.valueChanges.pipe(takeUntilDestroyed()).subscribe(this.onChanged.bind(this));
   }
@@ -125,7 +128,7 @@ export class NDBDocumentationComponent {
   }
 
   openGuidelines(): void {
-    // TODO: add business logic
+    this.dialog.open(NDBGuidelinesDialogComponent, NDBGuidelinesDialogComponent.Config);
   }
 
   async delete(): Promise<void> {

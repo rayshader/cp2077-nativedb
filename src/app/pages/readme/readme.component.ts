@@ -12,6 +12,8 @@ import {cyrb53} from "../../../shared/string";
 import {PageService} from "../../../shared/services/page.service";
 import {MatChipsModule} from "@angular/material/chips";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {MatDialog} from "@angular/material/dialog";
+import {NDBGuidelinesDialogComponent} from "../../components/ndb-guidelines-dialog/ndb-guidelines-dialog.component";
 
 @Component({
   selector: 'readme',
@@ -36,13 +38,18 @@ export class ReadmeComponent implements OnInit {
   readonly id: number = cyrb53('ScriptGameInstance');
 
   constructor(private readonly dumpService: RedDumpService,
-              private readonly pageService: PageService) {
+              private readonly pageService: PageService,
+              private readonly dialog: MatDialog) {
     this.getGameInstance$ = this.dumpService.functions$.pipe(this.getGameInstance());
     this.addFact$ = this.dumpService.functions$.pipe(this.getAddFact());
   }
 
   ngOnInit(): void {
     this.pageService.restoreScroll();
+  }
+
+  openGuidelines(): void {
+    this.dialog.open(NDBGuidelinesDialogComponent, NDBGuidelinesDialogComponent.Config);
   }
 
   private getGameInstance(): OperatorFunction<RedFunctionAst[], RedFunctionAst | undefined> {
