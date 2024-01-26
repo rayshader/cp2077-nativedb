@@ -138,7 +138,8 @@
                     (click)="resetFunctionsFilter()">highlight_off</mat-icon>
         </div>
 
-        @for (func of data.functions; track func.id; let i = $index) {
+        <!-- NOTE: tracking with id will crash webapp when filtering per badge several times. -->
+        @for (func of data.functions; track func.fullName; let i = $index) {
           <function-span ndbHighlight
                          [id]="cyrb53(func.name)"
                          [node]="func"
