@@ -40,11 +40,11 @@ export class RedDumpService {
               private readonly settingsService: SettingsService) {
     this.enums$ = this.http.get(`/assets/reddump/enums.json`).pipe(
       map((json: any) => json.map(RedEnumAst.fromJson)),
-      shareReplay()
+      shareReplay(1)
     );
     this.bitfields$ = this.http.get(`/assets/reddump/bitfields.json`).pipe(
       map((json: any) => json.map(RedBitfieldAst.fromJson)),
-      shareReplay()
+      shareReplay(1)
     );
     const classes$: Observable<RedClassAst[]> = this.http.get(`/assets/reddump/classes.json`).pipe(
       map((json: any) => json.map(RedClassAst.fromJson)),
@@ -55,17 +55,16 @@ export class RedDumpService {
           object.functions.sort(RedFunctionAst.sort);
         });
         return objects;
-      }),
-      shareReplay()
+      })
     );
 
     this.classes$ = classes$.pipe(
       map((objects) => objects.filter((object) => !object.isStruct)),
-      shareReplay()
+      shareReplay(1)
     );
     this.structs$ = classes$.pipe(
-      map((objects) => objects.filter((object: RedClassAst) => object.isStruct)),
-      shareReplay()
+      map((objects) => objects.filter((object) => object.isStruct)),
+      shareReplay(1)
     );
     this.functions$ = this.http.get(`/assets/reddump/globals.json`).pipe(
       map((json: any) => json.map(RedFunctionAst.fromJson)),
@@ -73,7 +72,7 @@ export class RedDumpService {
         functions.sort(RedFunctionAst.sort);
         return functions;
       }),
-      shareReplay(),
+      shareReplay(1),
       this.ignoreDuplicate(),
     );
     this.badges$ = combineLatest([this.classes$, this.structs$]).pipe(
@@ -86,7 +85,7 @@ export class RedDumpService {
         return Math.max(props, funcs);
       }),
       reduce(this.getMax),
-      shareReplay(),
+      shareReplay(1),
     );
     this.nodes$ = zip([
       this.enums$,
@@ -102,7 +101,7 @@ export class RedDumpService {
         ...data[3] as RedNodeAst[],
         ...data[4] as RedNodeAst[],
       ]),
-      shareReplay()
+      shareReplay(1)
     );
   }
 
