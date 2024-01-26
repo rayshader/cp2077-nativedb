@@ -162,9 +162,13 @@ export class ObjectComponent {
 
   protected readonly cyrb53 = cyrb53;
 
+  protected disableResetFilterProperties: boolean = false;
+  protected isPropertiesFiltered: boolean = false;
+  protected disableResetFilterFunctions: boolean = false;
+  protected isFunctionsFiltered: boolean = false;
+
   private readonly isDocumentedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private readonly isDocumented$: Observable<boolean> = this.isDocumentedSubject.asObservable();
-
   private readonly filterBadgesSubject: BehaviorSubject<void> = new BehaviorSubject<void>(undefined);
   private readonly filterBadges$: Observable<void> = this.filterBadgesSubject.asObservable();
 
@@ -199,16 +203,17 @@ export class ObjectComponent {
         return EMPTY;
       }),
       map((object) => object as RedClassAst),
-      shareReplay()
+      shareReplay(1)
     );
-    const parents$ = object$.pipe(this.getParents(), shareReplay());
-    const children$ = object$.pipe(this.getChildren(), shareReplay());
-    const documentation$ = object$.pipe(this.getDocumentation(), shareReplay());
+    const parents$ = object$.pipe(this.getParents(), shareReplay(1));
+    const children$ = object$.pipe(this.getChildren(), shareReplay(1));
+    const documentation$ = object$.pipe(this.getDocumentation(), shareReplay(1));
 
     combineLatest([
       this.settingsService.showDocumentation$,
       documentation$,
     ]).pipe(takeUntilDestroyed(this.dr)).subscribe(this.onShowDocumentation.bind(this));
+
     this.data$ = combineLatest([
       object$,
       parents$,
@@ -217,7 +222,7 @@ export class ObjectComponent {
       this.isDocumented$,
       this.dumpService.badges$,
       this.settingsService.settings$,
-      this.responsiveService.mobile$,
+      this.isMobile$,
       this.filterBadges$
     ]).pipe(
       map(([
@@ -269,22 +274,6 @@ export class ObjectComponent {
     );
   }
 
-  protected get disableResetFilterProperties(): boolean {
-    return this.badgesProperty.filter((badge) => badge.isEnabled).length === this.badgesProperty.length;
-  }
-
-  protected get disableResetFilterFunctions(): boolean {
-    return this.badgesFunction.filter((badge) => badge.isEnabled).length === this.badgesFunction.length;
-  }
-
-  protected get isFunctionsFiltered(): boolean {
-    return this.badgesFunction.filter((badge) => badge.isEnabled).length === 1;
-  }
-
-  protected get isPropertiesFiltered(): boolean {
-    return this.badgesProperty.filter((badge) => badge.isEnabled).length === 1;
-  }
-
   changeDocumentation(isDocumented: boolean): void {
     this.isDocumentedSubject.next(isDocumented);
   }
@@ -296,22 +285,30 @@ export class ObjectComponent {
   togglePropertyFilter(badge: BadgeFilterItem<RedPropertyAst>): void {
     this.badgesProperty.forEach((badge) => badge.isEnabled = false);
     badge.isEnabled = !badge.isEnabled;
+    this.disableResetFilterProperties = this.badgesProperty.filter((badge) => badge.isEnabled).length === this.badgesProperty.length;
+    this.isPropertiesFiltered = this.badgesProperty.filter((badge) => badge.isEnabled).length === 1;
+    this.filterBadgesSubject.next();
+  }
+
+  resetPropertiesFilter(): void {
+    this.badgesProperty.forEach((badge) => badge.isEnabled = true);
+    this.disableResetFilterProperties = this.badgesProperty.filter((badge) => badge.isEnabled).length === this.badgesProperty.length;
+    this.isPropertiesFiltered = this.badgesProperty.filter((badge) => badge.isEnabled).length === 1;
     this.filterBadgesSubject.next();
   }
 
   toggleFunctionFilter(badge: BadgeFilterItem<RedFunctionAst>): void {
     this.badgesFunction.forEach((badge) => badge.isEnabled = false);
     badge.isEnabled = !badge.isEnabled;
-    this.filterBadgesSubject.next();
-  }
-
-  resetPropertiesFilter(): void {
-    this.badgesProperty.forEach((badge) => badge.isEnabled = true);
+    this.disableResetFilterFunctions = this.badgesFunction.filter((badge) => badge.isEnabled).length === this.badgesFunction.length;
+    this.isFunctionsFiltered = this.badgesFunction.filter((badge) => badge.isEnabled).length === 1;
     this.filterBadgesSubject.next();
   }
 
   resetFunctionsFilter(): void {
     this.badgesFunction.forEach((badge) => badge.isEnabled = true);
+    this.disableResetFilterFunctions = this.badgesFunction.filter((badge) => badge.isEnabled).length === this.badgesFunction.length;
+    this.isFunctionsFiltered = this.badgesFunction.filter((badge) => badge.isEnabled).length === 1;
     this.filterBadgesSubject.next();
   }
 
