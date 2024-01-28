@@ -16,6 +16,18 @@
 
 <div class="setting">
   <p>
+    Show all definitions or only Redscript definitions.
+  </p>
+
+  <mat-slide-toggle color="primary" [formControl]="scriptOnly">
+    {{scriptOnly.value ? "Redscript only" : "All"}}
+  </mat-slide-toggle>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="setting">
+  <p>
     Select automatic scrolling behavior when navigating to a new page.
   </p>
 

@@ -44,6 +44,7 @@ export class SettingsComponent implements OnInit {
   ];
 
   readonly ignoreDuplicate: FormControl<boolean | null> = new FormControl(true);
+  readonly scriptOnly: FormControl<boolean | null> = new FormControl(false);
   readonly scrollBehavior: FormControl<PageScrollBehavior | null> = new FormControl('smooth');
   readonly showDocumentation: FormControl<boolean | null> = new FormControl(true);
   readonly highlightEmptyObject: FormControl<boolean | null> = new FormControl(true);
@@ -60,6 +61,7 @@ export class SettingsComponent implements OnInit {
     this.settingsService.settings$.pipe(take(1), takeUntilDestroyed(this.dr)).subscribe(this.onSettingsLoaded.bind(this));
 
     this.ignoreDuplicate.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onIgnoreDuplicateChanged.bind(this));
+    this.scriptOnly.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onScriptOnlyChanged.bind(this));
     this.scrollBehavior.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onScrollBehaviorChanged.bind(this));
     this.showDocumentation.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onShowDocumentationChanged.bind(this));
     this.highlightEmptyObject.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onHighlightEmptyObjectChanged.bind(this));
@@ -74,6 +76,13 @@ export class SettingsComponent implements OnInit {
       return;
     }
     this.settingsService.updateIgnoreDuplicate(state);
+  }
+
+  private onScriptOnlyChanged(state: boolean | null): void {
+    if (state === null) {
+      return;
+    }
+    this.settingsService.updateScriptOnly(state);
   }
 
   private onScrollBehaviorChanged(behavior: ScrollBehavior | 'disabled' | null): void {
@@ -127,6 +136,7 @@ export class SettingsComponent implements OnInit {
 
   private onSettingsLoaded(settings: Settings): void {
     this.ignoreDuplicate.setValue(settings.ignoreDuplicate, {emitEvent: false});
+    this.scriptOnly.setValue(settings.scriptOnly, {emitEvent: false});
     this.scrollBehavior.setValue(settings.scrollBehavior, {emitEvent: false});
     this.showDocumentation.setValue(settings.showDocumentation, {emitEvent: false});
     this.highlightEmptyObject.setValue(settings.highlightEmptyObject, {emitEvent: false});

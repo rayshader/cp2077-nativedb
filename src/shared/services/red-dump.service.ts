@@ -21,6 +21,7 @@ import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedPropertyAst} from "../red-ast/red-property.ast";
 import {SettingsService} from "./settings.service";
 import {cyrb53} from "../string";
+import {RedOriginDef} from "../red-ast/red-definitions.ast";
 
 @Injectable({
   providedIn: 'root'
@@ -60,11 +61,13 @@ export class RedDumpService {
 
     this.classes$ = objects$.pipe(
       map((objects) => objects.filter((object) => !object.isStruct)),
-      shareReplay(1)
+      shareReplay(1),
+      this.scriptOnly()
     );
     this.structs$ = objects$.pipe(
       map((objects) => objects.filter((object) => object.isStruct)),
-      shareReplay(1)
+      shareReplay(1),
+      this.scriptOnly()
     );
     this.functions$ = this.http.get(`/assets/reddump/globals.json`).pipe(
       map((json: any) => json.map(RedFunctionAst.fromJson)),
@@ -194,6 +197,18 @@ export class RedDumpService {
         return functions.filter((func) => {
           return !func.name.startsWith('Operator') && !func.name.startsWith('Cast');
         });
+      })
+    );
+  }
+
+  private scriptOnly(): OperatorFunction<RedClassAst[], RedClassAst[]> {
+    return pipe(
+      combineLatestWith(this.settingsService.scriptOnly$),
+      map(([objects, scriptOnly]) => {
+        if (!scriptOnly) {
+          return objects;
+        }
+        return objects.filter((object) => object.origin === RedOriginDef.script);
       })
     );
   }

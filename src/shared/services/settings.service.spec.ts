@@ -28,6 +28,7 @@ describe('SettingsService', () => {
     expect(service.isFirstUsage).toBeTruthy();
     expect(settings).toEqual(<Settings>{
       ignoreDuplicate: true,
+      scriptOnly: false,
       scrollBehavior: 'smooth',
       showDocumentation: true,
       highlightEmptyObject: true,
@@ -45,6 +46,7 @@ describe('SettingsService', () => {
     storageMock.mockItems({
       'first-usage': false,
       'ignore-duplicate': false,
+      'script-only': false,
       'scroll-behavior': 'disabled',
       'show-documentation': false,
       'highlight-empty-object': true,
@@ -65,6 +67,7 @@ describe('SettingsService', () => {
     expect(service.isFirstUsage).toBeFalsy();
     expect(settings).toEqual(<Settings>{
       ignoreDuplicate: false,
+      scriptOnly: false,
       scrollBehavior: 'disabled',
       showDocumentation: false,
       highlightEmptyObject: true,
@@ -81,6 +84,7 @@ describe('SettingsService', () => {
     // GIVEN
     storageMock.mockItems({
       'ignore-duplicate': true,
+      'script-only': true,
       'scroll-behavior': 'instant',
       'show-documentation': true,
       'highlight-empty-object': false,
@@ -98,6 +102,7 @@ describe('SettingsService', () => {
     // THEN
     const settings = await firstValueFrom(combineLatest([
       service.ignoreDuplicate$,
+      service.scriptOnly$,
       service.scrollBehavior$,
       service.showDocumentation$,
       service.highlightEmptyObject$,
@@ -111,21 +116,23 @@ describe('SettingsService', () => {
       map((data) => {
         return {
           ignoreDuplicate: data[0],
-          scrollBehavior: data[1],
-          showDocumentation: data[2],
-          highlightEmptyObject: data[3],
-          showEmptyAccordion: data[4],
-          mergeObject: data[5],
-          tabsWidth: data[6],
-          isBarPinned: data[7],
-          clipboardSyntax: data[8],
-          codeSyntax: data[9]
+          scriptOnly: data[1],
+          scrollBehavior: data[2],
+          showDocumentation: data[3],
+          highlightEmptyObject: data[4],
+          showEmptyAccordion: data[5],
+          mergeObject: data[6],
+          tabsWidth: data[7],
+          isBarPinned: data[8],
+          clipboardSyntax: data[9],
+          codeSyntax: data[10]
         };
       })
     ));
 
     expect(settings).toEqual({
       ignoreDuplicate: true,
+      scriptOnly: true,
       scrollBehavior: 'instant',
       showDocumentation: true,
       highlightEmptyObject: false,
@@ -141,6 +148,7 @@ describe('SettingsService', () => {
   describe('update actions', () => {
     const updates: any[] = [
       {name: 'ignoreDuplicate', key: 'ignore-duplicate', change: true, expect: 'true'},
+      {name: 'scriptOnly', key: 'script-only', change: true, expect: 'true'},
       {name: 'scrollBehavior', key: 'scroll-behavior', change: 'auto', expect: 'auto'},
       {name: 'showDocumentation', key: 'show-documentation', change: false, expect: 'false'},
       {name: 'highlightEmptyObject', key: 'highlight-empty-object', change: false, expect: 'false'},

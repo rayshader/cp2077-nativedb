@@ -1,7 +1,7 @@
 @mixin slide-toggle-theme($theme) {
   mat-slide-toggle {
     & label {
-      min-width: 40px;
+      min-width: 92px;
       margin-left: 12px!important;
     }
   }
