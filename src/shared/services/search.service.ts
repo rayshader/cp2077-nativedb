@@ -8,6 +8,7 @@ import {SettingsService} from "./settings.service";
 import {RedPropertyAst} from "../red-ast/red-property.ast";
 import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedTypeAst} from "../red-ast/red-type.ast";
+import {RedOriginDef} from "../red-ast/red-definitions.ast";
 
 export enum FilterBy {
   name,
@@ -64,7 +65,7 @@ export class SearchService {
 
   private transformData<T extends RedNodeAst>(data$: Observable<T[]>): Observable<TabItemNode[]> {
     return data$.pipe(
-      combineLatestWith(this.query$),
+      this.filterScriptOnly(),
       this.filterByQuery(),
       this.getTabData()
     );
@@ -92,8 +93,28 @@ export class SearchService {
     );
   }
 
-  private filterByQuery<T extends RedNodeAst>(): OperatorFunction<[T[], SearchRequest], T[]> {
+  private filterScriptOnly<T extends RedNodeAst>(): OperatorFunction<T[], T[]> {
     return pipe(
+      combineLatestWith(this.settingsService.scriptOnly$),
+      map(([nodes, scriptOnly]) => {
+        if (!scriptOnly) {
+          return nodes;
+        }
+        return nodes.filter((node) => {
+          if (node.kind !== RedNodeKind.class && node.kind !== RedNodeKind.struct) {
+            return true;
+          }
+          const object: RedClassAst = node as unknown as RedClassAst;
+
+          return object.origin === RedOriginDef.script;
+        });
+      })
+    );
+  }
+
+  private filterByQuery<T extends RedNodeAst>(): OperatorFunction<T[], T[]> {
+    return pipe(
+      combineLatestWith(this.query$),
       map(([nodes, request]: [T[], SearchRequest]) => {
         if (request.query.length === 0) {
           return nodes;
