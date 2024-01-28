@@ -1,15 +1,6 @@
 import {Injectable} from "@angular/core";
 import {RedDumpService} from "./red-dump.service";
-import {
-  BehaviorSubject,
-  combineLatest,
-  combineLatestWith,
-  map,
-  Observable,
-  OperatorFunction,
-  pipe,
-  shareReplay
-} from "rxjs";
+import {BehaviorSubject, combineLatestWith, map, Observable, OperatorFunction, pipe, shareReplay} from "rxjs";
 import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
 import {TabItemNode} from "../../app/components/ndb-tabs/ndb-tabs.component";
 import {RedClassAst} from "../red-ast/red-class.ast";
@@ -72,10 +63,8 @@ export class SearchService {
   }
 
   private transformData<T extends RedNodeAst>(data$: Observable<T[]>): Observable<TabItemNode[]> {
-    return combineLatest([
-      data$,
-      this.query$
-    ]).pipe(
+    return data$.pipe(
+      combineLatestWith(this.query$),
       this.filterByQuery(),
       this.getTabData()
     );
