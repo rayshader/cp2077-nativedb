@@ -46,7 +46,7 @@ export class RedDumpService {
       map((json: any) => json.map(RedBitfieldAst.fromJson)),
       shareReplay(1)
     );
-    const classes$: Observable<RedClassAst[]> = this.http.get(`/assets/reddump/classes.json`).pipe(
+    const objects$: Observable<RedClassAst[]> = this.http.get(`/assets/reddump/classes.json`).pipe(
       map((json: any) => json.map(RedClassAst.fromJson)),
       map((objects: RedClassAst[]) => {
         objects.sort(RedClassAst.sort);
@@ -58,11 +58,11 @@ export class RedDumpService {
       })
     );
 
-    this.classes$ = classes$.pipe(
+    this.classes$ = objects$.pipe(
       map((objects) => objects.filter((object) => !object.isStruct)),
       shareReplay(1)
     );
-    this.structs$ = classes$.pipe(
+    this.structs$ = objects$.pipe(
       map((objects) => objects.filter((object) => object.isStruct)),
       shareReplay(1)
     );
@@ -75,8 +75,7 @@ export class RedDumpService {
       shareReplay(1),
       this.ignoreDuplicate(),
     );
-    this.badges$ = combineLatest([this.classes$, this.structs$]).pipe(
-      mergeAll(),
+    this.badges$ = objects$.pipe(
       mergeAll(),
       map((object: RedClassAst) => {
         const props = object.properties.map(RedPropertyAst.computeBadges).reduce(this.getMax, 1);
