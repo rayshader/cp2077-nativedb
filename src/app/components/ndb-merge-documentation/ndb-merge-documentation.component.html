@@ -27,7 +27,9 @@
                         [body]="merge.body"
                         (updated)="updated.emit()"></ndb-merge-body>
 
-        <mat-divider></mat-divider>
+        @if (merge.members?.length ?? 0 > 0) {
+          <mat-divider></mat-divider>
+        }
       }
 
       @for (member of merge.members; track member.id) {
