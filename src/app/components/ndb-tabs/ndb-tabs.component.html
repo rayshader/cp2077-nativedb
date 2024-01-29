@@ -1,6 +1,6 @@
 <mat-tab-group [style.width]="width" animationDuration="0ms">
-  @if (tabs$ | async; as tabs) {
-    @for (tab of tabs; track tab.icon) {
+  @if (data$ | async; as data) {
+    @for (tab of data.tabs; track tab.icon) {
       <mat-tab [disabled]="tab.nodes.length === 0">
         <ng-template mat-tab-label class="mat-tab-label">
           @if (tab.icon.length > 0) {
@@ -25,8 +25,7 @@
 
             <mat-divider></mat-divider>
           }
-          <cdk-virtual-scroll-viewport itemSize="35"
-                                       cdkVirtualForTemplateCacheSize="30">
+          <cdk-virtual-scroll-viewport [itemSize]="data.itemSize">
             <a *cdkVirtualFor="let node of tab.nodes"
                class="stx stx-type"
                [class.disabled]="node.isEmpty"
