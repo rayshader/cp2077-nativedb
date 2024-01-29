@@ -36,7 +36,7 @@ describe('SettingsService', () => {
       mergeObject: false,
       tabsWidth: 320,
       isBarPinned: true,
-      clipboardSyntax: CodeSyntax.redscript,
+      clipboardSyntax: CodeSyntax.lua,
       codeSyntax: CodeSyntax.vanilla
     });
   });
