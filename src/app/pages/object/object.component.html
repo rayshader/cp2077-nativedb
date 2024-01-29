@@ -99,12 +99,12 @@
                     (click)="resetPropertiesFilter()">highlight_off</mat-icon>
         </div>
 
-        @for (prop of data.properties; track prop.name; let i = $index) {
+        @for (prop of data.properties; track prop.name) {
           <property-span ndbHighlight
                          [id]="prop.id"
                          [node]="prop"
                          [badges]="data.badges"></property-span>
-          @if (data.isMobile && i + 1 < data.properties.length) {
+          @if (data.isMobile && !$last) {
             <mat-divider></mat-divider>
           }
         }
@@ -139,7 +139,7 @@
         </div>
 
         <!-- NOTE: tracking with id will crash webapp when filtering per badge several times. -->
-        @for (func of data.functions; track func.fullName; let i = $index) {
+        @for (func of data.functions; track func.fullName) {
           <function-span ndbHighlight
                          [id]="cyrb53(func.name)"
                          [node]="func"
@@ -148,7 +148,7 @@
                          [canCopy]="true"
                          [canDocument]="!data.hideDocumentation"
                          [badges]="data.badges"></function-span>
-          @if (data.isMobile && i + 1 < data.functions.length) {
+          @if (data.isMobile && !$last) {
             <mat-divider></mat-divider>
           }
         }

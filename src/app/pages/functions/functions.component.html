@@ -3,9 +3,9 @@
     <mat-icon class="badge-function" svgIcon="function" matTooltip="function"></mat-icon>
   </ndb-title-bar>
 
-  @for (func of data.functions; track func.id; let i = $index) {
+  @for (func of data.functions; track func.id) {
     <function-span [node]="func" [canCopy]="true" [canShare]="false"></function-span>
-    @if (data.isMobile && i + 1 < data.functions.length) {
+    @if (data.isMobile && !$last) {
       <mat-divider></mat-divider>
     }
   }

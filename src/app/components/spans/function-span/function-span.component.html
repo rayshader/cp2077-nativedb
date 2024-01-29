@@ -66,10 +66,10 @@
         <span class="stx-parenthesis">(</span>
       </div>
 
-      @for (arg of node.arguments; track arg.name; let i = $index) {
+      @for (arg of node.arguments; track arg.name) {
         <div class="group">
           <argument-span [node]="arg"></argument-span>
-          @if (i + 1 < node.arguments.length) {
+          @if (!$last) {
             <span class="stx-comma">,&nbsp;</span>
           }
         </div>

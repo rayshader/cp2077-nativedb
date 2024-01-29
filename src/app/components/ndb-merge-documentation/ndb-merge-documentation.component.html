@@ -30,11 +30,11 @@
         <mat-divider></mat-divider>
       }
 
-      @for (member of merge.members; track member.id; let i = $index) {
+      @for (member of merge.members; track member.id) {
         <ndb-merge-function [object]="data"
                             [member]="member"
                             (updated)="updated.emit()"></ndb-merge-function>
-        @if (i + 1 < merge.members!.length) {
+        @if (!$last) {
           <mat-divider></mat-divider>
         }
       }
