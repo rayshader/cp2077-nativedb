@@ -1,4 +1,4 @@
-import {Component, DestroyRef, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {ApplicationRef, Component, DestroyRef, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {NavigationEnd, Router, RouterLink, RouterOutlet} from '@angular/router';
 import {MatToolbarModule} from "@angular/material/toolbar";
@@ -17,7 +17,7 @@ import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from "@angular/material/form-field";
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {NDBToolbarComponent} from "./components/ndb-toolbar/ndb-toolbar.component";
 import {NDBBottomBarComponent} from "./components/ndb-bottom-bar/ndb-bottom-bar.component";
-import {debounceTime, filter} from "rxjs";
+import {combineLatestWith, filter, map, OperatorFunction, pipe, take} from "rxjs";
 import {ResponsiveService} from "../shared/services/responsive.service";
 import {DocumentationDatabase} from "../shared/repositories/documentation.database";
 
@@ -60,6 +60,7 @@ export class AppComponent implements OnInit {
               private readonly pageService: PageService,
               private readonly documentationDB: DocumentationDatabase,
               private readonly responsiveService: ResponsiveService,
+              private readonly app: ApplicationRef,
               private readonly dialog: MatDialog,
               private readonly router: Router,
               private readonly swService: SwUpdate,
@@ -87,7 +88,7 @@ export class AppComponent implements OnInit {
       takeUntilDestroyed(this.dr)
     ).subscribe(this.onRouteChanged.bind(this));
     this.responsiveService.mobile$.pipe(
-      debounceTime(500),
+      this.isReady(),
       takeUntilDestroyed(this.dr)
     ).subscribe(this.onMobile.bind(this));
     this.pageService.scroll$.pipe(takeUntilDestroyed(this.dr)).subscribe(this.scroll.bind(this));
@@ -143,6 +144,20 @@ export class AppComponent implements OnInit {
       return;
     }
     window.location.reload();
+  }
+
+  private isReady(): OperatorFunction<boolean, boolean> {
+    return pipe(
+      combineLatestWith(
+        this.app.isStable.pipe(
+          filter((stable: boolean) => stable),
+          take(1)
+        ),
+      ),
+      map(([isMobile,]) => {
+        return isMobile;
+      })
+    );
   }
 
 }
