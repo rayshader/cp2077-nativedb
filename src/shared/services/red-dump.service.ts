@@ -39,10 +39,18 @@ export class RedDumpService {
               private readonly settingsService: SettingsService) {
     this.enums$ = this.http.get(`/assets/reddump/enums.json`).pipe(
       map((json: any) => json.map(RedEnumAst.fromJson)),
+      map((enums: RedEnumAst[]) => {
+        enums.sort(RedEnumAst.sort);
+        return enums;
+      }),
       shareReplay(1)
     );
     this.bitfields$ = this.http.get(`/assets/reddump/bitfields.json`).pipe(
       map((json: any) => json.map(RedBitfieldAst.fromJson)),
+      map((bitfields: RedBitfieldAst[]) => {
+        bitfields.sort(RedBitfieldAst.sort);
+        return bitfields;
+      }),
       shareReplay(1)
     );
     const objects$: Observable<RedClassAst[]> = this.http.get(`/assets/reddump/classes.json`).pipe(
