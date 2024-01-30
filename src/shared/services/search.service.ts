@@ -134,8 +134,10 @@ export class SearchService {
 
     return nodes.filter((node) => {
       const name: string = node.name.toLowerCase();
+      const aliasName: string | undefined = node.aliasName;
 
-      return words.every((word) => name.includes(word));
+      return words.every((word) => name.includes(word)) ||
+        (aliasName && words.every((word) => aliasName.includes(word)));
     });
   }
 
