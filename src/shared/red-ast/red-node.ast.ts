@@ -11,6 +11,7 @@ export enum RedNodeKind {
 export interface RedNodeAst {
   readonly id: number;
   readonly name: string;
+  readonly aliasName?: string;
   readonly kind: RedNodeKind;
 }
 

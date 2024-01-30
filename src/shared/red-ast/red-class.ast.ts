@@ -7,17 +7,17 @@ import {RedFunctionAst, RedFunctionJson} from "./red-function.ast";
 export interface RedClassJson {
   readonly a?: string; // parent
   readonly b: string; // name
-  readonly c: number; // class flags
-  readonly f?: true; // is struct
-  readonly d?: RedPropertyJson[]; // properties
-  readonly e?: RedFunctionJson[]; // functions
+  readonly c?: string; // alias name
+  readonly d: number; // class flags
+  readonly e?: RedPropertyJson[]; // properties
+  readonly f?: RedFunctionJson[]; // functions
+  readonly g?: true; // is struct
 }
 
 export interface RedClassAst extends RedNodeAst {
   readonly visibility: RedVisibilityDef;
   readonly isAbstract: boolean;
   readonly origin: RedOriginDef;
-  //readonly name: string;
   readonly isStruct: boolean;
   readonly parent?: string;
   readonly properties: RedPropertyAst[];
@@ -30,20 +30,21 @@ export class RedClassAst {
   }
 
   static fromJson(json: RedClassJson): RedClassAst {
-    const flags: number = json.c;
+    const flags: number = json.d;
     const name: string = json.b;
 
     return {
       id: cyrb53(name),
-      kind: (json.f === true) ? RedNodeKind.struct : RedNodeKind.class,
+      kind: (json.g === true) ? RedNodeKind.struct : RedNodeKind.class,
       visibility: getVisibilityFromClassFlags(flags),
       isAbstract: (flags & RedClassFlags.isAbstract) === RedClassFlags.isAbstract,
       origin: getOriginFromClassFlags(flags),
       name: name,
-      isStruct: json.f === true,
+      aliasName: json.c,
+      isStruct: json.g === true,
       parent: json.a,
-      properties: json.d?.map(RedPropertyAst.fromJson) ?? [],
-      functions: json.e?.map(RedFunctionAst.fromJson) ?? []
+      properties: json.e?.map(RedPropertyAst.fromJson) ?? [],
+      functions: json.f?.map(RedFunctionAst.fromJson) ?? []
     };
   }
 }

@@ -3,7 +3,8 @@ import {cyrb53} from "../string";
 
 export interface RedEnumJson {
   readonly a: string; // name
-  readonly b: RedEnumMemberJson[]; // members
+  readonly b?: string; // alias name
+  readonly c: RedEnumMemberJson[]; // members
 }
 
 export interface RedEnumMemberJson {
@@ -11,7 +12,6 @@ export interface RedEnumMemberJson {
 }
 
 export interface RedEnumAst extends RedNodeAst {
-  //readonly name: string;
   readonly members: RedEnumMemberAst[];
 }
 
@@ -30,7 +30,8 @@ export class RedEnumAst {
       id: cyrb53(json.a),
       kind: RedNodeKind.enum,
       name: json.a,
-      members: json.b.map((member) => {
+      aliasName: json.b,
+      members: json.c.map((member) => {
         const key: string = Object.keys(member)[0];
 
         return {

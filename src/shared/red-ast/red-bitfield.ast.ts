@@ -7,7 +7,6 @@ export interface RedBitfieldJson extends RedEnumJson {
 }
 
 export interface RedBitfieldAst extends RedNodeAst {
-  //readonly name: string;
   readonly members: RedBitfieldMemberAst[];
 }
 
@@ -24,7 +23,8 @@ export class RedBitfieldAst {
       id: cyrb53(json.a),
       kind: RedNodeKind.bitfield,
       name: json.a,
-      members: json.b.map((member) => {
+      aliasName: json.b,
+      members: json.c.map((member) => {
         const key: string = Object.keys(member)[0];
 
         return {
