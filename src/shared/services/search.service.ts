@@ -134,10 +134,10 @@ export class SearchService {
 
     return nodes.filter((node) => {
       const name: string = node.name.toLowerCase();
-      const aliasName: string | undefined = node.aliasName;
+      const aliasName: string | undefined = node.aliasName?.toLowerCase();
 
       return words.every((word) => name.includes(word)) ||
-        (aliasName && words.every((word) => aliasName.includes(word)));
+        (!!aliasName && words.every((word) => aliasName.includes(word)));
     });
   }
 
@@ -209,8 +209,10 @@ export class SearchService {
       return this.hasType(words, type.innerType);
     }
     const name: string = type.name.toLowerCase();
+    const aliasName: string | undefined = type.aliasName?.toLowerCase();
 
-    return words.every((word) => name.includes(word));
+    return words.every((word) => name.includes(word)) ||
+      (!!aliasName && words.every((word) => aliasName.includes(word)));
   }
 
 }
