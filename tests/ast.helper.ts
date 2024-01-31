@@ -15,13 +15,8 @@ import {RedBitfieldAst, RedBitfieldMemberAst} from "../src/shared/red-ast/red-bi
 
 export class AstHelper {
 
-  static get Bool(): RedTypeAst {
-    return this.buildPrimitive(RedPrimitiveDef.Bool);
-  }
-
-  static get Float(): RedTypeAst {
-    return this.buildPrimitive(RedPrimitiveDef.Float);
-  }
+  static readonly Bool: RedTypeAst = this.buildPrimitive(RedPrimitiveDef.Bool);
+  static readonly Float: RedTypeAst = this.buildPrimitive(RedPrimitiveDef.Float);
 
   static buildEnum(name: string, members: RedEnumMemberAst[] = []): RedEnumAst {
     return {
