@@ -33,10 +33,14 @@
     } @else {
       @switch (syntax) {
         @case (redscript) {
-          <span class="stx-type redirect" (click)="onRedirect()">{{node.aliasName ?? node.name}}</span>
+          <span class="stx-type redirect"
+                [class.disabled]="isEmpty"
+                (click)="onRedirect()">{{node.aliasName ?? node.name}}</span>
         }
         @default {
-          <span class="stx-type redirect" (click)="onRedirect()">{{node.name}}</span>
+          <span class="stx-type redirect"
+                [class.disabled]="isEmpty"
+                (click)="onRedirect()">{{node.name}}</span>
         }
       }
     }

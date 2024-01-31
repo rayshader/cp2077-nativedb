@@ -21,6 +21,9 @@ export class TypeSpanComponent {
   @Input()
   node?: RedTypeAst;
 
+  @Input()
+  isEmpty: boolean = false;
+
   protected readonly syntax$: Observable<number>;
   protected readonly vanilla: number = CodeSyntax.vanilla + 1;
   protected readonly redscript: number = CodeSyntax.redscript + 1;

@@ -78,13 +78,7 @@ export class SearchService {
         this.settingsService.code$
       ),
       map(([nodes, highlightEmptyObject, syntax]) => nodes.map((node) => {
-        let isEmpty: boolean = false;
-
-        if (node.kind === RedNodeKind.class || node.kind === RedNodeKind.struct) {
-          const classOrStruct: RedClassAst = node as unknown as RedClassAst;
-
-          isEmpty = classOrStruct.properties.length === 0 && classOrStruct.functions.length === 0;
-        }
+        const isEmpty: boolean = RedNodeAst.isEmpty(node);
         let name: string = node.name;
 
         if (syntax === CodeSyntax.redscript && node.aliasName) {

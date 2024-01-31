@@ -1,3 +1,5 @@
+import {RedClassAst} from "./red-class.ast";
+
 export enum RedNodeKind {
   enum,
   bitfield,
@@ -21,4 +23,17 @@ export function getRedNodeKindName(kind: RedNodeKind): string {
   const name: string = RedNodeKind[kind];
 
   return `${name[0].toUpperCase()}${name.substring(1)}`;
+}
+
+export class RedNodeAst {
+
+  static isEmpty(node: RedNodeAst): boolean {
+    if (node.kind !== RedNodeKind.class && node.kind !== RedNodeKind.struct) {
+      return false;
+    }
+    const object: RedClassAst = node as unknown as RedClassAst;
+
+    return object.properties.length === 0 && object.functions.length === 0;
+  }
+
 }

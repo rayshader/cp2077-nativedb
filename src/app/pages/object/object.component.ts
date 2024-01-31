@@ -8,7 +8,7 @@ import {NDBAccordionItemComponent} from "../../components/ndb-accordion-item/ndb
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
 import {
   BehaviorSubject,
-  combineLatest,
+  combineLatest, combineLatestWith,
   EMPTY,
   filter,
   first,
@@ -21,7 +21,7 @@ import {
   switchMap
 } from "rxjs";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
-import {RedNodeKind} from "../../../shared/red-ast/red-node.ast";
+import {RedNodeAst, RedNodeKind} from "../../../shared/red-ast/red-node.ast";
 import {ActivatedRoute} from "@angular/router";
 import {MatChipsModule} from "@angular/material/chips";
 import {RedClassAst} from "../../../shared/red-ast/red-class.ast";
@@ -43,6 +43,10 @@ import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
 import {NDBDocumentationComponent} from "../../components/ndb-documentation/ndb-documentation.component";
 import {MatTooltipModule} from "@angular/material/tooltip";
 
+interface InheritData extends RedTypeAst {
+  readonly isEmpty: boolean;
+}
+
 interface ObjectData {
   readonly object: RedClassAst;
   readonly name: string;
@@ -50,8 +54,8 @@ interface ObjectData {
   readonly scope: string;
   readonly isAbstract: boolean;
   readonly isFinal: boolean;
-  readonly parents: RedTypeAst[];
-  readonly children: RedTypeAst[];
+  readonly parents: InheritData[];
+  readonly children: InheritData[];
   readonly properties: RedPropertyAst[];
   readonly functions: RedFunctionAst[];
   readonly badges: number;
@@ -369,12 +373,14 @@ export class ObjectComponent {
         }
         return this.dumpService.getParentsByName(object.parent, RedNodeKind.class);
       }),
-      map((parents: RedClassAst[]) => {
-        return parents.map((parent) => <RedTypeAst>{
+      combineLatestWith(this.settingsService.highlightEmptyObject$),
+      map(([parents, highlightEmptyObject]: [RedClassAst[], boolean]) => {
+        return parents.map((parent) => <InheritData>{
           id: parent.id,
           kind: RedNodeKind.class,
           name: parent.name,
           aliasName: parent.aliasName,
+          isEmpty: highlightEmptyObject && RedNodeAst.isEmpty(parent),
           size: -1
         })
       })
@@ -389,12 +395,14 @@ export class ObjectComponent {
         }
         return this.dumpService.getChildrenByName(object.name, RedNodeKind.class);
       }),
-      map((children: RedClassAst[]) => {
-        return children.map((child) => <RedTypeAst>{
+      combineLatestWith(this.settingsService.highlightEmptyObject$),
+      map(([children, highlightEmptyObject]: [RedClassAst[], boolean]) => {
+        return children.map((child) => <InheritData>{
           id: child.id,
           kind: RedNodeKind.class,
           name: child.name,
           aliasName: child.aliasName,
+          isEmpty: highlightEmptyObject && RedNodeAst.isEmpty(child),
           size: -1
         })
       })
