@@ -1,17 +1,17 @@
-@if (enum$ | async; as enum) {
-  <ndb-title-bar [title]="enum.name"
-                 [node]="enum"
+@if (data$ | async; as data) {
+  <ndb-title-bar [title]="data.node.name"
+                 [node]="data.node"
                  [hideDocumentation]="true">
     <mat-icon class="badge-enum" svgIcon="enum" matTooltip="enum"></mat-icon>
   </ndb-title-bar>
 
-  @for (member of enum.members; track member.key) {
+  @for (member of data.node.members; track member.key) {
     <p class="field stx"
        ndbHighlight
        [id]="cyrb53(member.key)">
       <button mat-icon-button
               class="badge clipboard"
-              (click)="copyClipboard(enum, member.key)"><mat-icon>content_copy</mat-icon></button>
+              (click)="copyClipboard(data.node, member.key)"><mat-icon>content_copy</mat-icon></button>
       <span class="stx-text">{{member.key}}</span>
       <span class="stx-text">&nbsp;=&nbsp;</span>
       <span class="stx-number">{{member.value}}</span>

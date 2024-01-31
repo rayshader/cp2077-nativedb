@@ -30,7 +30,7 @@ import {RedPropertyAst} from "../../../shared/red-ast/red-property.ast";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {RedOriginDef, RedVisibilityDef} from "../../../shared/red-ast/red-definitions.ast";
 import {PageService} from "../../../shared/services/page.service";
-import {SettingsService} from "../../../shared/services/settings.service";
+import {CodeSyntax, SettingsService} from "../../../shared/services/settings.service";
 import {MatButtonModule} from "@angular/material/button";
 import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
 import {RecentVisitService} from "../../../shared/services/recent-visit.service";
@@ -45,6 +45,8 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 
 interface ObjectData {
   readonly object: RedClassAst;
+  readonly name: string;
+
   readonly scope: string;
   readonly isAbstract: boolean;
   readonly isFinal: boolean;
@@ -236,9 +238,13 @@ export class ObjectComponent {
              isMobile
            ]) => {
         const showEmptyAccordion: boolean = settings.showEmptyAccordion;
+        let name: string = object.name;
         let properties: RedPropertyAst[] = object.properties;
         let functions: RedFunctionAst[] = object.functions;
 
+        if (settings.codeSyntax === CodeSyntax.redscript && object.aliasName) {
+          name = object.aliasName;
+        }
         if (this.isPropertiesFiltered) {
           properties = properties.filter(this.hasPropertyFlag.bind(this));
         }
@@ -252,6 +258,7 @@ export class ObjectComponent {
         ).subscribe(this.onScrollToFragment.bind(this));
         return <ObjectData>{
           object: object,
+          name: name,
           scope: RedVisibilityDef[object.visibility],
           isAbstract: object.isAbstract,
           parents: parents,

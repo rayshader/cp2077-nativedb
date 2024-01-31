@@ -1,6 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {RedDumpService} from "../../../shared/services/red-dump.service";
-import {EMPTY, Observable} from "rxjs";
+import {combineLatest, EMPTY, filter, map, Observable} from "rxjs";
 import {AsyncPipe} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
@@ -11,6 +11,12 @@ import {RecentVisitService} from "../../../shared/services/recent-visit.service"
 import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
 import {cyrb53} from "../../../shared/string";
 import {MatTooltip} from "@angular/material/tooltip";
+import {CodeSyntax, SettingsService} from "../../../shared/services/settings.service";
+
+interface EnumData {
+  readonly node: RedEnumAst;
+  readonly name: string;
+}
 
 @Component({
   selector: 'enum',
@@ -28,11 +34,12 @@ import {MatTooltip} from "@angular/material/tooltip";
 })
 export class EnumComponent {
 
-  enum$: Observable<RedEnumAst | undefined> = EMPTY;
+  data$: Observable<EnumData> = EMPTY;
 
   protected readonly cyrb53 = cyrb53;
 
   constructor(private readonly dumpService: RedDumpService,
+              private readonly settingsService: SettingsService,
               private readonly pageService: PageService,
               private readonly recentVisitService: RecentVisitService) {
   }
@@ -41,7 +48,23 @@ export class EnumComponent {
   set id(id: string) {
     this.pageService.restoreScroll();
     this.recentVisitService.pushLastVisit(+id);
-    this.enum$ = this.dumpService.getEnumById(+id);
+    this.data$ = combineLatest([
+      this.dumpService.getEnumById(+id),
+      this.settingsService.code$
+    ]).pipe(
+      filter(([node,]) => !!node),
+      map(([node, syntax]) => {
+        let name: string = node!.name;
+
+        if (syntax === CodeSyntax.redscript && node!.aliasName) {
+          name = node!.aliasName;
+        }
+        return <EnumData>{
+          node: node,
+          name: name
+        };
+      })
+    );
   }
 
   protected async copyClipboard(node: RedEnumAst, key: string): Promise<void> {
