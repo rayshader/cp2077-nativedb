@@ -116,10 +116,17 @@ export class RedDumpService {
     nameOnly ??= false;
     return this.nodes$.pipe(
       map((nodes) => nodes.find((node) => {
+        let match: boolean;
+
         if (nameOnly) {
-          return cyrb53(node.name) === id;
+          match = cyrb53(node.name) === id;
+        } else {
+          match = node.id === id;
         }
-        return node.id === id;
+        if (!match && node.aliasName) {
+          match = cyrb53(node.aliasName) === id;
+        }
+        return match;
       }))
     );
   }
