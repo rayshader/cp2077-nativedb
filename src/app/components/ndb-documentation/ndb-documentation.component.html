@@ -1,6 +1,7 @@
 @if (mode == 'view') {
   <p class="stx stx-doc"
      matTooltip="Double-click to edit"
+     matTooltipShowDelay="3000"
      (click)="onLinkClicked($event)"
      (dblclick)="mode = 'edit'"
      [innerHTML]="body | ndbFormatDocumentation"></p>
