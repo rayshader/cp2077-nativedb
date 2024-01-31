@@ -81,6 +81,13 @@ export class RedFunctionAst {
       returnType: returnType
     };
   }
+
+  static loadAlias(nodes: RedNodeAst[], func: RedFunctionAst): void {
+    if (func.returnType) {
+      RedTypeAst.loadAlias(nodes, func.returnType);
+    }
+    func.arguments.forEach((argument) => RedTypeAst.loadAlias(nodes, argument.type));
+  }
 }
 
 enum RedFunctionFlags {

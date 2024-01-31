@@ -1,6 +1,7 @@
 import {Injectable} from "@angular/core";
 import {HttpClient} from "@angular/common/http";
 import {
+  combineLatest,
   combineLatestWith,
   EMPTY,
   map,
@@ -9,8 +10,7 @@ import {
   OperatorFunction,
   pipe,
   reduce,
-  shareReplay,
-  zip
+  shareReplay
 } from "rxjs";
 import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
 import {RedEnumAst} from "../red-ast/red-enum.ast";
@@ -35,8 +35,8 @@ export class RedDumpService {
 
   private readonly nodes$: Observable<RedNodeAst[]>;
 
-  constructor(private readonly http: HttpClient,
-              private readonly settingsService: SettingsService) {
+  constructor(private readonly settingsService: SettingsService,
+              private readonly http: HttpClient) {
     this.enums$ = this.http.get(`/assets/reddump/enums.json`).pipe(
       map((json: any) => json.map(RedEnumAst.fromJson)),
       map((enums: RedEnumAst[]) => {
@@ -93,7 +93,7 @@ export class RedDumpService {
       reduce(this.getMax),
       shareReplay(1),
     );
-    this.nodes$ = zip([
+    this.nodes$ = combineLatest([
       this.enums$,
       this.bitfields$,
       this.classes$,
@@ -109,6 +109,7 @@ export class RedDumpService {
       ]),
       shareReplay(1)
     );
+    this.loadAliases();
   }
 
   getById(id: number, nameOnly?: boolean): Observable<RedNodeAst | undefined> {
@@ -203,6 +204,22 @@ export class RedDumpService {
         });
       })
     );
+  }
+
+  private loadAliases(): void {
+    this.nodes$.subscribe((nodes) => {
+      const aliases: RedNodeAst[] = nodes.filter((node) => node.aliasName);
+
+      nodes
+        .filter((node) => node.kind !== RedNodeKind.enum && node.kind !== RedNodeKind.bitfield)
+        .forEach((node) => {
+          if (node.kind === RedNodeKind.class || node.kind === RedNodeKind.struct) {
+            RedClassAst.loadAliases(aliases, node as RedClassAst);
+          } else if (node.kind === RedNodeKind.function) {
+            RedFunctionAst.loadAlias(aliases, node as RedFunctionAst);
+          }
+        });
+    });
   }
 
   private findById<T extends RedNodeAst>(id: number): OperatorFunction<T[], T | undefined> {

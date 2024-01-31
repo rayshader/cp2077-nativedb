@@ -3,6 +3,7 @@ import {RedNodeAst, RedNodeKind} from "./red-node.ast";
 import {cyrb53} from "../string";
 import {RedPropertyAst, RedPropertyJson} from "./red-property.ast";
 import {RedFunctionAst, RedFunctionJson} from "./red-function.ast";
+import {RedTypeAst} from "./red-type.ast";
 
 export interface RedClassJson {
   readonly a?: string; // parent
@@ -46,6 +47,11 @@ export class RedClassAst {
       properties: json.e?.map(RedPropertyAst.fromJson) ?? [],
       functions: json.f?.map(RedFunctionAst.fromJson) ?? []
     };
+  }
+
+  static loadAliases(nodes: RedNodeAst[], object: RedClassAst): void {
+    object.properties.forEach((property) => RedTypeAst.loadAlias(nodes, property.type));
+    object.functions.forEach((func) => RedFunctionAst.loadAlias(nodes, func));
   }
 }
 

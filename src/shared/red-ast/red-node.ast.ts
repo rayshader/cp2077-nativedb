@@ -11,8 +11,10 @@ export enum RedNodeKind {
 export interface RedNodeAst {
   readonly id: number;
   readonly name: string;
-  readonly aliasName?: string;
   readonly kind: RedNodeKind;
+
+  // Define alias, when it exists, while loading data.
+  aliasName?: string;
 }
 
 export function getRedNodeKindName(kind: RedNodeKind): string {

@@ -10,7 +10,6 @@ export interface RedTypeJson {
 }
 
 export interface RedTypeAst extends RedNodeAst {
-  //readonly name: string;
   readonly flag?: RedPrimitiveDef | RedTemplateDef;
   readonly innerType?: RedTypeAst;
   readonly size?: number;
@@ -50,5 +49,20 @@ export class RedTypeAst {
       innerType: (json.c !== undefined) ? RedTypeAst.fromJson(json.c) : undefined,
       size: json.d,
     };
+  }
+
+  static loadAlias(nodes: RedNodeAst[], type: RedTypeAst): void {
+    if (this.isPrimitive(type)) {
+      return;
+    }
+    if (type.innerType) {
+      return this.loadAlias(nodes, type.innerType);
+    }
+    const alias: RedNodeAst | undefined = nodes.find((node) => node.name === type.name);
+
+    if (!alias) {
+      return;
+    }
+    type.aliasName = alias.aliasName;
   }
 }
