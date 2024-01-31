@@ -50,7 +50,7 @@ describe('LuaFormatter', () => {
       'isAfter = GameTime.IsAfter(other)\n');
   });
 
-  it('should format static function with full name', () => {
+  it('should format static function and ignore full name', () => {
     // GIVEN
     const systemObj: RedClassAst = AstHelper.buildClass('gameVehicleSystem');
     const staticFn: RedFunctionAst = AstHelper.buildFunction(
@@ -69,7 +69,7 @@ describe('LuaFormatter', () => {
     expect(code).toBe('local game -- ScriptGameInstance\n' +
       'local isPlayerInVehicle -- Bool\n' +
       '\n' +
-      'isPlayerInVehicle = gameVehicleSystem[\'gameVehicleSystem::IsPlayerInVehicle;GameInstance\'](game)\n');
+      'isPlayerInVehicle = gameVehicleSystem.IsPlayerInVehicle(game)\n');
   });
 
   it('should format member function', () => {
@@ -99,7 +99,7 @@ describe('LuaFormatter', () => {
       'navPathToTarget = vehiclebaseobject:HasNavPathToTarget(targetID, duration, invert)\n');
   });
 
-  it('should format member function with full name', () => {
+  it('should format member function and ignore full name', () => {
     // GIVEN
     const vehicleObj: RedClassAst = AstHelper.buildClass('vehicleBaseObject');
     const memberFn: RedFunctionAst = AstHelper.buildFunction('TriggerExitBehavior',
@@ -119,7 +119,7 @@ describe('LuaFormatter', () => {
     expect(code).toBe('local vehiclebaseobject -- vehicleBaseObject\n' +
       'local maxDelayOverride -- Float, optional\n' +
       '\n' +
-      'vehiclebaseobject[\'TriggerExitBehavior;Float\'](vehiclebaseobject, maxDelayOverride)\n');
+      'vehiclebaseobject:TriggerExitBehavior(maxDelayOverride)\n');
   });
 
   it('should format global function with an alias', () => {

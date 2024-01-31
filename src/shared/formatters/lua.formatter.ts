@@ -50,33 +50,17 @@ export class LuaFormatter extends CodeFormatter {
       };
     });
 
-    if (selfName) {
-      argVars.splice(0, 0, {
-        prefix: '',
-        name: selfName,
-        suffix: ''
-      });
-    }
     return argVars;
   }
 
   protected override formatMemberStaticCall(func: RedFunctionAst, memberOf: RedClassAst): string {
     const name: string = this.formatAlias(memberOf.name);
-    const hasFullName: boolean = func.name !== func.fullName;
 
-    if (!hasFullName) {
-      return `${name}.${func.name}`;
-    }
-    return `${name}['${func.fullName}']`;
+    return `${name}.${func.name}`;
   }
 
   protected override formatMemberCall(selfVar: CodeVariableFormat, func: RedFunctionAst): string {
-    const hasFullName: boolean = func.name !== func.fullName;
-
-    if (!hasFullName) {
-      return `${selfVar.name}:${func.name}`;
-    }
-    return `${selfVar.name}['${func.fullName}']`;
+    return `${selfVar.name}:${func.name}`;
   }
 
   protected override formatStaticCall(func: RedFunctionAst): string {
