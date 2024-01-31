@@ -4,7 +4,7 @@ import {BehaviorSubject, combineLatestWith, map, Observable, OperatorFunction, p
 import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
 import {TabItemNode} from "../../app/components/ndb-tabs/ndb-tabs.component";
 import {RedClassAst} from "../red-ast/red-class.ast";
-import {SettingsService} from "./settings.service";
+import {CodeSyntax, SettingsService} from "./settings.service";
 import {RedPropertyAst} from "../red-ast/red-property.ast";
 import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedTypeAst} from "../red-ast/red-type.ast";
@@ -73,8 +73,11 @@ export class SearchService {
 
   private getTabData<T extends RedNodeAst>(): OperatorFunction<T[], TabItemNode[]> {
     return pipe(
-      combineLatestWith(this.settingsService.highlightEmptyObject$),
-      map(([nodes, highlightEmptyObject]) => nodes.map((node) => {
+      combineLatestWith(
+        this.settingsService.highlightEmptyObject$,
+        this.settingsService.code$
+      ),
+      map(([nodes, highlightEmptyObject, syntax]) => nodes.map((node) => {
         let isEmpty: boolean = false;
 
         if (node.kind === RedNodeKind.class || node.kind === RedNodeKind.struct) {
@@ -82,10 +85,15 @@ export class SearchService {
 
           isEmpty = classOrStruct.properties.length === 0 && classOrStruct.functions.length === 0;
         }
+        let name: string = node.name;
+
+        if (syntax === CodeSyntax.redscript && node.aliasName) {
+          name = node.aliasName;
+        }
         return <TabItemNode>{
           id: node.id,
           uri: `/${RedNodeKind[node.kind][0]}/${node.id}`,
-          name: node.name,
+          name: name,
           isEmpty: highlightEmptyObject && isEmpty,
         };
       })),
