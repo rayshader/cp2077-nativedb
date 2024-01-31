@@ -1,6 +1,7 @@
 import {RedNodeAst, RedNodeKind} from "./red-node.ast";
 import {cyrb53} from "../string";
 import {RedPrimitiveDef, RedTemplateDef} from "./red-definitions.ast";
+import {CodeSyntax} from "../services/settings.service";
 
 export interface RedTypeJson {
   readonly a?: number; // flag
@@ -20,19 +21,23 @@ export class RedTypeAst {
     return type.flag !== undefined && type.flag >= RedPrimitiveDef.Void && type.flag <= RedPrimitiveDef.Variant;
   }
 
-  static toString(type: RedTypeAst): string {
+  static toString(type: RedTypeAst, syntax?: CodeSyntax): string {
+    let name: string = type.name;
     let str: string = '';
 
+    if ((syntax === CodeSyntax.lua || syntax === CodeSyntax.redscript) && type.aliasName) {
+      name = type.aliasName;
+    }
     // TODO: ignore script_ref<T> when syntax is for Redscript / Lua ?
     if (type.innerType !== undefined) {
       str += `${type.name}<`;
-      str += RedTypeAst.toString(type.innerType);
+      str += RedTypeAst.toString(type.innerType, syntax);
       if (type.size !== undefined) {
         str += `; ${type.size}`;
       }
       str += '>';
     } else {
-      str = type.name;
+      str = name;
     }
     return str;
   }

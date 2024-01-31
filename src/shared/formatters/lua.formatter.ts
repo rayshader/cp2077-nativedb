@@ -3,6 +3,7 @@ import {RedClassAst} from "../red-ast/red-class.ast";
 import {CodeFormatter, CodeVariableFormat} from "./formatter";
 import {RedTypeAst} from "../red-ast/red-type.ast";
 import {RedArgumentAst} from "../red-ast/red-argument.ast";
+import {CodeSyntax} from "../services/settings.service";
 
 export class LuaFormatter extends CodeFormatter {
 
@@ -14,7 +15,7 @@ export class LuaFormatter extends CodeFormatter {
     if (func.isStatic || !memberOf) {
       return undefined;
     }
-    const name: string = memberOf.name;
+    const name: string = memberOf.aliasName ?? memberOf.name;
 
     return {
       prefix: 'local ',
@@ -27,7 +28,7 @@ export class LuaFormatter extends CodeFormatter {
     if (!func.returnType) {
       return undefined;
     }
-    const type: string = RedTypeAst.toString(func.returnType);
+    const type: string = RedTypeAst.toString(func.returnType, CodeSyntax.lua);
 
     return {
       prefix: 'local ',
@@ -40,7 +41,7 @@ export class LuaFormatter extends CodeFormatter {
     const argVars: CodeVariableFormat[] = func.arguments.filter((arg: RedArgumentAst) => {
       return arg.name !== 'self';
     }).map((arg: RedArgumentAst) => {
-      const type: string = RedTypeAst.toString(arg.type);
+      const type: string = RedTypeAst.toString(arg.type, CodeSyntax.lua);
       const optional: string = arg.isOptional ? ', optional' : '';
 
       return {
@@ -54,7 +55,7 @@ export class LuaFormatter extends CodeFormatter {
   }
 
   protected override formatMemberStaticCall(func: RedFunctionAst, memberOf: RedClassAst): string {
-    const name: string = this.formatAlias(memberOf.name);
+    const name: string = this.formatAlias(memberOf.aliasName ?? memberOf.name);
 
     return `${name}.${func.name}`;
   }
@@ -68,7 +69,7 @@ export class LuaFormatter extends CodeFormatter {
   }
 
   private formatAlias(name: string): string {
-    if (name === 'ScriptGameInstance') {
+    if (name === 'GameInstance') {
       return 'Game';
     }
     return name;

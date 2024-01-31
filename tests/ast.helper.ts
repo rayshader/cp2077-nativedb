@@ -36,11 +36,12 @@ export class AstHelper {
     };
   }
 
-  static buildClass(name: string): RedClassAst {
+  static buildClass(name: string, aliasName?: string): RedClassAst {
     return {
       kind: RedNodeKind.class,
       id: cyrb53(name),
       name: name,
+      aliasName: aliasName,
       origin: RedOriginDef.native,
       visibility: RedVisibilityDef.public,
       isAbstract: false,
@@ -50,11 +51,12 @@ export class AstHelper {
     };
   }
 
-  static buildStruct(name: string): RedClassAst {
+  static buildStruct(name: string, aliasName?: string): RedClassAst {
     return {
       kind: RedNodeKind.struct,
       id: cyrb53(name),
       name: name,
+      aliasName: aliasName,
       origin: RedOriginDef.native,
       visibility: RedVisibilityDef.public,
       isAbstract: false,
@@ -115,21 +117,22 @@ export class AstHelper {
     };
   }
 
-  static buildType(name: string): RedTypeAst {
+  static buildType(name: string, aliasName?: string): RedTypeAst {
     return {
       kind: RedNodeKind.type,
       id: cyrb53(name),
-      name: name
+      name: name,
+      aliasName: aliasName
     };
   }
 
-  static buildRef(name: string): RedTypeAst {
+  static buildRef(name: string, aliasName?: string): RedTypeAst {
     return {
       kind: RedNodeKind.type,
       id: cyrb53('ref'),
       name: 'ref',
       flag: RedTemplateDef.ref,
-      innerType: this.buildType(name)
+      innerType: this.buildType(name, aliasName)
     };
   }
 
