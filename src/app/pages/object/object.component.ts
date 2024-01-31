@@ -374,6 +374,7 @@ export class ObjectComponent {
           id: parent.id,
           kind: RedNodeKind.class,
           name: parent.name,
+          aliasName: parent.aliasName,
           size: -1
         })
       })
@@ -393,6 +394,7 @@ export class ObjectComponent {
           id: child.id,
           kind: RedNodeKind.class,
           name: child.name,
+          aliasName: child.aliasName,
           size: -1
         })
       })
