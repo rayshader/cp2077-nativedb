@@ -31,7 +31,14 @@
     } @else if (isPrimitive) {
       <span class="stx-primitive-type">{{node | ndbFormatCode:syntax}}</span>
     } @else {
-      <span class="stx-type redirect" (click)="onRedirect()">{{node.name}}</span>
+      @switch (syntax) {
+        @case (redscript) {
+          <span class="stx-type redirect" (click)="onRedirect()">{{node.aliasName ?? node.name}}</span>
+        }
+        @default {
+          <span class="stx-type redirect" (click)="onRedirect()">{{node.name}}</span>
+        }
+      }
     }
   } @else {
     @if (syntax === cpp) {
