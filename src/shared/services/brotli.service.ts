@@ -1,9 +1,5 @@
-import {Injectable} from "@angular/core";
-
-interface Brotli {
-  compress(buffer: Uint8Array): Uint8Array;
-  decompress(buffer: Uint8Array): Uint8Array;
-}
+import {Injectable, isDevMode} from "@angular/core";
+import {BrotliWasmType} from "brotli-wasm";
 
 @Injectable({
   providedIn: 'root'
@@ -12,11 +8,18 @@ export class BrotliService {
 
   private readonly encoder: TextEncoder = new TextEncoder();
   private readonly decoder: TextDecoder = new TextDecoder();
-  private brotli?: Brotli;
+  private brotli?: BrotliWasmType;
 
   async load(): Promise<void> {
-    // @ts-ignore
-    this.brotli = await import("https://unpkg.com/brotli-wasm@1.3.1/index.web.js?module").then(m => m.default);
+    if (isDevMode()) {
+      // NOTE: Use CDN to load WASM module as it is not natively supported by Angular CLI.
+      //       See issue https://github.com/angular/angular-cli/issues/25102.
+      // @ts-ignore
+      this.brotli = await import("https://unpkg.com/brotli-wasm@2.0.1/index.web.js?module").then(m => m.default);
+    } else {
+      // NOTE: .wasm file is copied in src/ on 'postinstall' event.
+      this.brotli = await import("brotli-wasm").then((m: any) => m.default);
+    }
   }
 
   compress(data: string): Uint8Array {
