@@ -43,3 +43,6 @@ Thumbs.db
 
 # RTTI dumps
 src/assets/reddump/
+
+# WASM files
+src/*.wasm
