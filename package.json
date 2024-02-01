@@ -2,6 +2,7 @@
   "name": "cp2077-nativedb",
   "version": "0.0.0",
   "scripts": {
+    "postinstall": "gulp -f gulp.mjs install-wasm",
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
@@ -32,6 +33,7 @@
     "@angular/platform-browser-dynamic": "^17.1.1",
     "@angular/router": "^17.1.1",
     "@angular/service-worker": "^17.1.1",
+    "brotli-wasm": "^2.0.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "^0.14.3"
