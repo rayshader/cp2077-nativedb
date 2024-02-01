@@ -62,7 +62,8 @@ export class RedDumpService {
           object.functions.sort(RedFunctionAst.sort);
         });
         return objects;
-      })
+      }),
+      shareReplay(1)
     );
 
     this.classes$ = objects$.pipe(
