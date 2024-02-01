@@ -1,4 +1,4 @@
-import {Component, DestroyRef, ElementRef, OnInit, ViewChild} from '@angular/core';
+import {Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {ClassDocumentation, DocumentationService} from "../../../shared/services/documentation.service";
@@ -25,7 +25,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
   templateUrl: './ndb-sync-documentation.component.html',
   styleUrl: './ndb-sync-documentation.component.scss'
 })
-export class NDBSyncDocumentationComponent implements OnInit {
+export class NDBSyncDocumentationComponent implements OnInit, OnDestroy {
 
   @ViewChild('download')
   input?: ElementRef;
@@ -63,6 +63,10 @@ export class NDBSyncDocumentationComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.loadWorker();
+  }
+
+  ngOnDestroy() {
+    this.worker?.terminate();
   }
 
   import(): void {
