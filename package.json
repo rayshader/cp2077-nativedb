@@ -42,7 +42,7 @@
     "@angular-devkit/build-angular": "^17.1.1",
     "@angular/cli": "^17.1.1",
     "@angular/compiler-cli": "^17.1.2",
-    "@types/jest": "^29.5.11",
+    "@types/jest": "^29.5.12",
     "gulp": "^4.0.2",
     "gulp-brotli": "^3.0.0",
     "gulp-gzip": "^1.4.2",
