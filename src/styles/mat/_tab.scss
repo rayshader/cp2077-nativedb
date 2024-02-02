@@ -1,5 +1,7 @@
 @mixin tab-theme($theme) {
   .mat-mdc-tab-group {
+    user-select: none;
+
     height: 100%;
 
     & .mat-mdc-tab-header {
