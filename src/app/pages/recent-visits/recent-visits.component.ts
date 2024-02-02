@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {AsyncPipe} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
-import {filter, map, mergeAll, Observable, of, scan, zip} from "rxjs";
+import {combineLatest, map, Observable, of} from "rxjs";
 import {getRedNodeKindName, RedNodeAst, RedNodeKind} from "../../../shared/red-ast/red-node.ast";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {RecentVisitItem, RecentVisitService} from "../../../shared/services/recent-visit.service";
@@ -46,15 +46,15 @@ export class RecentVisitsComponent implements OnInit {
     const items$ = items.map((item) => this.dumpService.getById(item.id));
 
     this.cannotClearAll$ = of(items.length === 0);
-    this.recentVisits$ = zip(items$).pipe(
-      mergeAll(),
-      filter((node) => node !== undefined),
-      map((node) => <RecentVisitData>{
-        node: node,
-        icon: RedNodeKind[node!.kind],
-        alt: getRedNodeKindName(node!.kind)
-      }),
-      scan((nodes: RecentVisitData[], node) => [...nodes, node], []),
+    this.recentVisits$ = combineLatest(items$).pipe(
+      map((nodes: (RedNodeAst | undefined)[]) => nodes
+        .filter((node) => !!node)
+        .map((node) => <RecentVisitData>{
+          node: node,
+          icon: RedNodeKind[node!.kind],
+          alt: getRedNodeKindName(node!.kind)
+        })
+      )
     );
   }
 

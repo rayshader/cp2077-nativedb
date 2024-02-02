@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {BookmarkService} from "../../../shared/services/bookmark.service";
-import {filter, map, mergeAll, Observable, of, scan, zip} from "rxjs";
+import {combineLatest, map, Observable, of} from "rxjs";
 import {getRedNodeKindName, RedNodeAst, RedNodeKind} from "../../../shared/red-ast/red-node.ast";
 import {AsyncPipe} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
@@ -40,26 +40,23 @@ export class BookmarksComponent implements OnInit {
     const bookmarks: number[] = this.bookmarkService.getAll();
     const bookmarks$ = bookmarks.map((id) => this.dumpService.getById(id));
 
-    this.bookmarks$ = zip(bookmarks$).pipe(
-      mergeAll(),
-      filter((node) => node !== undefined),
-      map((node) => <BookmarkItem>{
-        node: node,
-        icon: RedNodeKind[node!.kind],
-        alt: getRedNodeKindName(node!.kind)
-      }),
-      scan((nodes: BookmarkItem[], node) => [...nodes, node], []),
-      map((bookmarks) => {
-        bookmarks.sort((a, b) => {
+    this.bookmarks$ = combineLatest(bookmarks$).pipe(
+      map((nodes: (RedNodeAst | undefined)[]) => nodes
+        .filter((node) => !!node)
+        .map((node) => <BookmarkItem>{
+          node: node,
+          icon: RedNodeKind[node!.kind],
+          alt: getRedNodeKindName(node!.kind)
+        })
+        .sort((a, b) => {
           let delta: number = a.node.kind - b.node.kind;
 
           if (delta !== 0) {
             return delta;
           }
           return a.node.name.localeCompare(b.node.name);
-        });
-        return bookmarks;
-      })
+        })
+      )
     );
   }
 
