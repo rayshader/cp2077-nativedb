@@ -11,7 +11,7 @@ You must install RTTI dump assets yourself. You will need [RTTIDumper]:
 2. Build it by following its README.
 3. Install it like any other RED4ext plugin.
 4. Run the game, wait (loading will block)... and close the game.
-5. Copy generated files listed below from `<game>\bin\x64\dumps\ast\json` 
+5. Copy generated files listed below from `<game>\bin\x64\dumps\nativedb\json` 
    to `<project>\src\assets\reddump\`:
 
 - enums.json
