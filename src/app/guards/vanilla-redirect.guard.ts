@@ -3,7 +3,7 @@ import {inject} from "@angular/core";
 import {ActivatedRouteSnapshot, Router, UrlTree} from "@angular/router";
 import {cyrb53} from "../../shared/string";
 import {RedNodeAst, RedNodeKind} from "../../shared/red-ast/red-node.ast";
-import {map} from "rxjs";
+import {combineLatestWith, filter, map} from "rxjs";
 
 export function vanillaRedirectGuard(next: ActivatedRouteSnapshot) {
   const dumpService: RedDumpService = inject(RedDumpService);
@@ -17,8 +17,10 @@ export function vanillaRedirectGuard(next: ActivatedRouteSnapshot) {
   }
   const id: number = cyrb53(name);
 
-  return dumpService.getById(id, nameOnly).pipe(
-    map((node: RedNodeAst | undefined) => {
+  return dumpService.isReady$.pipe(
+    filter((isReady) => isReady),
+    combineLatestWith(dumpService.getById(id, nameOnly)),
+    map(([, node]: [boolean, RedNodeAst | undefined]) => {
       if (!node) {
         return router.createUrlTree([]);
       }

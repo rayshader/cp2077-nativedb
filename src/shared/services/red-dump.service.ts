@@ -50,6 +50,7 @@ export class RedDumpService {
   readonly classes$: Observable<RedClassAst[]>;
   readonly structs$: Observable<RedClassAst[]>;
   readonly badges$: Observable<number>;
+  readonly isReady$: Observable<boolean>;
 
   private readonly enums: BehaviorSubject<RedEnumAst[]> = new BehaviorSubject<RedEnumAst[]>([]);
   private readonly bitfields: BehaviorSubject<RedBitfieldAst[]> = new BehaviorSubject<RedBitfieldAst[]>([]);
@@ -58,6 +59,7 @@ export class RedDumpService {
   private readonly structs: BehaviorSubject<RedClassAst[]> = new BehaviorSubject<RedClassAst[]>([]);
   private readonly badges: BehaviorSubject<number> = new BehaviorSubject<number>(1);
   private readonly inheritance: Subject<RedClassAst> = new Subject<RedClassAst>();
+  private readonly isReady: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   private readonly nodes$: Observable<RedNodeAst[]>;
   private readonly inheritance$: Observable<RedClassAst> = this.inheritance.asObservable();
@@ -79,6 +81,7 @@ export class RedDumpService {
     this.classes$ = this.classes.asObservable();
     this.structs$ = this.structs.asObservable();
     this.badges$ = this.badges.asObservable();
+    this.isReady$ = this.isReady.asObservable();
     this.loadWorker();
 
     this.nodes$ = combineLatest([
@@ -208,6 +211,7 @@ export class RedDumpService {
     this.classes.next(data.classes);
     this.structs.next(data.structs);
     this.badges.next(data.badges);
+    this.isReady.next(true);
   }
 
   private onWorkerLoadAliases(data: RedDumpWorkerLoadAliases): void {
