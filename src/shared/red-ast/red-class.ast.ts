@@ -4,6 +4,7 @@ import {cyrb53} from "../string";
 import {RedPropertyAst, RedPropertyJson} from "./red-property.ast";
 import {RedFunctionAst, RedFunctionJson} from "./red-function.ast";
 import {RedTypeAst} from "./red-type.ast";
+import {InheritData} from "../../app/pages/object/object.component";
 
 export interface RedClassJson {
   readonly a?: string; // parent
@@ -23,6 +24,10 @@ export interface RedClassAst extends RedNodeAst {
   readonly parent?: string;
   readonly properties: RedPropertyAst[];
   readonly functions: RedFunctionAst[];
+
+  // Fill parents/children, while loading.
+  readonly parents: InheritData[];
+  readonly children: InheritData[];
 }
 
 export class RedClassAst {
@@ -45,7 +50,9 @@ export class RedClassAst {
       isStruct: json.g === true,
       parent: json.a,
       properties: json.e?.map(RedPropertyAst.fromJson) ?? [],
-      functions: json.f?.map(RedFunctionAst.fromJson) ?? []
+      functions: json.f?.map(RedFunctionAst.fromJson) ?? [],
+      parents: [],
+      children: []
     };
   }
 

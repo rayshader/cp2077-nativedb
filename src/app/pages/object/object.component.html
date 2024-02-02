@@ -46,7 +46,7 @@
           <div class="inheritance stx">
             <div class="align" [style.width]="data.align"></div>
             <mat-icon>subdirectory_arrow_right</mat-icon>
-            <type-span [node]="parent" [isEmpty]="parent.isEmpty"></type-span>
+            <type-span [node]="parent" [isEmpty]="data.highlightEmpty && parent.isEmpty"></type-span>
           </div>
         }
       </ndb-accordion-item>
@@ -66,7 +66,7 @@
           <div class="inheritance stx">
             <div class="align" [style.width]="data.align"></div>
             <mat-icon>subdirectory_arrow_left</mat-icon>
-            <type-span [node]="child" [isEmpty]="child.isEmpty"></type-span>
+            <type-span [node]="child" [isEmpty]="data.highlightEmpty && child.isEmpty"></type-span>
           </div>
         }
       </ndb-accordion-item>

@@ -1,10 +1,18 @@
 export enum NDBCommand {
+  // Documentation
   ready,
   import,
   export,
 
   importError,
-  exportError
+  exportError,
+
+  // RedDump
+  rd_load,
+  rd_update,
+
+  // WebWorker
+  dispose
 }
 
 export interface NDBMessage {

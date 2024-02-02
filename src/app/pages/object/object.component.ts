@@ -8,7 +8,7 @@ import {NDBAccordionItemComponent} from "../../components/ndb-accordion-item/ndb
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
 import {
   BehaviorSubject,
-  combineLatest, combineLatestWith,
+  combineLatest,
   EMPTY,
   filter,
   first,
@@ -21,7 +21,7 @@ import {
   switchMap
 } from "rxjs";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
-import {RedNodeAst, RedNodeKind} from "../../../shared/red-ast/red-node.ast";
+import {RedNodeKind} from "../../../shared/red-ast/red-node.ast";
 import {ActivatedRoute} from "@angular/router";
 import {MatChipsModule} from "@angular/material/chips";
 import {RedClassAst} from "../../../shared/red-ast/red-class.ast";
@@ -43,7 +43,7 @@ import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
 import {NDBDocumentationComponent} from "../../components/ndb-documentation/ndb-documentation.component";
 import {MatTooltipModule} from "@angular/material/tooltip";
 
-interface InheritData extends RedTypeAst {
+export interface InheritData extends RedTypeAst {
   readonly isEmpty: boolean;
 }
 
@@ -67,6 +67,8 @@ interface ObjectData {
 
   readonly isMobile: boolean;
   readonly isPinned: boolean;
+
+  readonly highlightEmpty: boolean;
 
   readonly showParents: boolean;
   readonly showChildren: boolean;
@@ -211,8 +213,6 @@ export class ObjectComponent {
       map((object) => object as RedClassAst),
       shareReplay(1)
     );
-    const parents$ = object$.pipe(this.getParents(), shareReplay(1));
-    const children$ = object$.pipe(this.getChildren(), shareReplay(1));
     const documentation$ = object$.pipe(this.getDocumentation(), shareReplay(1));
 
     combineLatest([
@@ -222,8 +222,6 @@ export class ObjectComponent {
 
     this.data$ = combineLatest([
       object$,
-      parents$,
-      children$,
       documentation$,
       this.isDocumented$,
       this.dumpService.badges$,
@@ -233,8 +231,6 @@ export class ObjectComponent {
     ]).pipe(
       map(([
              object,
-             parents,
-             children,
              documentation,
              isDocumented,
              badges,
@@ -265,8 +261,8 @@ export class ObjectComponent {
           name: name,
           scope: RedVisibilityDef[object.visibility],
           isAbstract: object.isAbstract,
-          parents: parents,
-          children: children,
+          parents: object.parents,
+          children: object.children,
           properties: properties,
           functions: functions,
           badges: badges,
@@ -276,8 +272,9 @@ export class ObjectComponent {
           hasBodyDocumentation: !isMobile && documentation.body !== undefined,
           isMobile: isMobile,
           isPinned: settings.isBarPinned,
-          showParents: parents.length > 0 || showEmptyAccordion,
-          showChildren: children.length > 0 || showEmptyAccordion,
+          highlightEmpty: settings.highlightEmptyObject,
+          showParents: object.parents.length > 0 || showEmptyAccordion,
+          showChildren: object.children.length > 0 || showEmptyAccordion,
           showProperties: properties.length > 0 || showEmptyAccordion || this.isPropertiesFiltered,
           showFunctions: functions.length > 0 || showEmptyAccordion || this.isFunctionsFiltered,
         };
@@ -363,50 +360,6 @@ export class ObjectComponent {
       return;
     }
     $element.scrollIntoView({block: 'center'});
-  }
-
-  private getParents(): OperatorFunction<RedClassAst | undefined, RedTypeAst[]> {
-    return pipe(
-      switchMap((object) => {
-        if (!object || !object.parent) {
-          return of([]);
-        }
-        return this.dumpService.getParentsByName(object.parent, RedNodeKind.class);
-      }),
-      combineLatestWith(this.settingsService.highlightEmptyObject$),
-      map(([parents, highlightEmptyObject]: [RedClassAst[], boolean]) => {
-        return parents.map((parent) => <InheritData>{
-          id: parent.id,
-          kind: RedNodeKind.class,
-          name: parent.name,
-          aliasName: parent.aliasName,
-          isEmpty: highlightEmptyObject && RedNodeAst.isEmpty(parent),
-          size: -1
-        })
-      })
-    );
-  }
-
-  private getChildren(): OperatorFunction<RedClassAst | undefined, RedTypeAst[]> {
-    return pipe(
-      switchMap((object) => {
-        if (!object) {
-          return of([]);
-        }
-        return this.dumpService.getChildrenByName(object.name, RedNodeKind.class);
-      }),
-      combineLatestWith(this.settingsService.highlightEmptyObject$),
-      map(([children, highlightEmptyObject]: [RedClassAst[], boolean]) => {
-        return children.map((child) => <InheritData>{
-          id: child.id,
-          kind: RedNodeKind.class,
-          name: child.name,
-          aliasName: child.aliasName,
-          isEmpty: highlightEmptyObject && RedNodeAst.isEmpty(child),
-          size: -1
-        })
-      })
-    );
   }
 
   private getDocumentation(): OperatorFunction<RedClassAst | undefined, ClassDocumentation> {
