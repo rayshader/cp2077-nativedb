@@ -1,7 +1,6 @@
 import {TestBed} from "@angular/core/testing";
 import {provideRouter, Router} from "@angular/router";
 import {RouterTestingHarness} from "@angular/router/testing";
-import {RedDumpService} from "../../shared/services/red-dump.service";
 import {RedDumpServiceMock} from "../../../tests/services/red-dump.service.mock";
 import {vanillaRedirectGuard} from "./vanilla-redirect.guard";
 import {Observable, of} from "rxjs";
@@ -9,6 +8,9 @@ import {RedNodeAst} from "../../shared/red-ast/red-node.ast";
 import {AstHelper} from "../../../tests/ast.helper";
 import {cyrb53} from "../../shared/string";
 import {DummyComponent} from "../../../tests/angular/dummy.component";
+import {RedDumpService} from "../../shared/services/red-dump.service";
+
+jest.mock("../../shared/services/red-dump.service");
 
 describe('vanillaRedirectGuard', () => {
   let dumpMock: any;
@@ -38,6 +40,7 @@ describe('vanillaRedirectGuard', () => {
     // GIVEN
     const observer: Observable<RedNodeAst | undefined> = of(undefined);
 
+    dumpMock.mockIsReady(true);
     dumpMock.getById.mockReturnValue(observer);
 
     // WHEN
@@ -54,6 +57,7 @@ describe('vanillaRedirectGuard', () => {
     // GIVEN
     const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildClass('Test'));
 
+    dumpMock.mockIsReady(true);
     dumpMock.getById.mockReturnValue(observer);
 
     // WHEN
@@ -70,6 +74,7 @@ describe('vanillaRedirectGuard', () => {
     // GIVEN
     const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildClass('Test'));
 
+    dumpMock.mockIsReady(true);
     dumpMock.getById.mockReturnValue(observer);
 
     // WHEN
@@ -88,6 +93,7 @@ describe('vanillaRedirectGuard', () => {
     // GIVEN
     const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildClass('Test'));
 
+    dumpMock.mockIsReady(true);
     dumpMock.getById.mockReturnValue(observer);
 
     // WHEN

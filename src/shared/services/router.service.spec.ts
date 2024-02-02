@@ -6,6 +6,8 @@ import {RedNodeAst} from "../red-ast/red-node.ast";
 import {AstHelper} from "../../../tests/ast.helper";
 import {cyrb53} from "../string";
 
+jest.mock("./red-dump.service");
+
 describe('RouterService', () => {
   let dumpMock: any;
   let routerMock: any;

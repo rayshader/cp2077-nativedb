@@ -47,7 +47,10 @@ export class AstHelper {
       isAbstract: false,
       isStruct: false,
       functions: [],
-      properties: []
+      properties: [],
+      parents: [],
+      children: [],
+      isInheritanceLoaded: false
     };
   }
 
@@ -62,7 +65,10 @@ export class AstHelper {
       isAbstract: false,
       isStruct: true,
       functions: [],
-      properties: []
+      properties: [],
+      parents: [],
+      children: [],
+      isInheritanceLoaded: false
     };
   }
 
