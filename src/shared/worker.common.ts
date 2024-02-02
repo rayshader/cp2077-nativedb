@@ -9,7 +9,8 @@ export enum NDBCommand {
 
   // RedDump
   rd_load,
-  rd_update,
+  rd_load_aliases,
+  rd_load_inheritance,
 
   // WebWorker
   dispose
@@ -22,5 +23,5 @@ export interface NDBMessage {
 
 export interface NDBCommandHandler {
   readonly command: NDBCommand;
-  readonly fn: (data: any) => void;
+  readonly fn: (data: any) => void | Promise<void>;
 }

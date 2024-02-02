@@ -25,9 +25,10 @@ export interface RedClassAst extends RedNodeAst {
   readonly properties: RedPropertyAst[];
   readonly functions: RedFunctionAst[];
 
-  // Fill parents/children, while loading.
+  // Load parents/children on first visit using WebWorker.
   readonly parents: InheritData[];
   readonly children: InheritData[];
+  isInheritanceLoaded: boolean;
 }
 
 export class RedClassAst {
@@ -52,7 +53,8 @@ export class RedClassAst {
       properties: json.e?.map(RedPropertyAst.fromJson) ?? [],
       functions: json.f?.map(RedFunctionAst.fromJson) ?? [],
       parents: [],
-      children: []
+      children: [],
+      isInheritanceLoaded: false
     };
   }
 

@@ -1,50 +1,91 @@
 import {RedEnumAst} from "../red-ast/red-enum.ast";
-import {NDBCommand, NDBMessage} from "../worker.common";
+import {NDBCommand, NDBCommandHandler, NDBMessage} from "../worker.common";
 import {RedBitfieldAst} from "../red-ast/red-bitfield.ast";
 import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
 import {RedPropertyAst} from "../red-ast/red-property.ast";
 import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
-import {RedDumpWorkerLoad, RedDumpWorkerUpdate} from "./red-dump.service";
+import {RedDumpWorkerLoad, RedDumpWorkerLoadAliases} from "./red-dump.service";
 import {InheritData} from "../../app/pages/object/object.component";
 
-(async () => {
-  const enums: RedEnumAst[] = await loadEnums();
-  const bitfields: RedBitfieldAst[] = await loadBitfields();
-  const functions: RedFunctionAst[] = await loadFunctions();
-  const objects: RedClassAst[] = await loadObjects();
-  const nodes: RedNodeAst[] = [...enums, ...bitfields, ...functions, ...objects];
+interface RedDumpData {
+  enums: RedEnumAst[];
+  bitfields: RedBitfieldAst[];
+  functions: RedFunctionAst[];
+  objects: RedClassAst[];
+  classes: RedClassAst[];
+  structs: RedClassAst[];
+}
 
-  const classes: RedClassAst[] = objects.filter((object) => !object.isStruct);
-  const structs: RedClassAst[] = objects.filter((object) => object.isStruct);
-  const badges: number = computeBadges(objects);
+const data: RedDumpData = {
+  enums: [],
+  bitfields: [],
+  functions: [],
+  objects: [],
+  classes: [],
+  structs: []
+};
+
+(async () => {
+  addEventListener('message', onMessage);
+
+  data.enums = await loadEnums();
+  data.bitfields = await loadBitfields();
+  data.functions = await loadFunctions();
+  data.objects = await loadObjects();
+  const nodes: RedNodeAst[] = [...data.enums, ...data.bitfields, ...data.functions, ...data.objects];
+
+  data.classes = data.objects.filter((object) => !object.isStruct);
+  data.structs = data.objects.filter((object) => object.isStruct);
+  const badges: number = computeBadges(data.objects);
 
   send(NDBCommand.rd_load, <RedDumpWorkerLoad>{
-    enums,
-    bitfields,
-    functions,
-    classes,
-    structs,
-    badges
+    enums: data.enums,
+    bitfields: data.bitfields,
+    functions: data.functions,
+    classes: data.classes,
+    structs: data.structs,
+    badges: badges
   });
 
   loadAliases(nodes);
 
-  send(NDBCommand.rd_update, <RedDumpWorkerUpdate>{
-    functions,
-    classes,
-    structs
+  send(NDBCommand.rd_load_aliases, <RedDumpWorkerLoadAliases>{
+    functions: data.functions,
+    classes: data.classes,
+    structs: data.structs
   });
-
-  loadInheritance(objects);
-
-  send(NDBCommand.rd_update, <RedDumpWorkerUpdate>{
-    classes,
-    structs
-  });
-
-  send(NDBCommand.dispose);
 })();
+
+const commands: NDBCommandHandler[] = [
+  {command: NDBCommand.rd_load_inheritance, fn: onLoadInheritance}
+];
+
+function onMessage(event: MessageEvent): void {
+  const message: NDBMessage = event.data as NDBMessage;
+  const handler: NDBCommandHandler | undefined = commands.find((item) => item.command === message.command);
+
+  if (!handler) {
+    console.warn('RedDumpWorker: unknown command.');
+    return;
+  }
+  handler.fn(message.data);
+}
+
+function onLoadInheritance(id: number): void {
+  const object: RedClassAst | undefined = data.objects.find((object) => object.id === id);
+
+  if (!object) {
+    return;
+  }
+  if (object.isInheritanceLoaded) {
+    return;
+  }
+  loadParents(data.objects, object);
+  loadChildren(data.objects, object);
+  object.isInheritanceLoaded = true;
+  send(NDBCommand.rd_load_inheritance, [object.id, object.parents, object.children]);
+}
 
 function send(command: NDBCommand, data?: any): void {
   postMessage(<NDBMessage>{
@@ -64,13 +105,6 @@ function computeBadges(objects: RedClassAst[]): number {
 
 function getMax(a: number, b: number): number {
   return Math.max(a, b);
-}
-
-function loadInheritance(objects: RedClassAst[]): void {
-  objects.forEach((object) => {
-    loadParents(objects, object);
-    loadChildren(objects, object);
-  });
 }
 
 function loadParents(objects: RedClassAst[], object: RedClassAst): void {

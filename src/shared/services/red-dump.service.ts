@@ -3,11 +3,16 @@ import {
   BehaviorSubject,
   combineLatest,
   combineLatestWith,
+  firstValueFrom,
   map,
   Observable,
+  of,
   OperatorFunction,
   pipe,
-  shareReplay
+  shareReplay,
+  Subject,
+  switchMap,
+  take
 } from "rxjs";
 import {RedNodeAst} from "../red-ast/red-node.ast";
 import {RedEnumAst} from "../red-ast/red-enum.ast";
@@ -17,6 +22,7 @@ import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {SettingsService} from "./settings.service";
 import {cyrb53} from "../string";
 import {NDBCommand, NDBCommandHandler, NDBMessage} from "../worker.common";
+import {InheritData} from "../../app/pages/object/object.component";
 
 export interface RedDumpWorkerLoad {
   readonly enums: RedEnumAst[];
@@ -27,7 +33,7 @@ export interface RedDumpWorkerLoad {
   readonly badges: number;
 }
 
-export interface RedDumpWorkerUpdate {
+export interface RedDumpWorkerLoadAliases {
   readonly functions?: RedFunctionAst[];
   readonly classes: RedClassAst[];
   readonly structs: RedClassAst[];
@@ -38,13 +44,6 @@ export interface RedDumpWorkerUpdate {
 })
 export class RedDumpService {
 
-  private readonly enums: BehaviorSubject<RedEnumAst[]> = new BehaviorSubject<RedEnumAst[]>([]);
-  private readonly bitfields: BehaviorSubject<RedBitfieldAst[]> = new BehaviorSubject<RedBitfieldAst[]>([]);
-  private readonly functions: BehaviorSubject<RedFunctionAst[]> = new BehaviorSubject<RedFunctionAst[]>([]);
-  private readonly classes: BehaviorSubject<RedClassAst[]> = new BehaviorSubject<RedClassAst[]>([]);
-  private readonly structs: BehaviorSubject<RedClassAst[]> = new BehaviorSubject<RedClassAst[]>([]);
-  private readonly badges: BehaviorSubject<number> = new BehaviorSubject<number>(5);
-
   readonly enums$: Observable<RedEnumAst[]>;
   readonly bitfields$: Observable<RedBitfieldAst[]>;
   readonly functions$: Observable<RedFunctionAst[]>;
@@ -52,12 +51,22 @@ export class RedDumpService {
   readonly structs$: Observable<RedClassAst[]>;
   readonly badges$: Observable<number>;
 
+  private readonly enums: BehaviorSubject<RedEnumAst[]> = new BehaviorSubject<RedEnumAst[]>([]);
+  private readonly bitfields: BehaviorSubject<RedBitfieldAst[]> = new BehaviorSubject<RedBitfieldAst[]>([]);
+  private readonly functions: BehaviorSubject<RedFunctionAst[]> = new BehaviorSubject<RedFunctionAst[]>([]);
+  private readonly classes: BehaviorSubject<RedClassAst[]> = new BehaviorSubject<RedClassAst[]>([]);
+  private readonly structs: BehaviorSubject<RedClassAst[]> = new BehaviorSubject<RedClassAst[]>([]);
+  private readonly badges: BehaviorSubject<number> = new BehaviorSubject<number>(1);
+  private readonly inheritance: Subject<RedClassAst> = new Subject<RedClassAst>();
+
   private readonly nodes$: Observable<RedNodeAst[]>;
+  private readonly inheritance$: Observable<RedClassAst> = this.inheritance.asObservable();
 
   private worker?: Worker;
-  private commands: NDBCommandHandler[] = [
+  private readonly commands: NDBCommandHandler[] = [
     {command: NDBCommand.rd_load, fn: this.onWorkerLoad.bind(this)},
-    {command: NDBCommand.rd_update, fn: this.onWorkerUpdate.bind(this)},
+    {command: NDBCommand.rd_load_aliases, fn: this.onWorkerLoadAliases.bind(this)},
+    {command: NDBCommand.rd_load_inheritance, fn: this.onWorkerLoadInheritance.bind(this)},
     {command: NDBCommand.dispose, fn: this.onWorkerDispose.bind(this)},
   ];
 
@@ -118,11 +127,17 @@ export class RedDumpService {
   }
 
   getClassById(id: number): Observable<RedClassAst | undefined> {
-    return this.classes$.pipe(this.findById(id));
+    return this.classes$.pipe(
+      this.findById(id),
+      this.loadInheritance()
+    );
   }
 
   getStructById(id: number): Observable<RedClassAst | undefined> {
-    return this.structs$.pipe(this.findById(id));
+    return this.structs$.pipe(
+      this.findById(id),
+      this.loadInheritance()
+    );
   }
 
   getFunctionById(id: number): Observable<RedFunctionAst | undefined> {
@@ -149,6 +164,24 @@ export class RedDumpService {
     );
   }
 
+  private loadInheritance(): OperatorFunction<RedClassAst | undefined, RedClassAst | undefined> {
+    return pipe(
+      switchMap((object) => {
+        if (!object) {
+          return of(object);
+        }
+        if (object.isInheritanceLoaded) {
+          return of(object);
+        }
+        this.worker?.postMessage(<NDBMessage>{
+          command: NDBCommand.rd_load_inheritance,
+          data: object.id
+        });
+        return this.inheritance$.pipe(take(1));
+      })
+    );
+  }
+
   private loadWorker(): void {
     if (typeof Worker === 'undefined') {
       return;
@@ -157,7 +190,7 @@ export class RedDumpService {
     this.worker.onmessage = this.onMessage.bind(this);
   }
 
-  private onMessage(event: MessageEvent): void {
+  private async onMessage(event: MessageEvent): Promise<void> {
     const message: NDBMessage = event.data as NDBMessage;
     const handler: NDBCommandHandler | undefined = this.commands.find((item) => item.command === message.command);
 
@@ -165,7 +198,7 @@ export class RedDumpService {
       console.warn('MainWorker: unknown command.');
       return;
     }
-    handler.fn(message.data);
+    await handler.fn(message.data);
   }
 
   private onWorkerLoad(data: RedDumpWorkerLoad): void {
@@ -177,12 +210,24 @@ export class RedDumpService {
     this.badges.next(data.badges);
   }
 
-  private onWorkerUpdate(data: RedDumpWorkerUpdate): void {
+  private onWorkerLoadAliases(data: RedDumpWorkerLoadAliases): void {
     if (data.functions) {
       this.functions.next(data.functions);
     }
     this.classes.next(data.classes);
     this.structs.next(data.structs);
+  }
+
+  private async onWorkerLoadInheritance([id, parents, children]: [number, InheritData[], InheritData[]]): Promise<void> {
+    const object: RedClassAst | undefined = await firstValueFrom(this.getById(id)) as RedClassAst;
+
+    if (!object || object.isInheritanceLoaded) {
+      return;
+    }
+    object.parents.push(...parents);
+    object.children.push(...children);
+    object.isInheritanceLoaded = true;
+    this.inheritance.next(object);
   }
 
   private onWorkerDispose(): void {
