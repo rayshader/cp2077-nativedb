@@ -41,8 +41,5 @@ testem.log
 .DS_Store
 Thumbs.db
 
-# RTTI dumps
-src/assets/reddump/
-
 # WASM files
 src/*.wasm
