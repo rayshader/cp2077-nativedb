@@ -163,7 +163,7 @@ function loadAliases(nodes: RedNodeAst[]): void {
 }
 
 async function loadEnums(): Promise<RedEnumAst[]> {
-  const json: any[] = await getJson('/assets/reddump/enums.json');
+  const json: any[] = await getJson('./assets/reddump/enums.json');
   const enums: RedEnumAst[] = json.map(RedEnumAst.fromJson);
 
   enums.sort(RedEnumAst.sort);
@@ -171,7 +171,7 @@ async function loadEnums(): Promise<RedEnumAst[]> {
 }
 
 async function loadBitfields(): Promise<RedBitfieldAst[]> {
-  const json: any[] = await getJson('/assets/reddump/bitfields.json');
+  const json: any[] = await getJson('./assets/reddump/bitfields.json');
   const bitfields: RedBitfieldAst[] = json.map(RedBitfieldAst.fromJson);
 
   bitfields.sort(RedBitfieldAst.sort);
@@ -179,7 +179,7 @@ async function loadBitfields(): Promise<RedBitfieldAst[]> {
 }
 
 async function loadFunctions(): Promise<RedFunctionAst[]> {
-  const json: any[] = await getJson('/assets/reddump/globals.json');
+  const json: any[] = await getJson('./assets/reddump/globals.json');
   const functions: RedFunctionAst[] = json.map(RedFunctionAst.fromJson);
 
   functions.sort(RedFunctionAst.sort);
@@ -187,7 +187,7 @@ async function loadFunctions(): Promise<RedFunctionAst[]> {
 }
 
 async function loadObjects(): Promise<RedClassAst[]> {
-  const json: any[] = await getJson('/assets/reddump/classes.json');
+  const json: any[] = await getJson('./assets/reddump/classes.json');
   const objects: RedClassAst[] = json.map(RedClassAst.fromJson);
 
   objects.sort(RedClassAst.sort);
