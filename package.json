@@ -6,6 +6,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "build:github": "ng build --base-href /cp2077-nativedb/",
     "postbuild": "gulp -f gulp.mjs compress-brotli",
     "prod": "npx http-server ./dist/browser/ --port 4400 --brotli -c-1",
     "watch": "ng build --watch --configuration development",
