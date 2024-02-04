@@ -142,6 +142,26 @@ export class AstHelper {
     };
   }
 
+  static buildWeakRef(name: string, aliasName?: string): RedTypeAst {
+    return {
+      kind: RedNodeKind.type,
+      id: cyrb53('wref'),
+      name: 'wref',
+      flag: RedTemplateDef.wref,
+      innerType: this.buildType(name, aliasName)
+    };
+  }
+
+  static buildArray(innerType: RedTypeAst): RedTypeAst {
+    return {
+      kind: RedNodeKind.type,
+      id: cyrb53('array'),
+      name: 'array',
+      flag: RedTemplateDef.array,
+      innerType: innerType
+    };
+  }
+
   private static buildPrimitive(primitive: RedPrimitiveDef): RedTypeAst {
     const name: string = RedPrimitiveDef[primitive];
 
