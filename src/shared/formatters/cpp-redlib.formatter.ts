@@ -6,6 +6,10 @@ import {NDBFormatCodePipe} from "../../app/pipes/ndb-format-code.pipe";
 import {CodeSyntax} from "../services/settings.service";
 import {RedPrimitiveDef} from "../red-ast/red-definitions.ast";
 
+/**
+ * @deprecated format of current implementation is not pure C++. Option is disabled in {@link SettingsComponent}.
+ * This formatter is kept in case someone wish to improve on it.
+ */
 export class CppRedLibFormatter extends CodeFormatter {
 
   private readonly formatCodePipe: NDBFormatCodePipe;

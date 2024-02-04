@@ -39,7 +39,7 @@ export class SettingsComponent implements OnInit {
   readonly codeOptions: AItem<CodeSyntax>[] = [
     {value: CodeSyntax.pseudocode, name: 'Pseudocode · Legacy', disabled: false},
     {value: CodeSyntax.redscript, name: 'Redscript', disabled: false},
-    {value: CodeSyntax.cppRED4ext, name: 'C++ · RED4ext / RedLib', disabled: false}
+    //{value: CodeSyntax.cppRED4ext, name: 'C++ · RED4ext / RedLib', disabled: false}
   ];
 
   readonly ignoreDuplicate: FormControl<boolean | null> = new FormControl(true);
