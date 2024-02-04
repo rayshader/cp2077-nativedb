@@ -31,7 +31,7 @@ interface AItem<T> {
 export class SettingsComponent implements OnInit {
 
   readonly clipboardOptions: AItem<CodeSyntax>[] = [
-    {value: CodeSyntax.redscript, name: 'Red · Scripts', disabled: true},
+    {value: CodeSyntax.redscript, name: 'Redscript', disabled: true},
     {value: CodeSyntax.lua, name: 'Lua · CET', disabled: false},
     {value: CodeSyntax.cppRedLib, name: 'C++ · RedLib', disabled: false},
   ];
@@ -40,6 +40,7 @@ export class SettingsComponent implements OnInit {
     {value: CodeSyntax.vanilla, name: 'Vanilla', disabled: false},
     {value: CodeSyntax.redscript, name: 'Red · Scripts', disabled: false},
     {value: CodeSyntax.cppRED4ext, name: 'C++ · RED4ext / RedLib', disabled: false}
+    {value: CodeSyntax.redscript, name: 'Redscript', disabled: false},
   ];
 
   readonly ignoreDuplicate: FormControl<boolean | null> = new FormControl(true);
