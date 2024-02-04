@@ -30,7 +30,9 @@ export class NDBHighlightDirective {
     if (!this.isHighlight) {
       return;
     }
-    this.router.navigateByUrl(window.location.pathname, {replaceUrl: true});
+    const url: string = this.getUrlWithoutFragment();
+
+    this.router.navigateByUrl(url, {replaceUrl: true});
   }
 
   @HostListener('click')
@@ -38,7 +40,18 @@ export class NDBHighlightDirective {
     if (!this.isHighlight) {
       return;
     }
-    this.router.navigateByUrl(window.location.pathname, {replaceUrl: true});
+    const url: string = this.getUrlWithoutFragment();
+
+    this.router.navigateByUrl(url, {replaceUrl: true});
+  }
+
+  private getUrlWithoutFragment(): string {
+    const url: string = this.router.url;
+
+    if (url.indexOf('#') === -1) {
+      return url;
+    }
+    return url.substring(0, url.indexOf('#'));
   }
 
 }
