@@ -140,4 +140,36 @@ describe('LuaFormatter', () => {
       'blackboardSystem = Game.GetBlackboardSystem()\n');
   });
 
+  it('should format member function without name conflicts', () => {
+    // GIVEN
+    const vehicleComponentObj: RedClassAst = AstHelper.buildClass('VehicleComponent');
+    const memberFn: RedFunctionAst = AstHelper.buildFunction('GetSeats',
+      AstHelper.Bool,
+      true,
+      RedVisibilityDef.public,
+      [
+        AstHelper.buildArg('gi', AstHelper.buildType('ScriptGameInstance', 'GameInstance')),
+        AstHelper.buildArg('vehicle',
+          AstHelper.buildWeakRef('vehicleBaseObject', 'VehicleObject')
+        ),
+        AstHelper.buildArg('seats',
+          AstHelper.buildArray(
+            AstHelper.buildWeakRef('gamedataVehicleSeat_Record', 'VehicleSeat_Record')
+          )
+        )
+      ]
+    );
+
+    // WHEN
+    const code: string = fmt.formatCode(memberFn, vehicleComponentObj);
+
+    // THEN
+    expect(code).toEqual('local gi -- GameInstance\n' +
+      'local vehicle -- wref<VehicleObject>\n' +
+      'local seats -- array<wref<VehicleSeat_Record>>\n' +
+      'local result -- Bool\n' +
+      '\n' +
+      'result = VehicleComponent.GetSeats(gi, vehicle, seats)\n');
+  });
+
 });

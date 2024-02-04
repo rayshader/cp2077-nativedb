@@ -87,6 +87,11 @@ export abstract class CodeFormatter {
       name = fnName.substring(offset);
     }
     name = `${name[0].toLowerCase()}${name.substring(1)}`;
+    const isPresent = func.arguments.findIndex((argument) => argument.name === name);
+
+    if (isPresent !== -1) {
+      name = 'result';
+    }
     return name;
   }
 
