@@ -53,8 +53,7 @@
     }
 
     @if (data.showChildren) {
-      <ndb-accordion-item [expanded]="data.children.length > 0"
-                          [disabled]="data.children.length === 0">
+      <ndb-accordion-item [disabled]="data.children.length === 0">
         <div header>
           <h3>Inherited by</h3>
           <mat-chip [highlighted]="data.children.length > 0"
