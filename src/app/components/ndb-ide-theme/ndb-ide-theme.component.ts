@@ -27,7 +27,7 @@ interface ThemeItem {
 export class NDBIdeThemeComponent {
 
   readonly themes: ThemeItem[] = [
-    {isSelected: true, value: IDETheme.vanilla, name: 'Vanilla'},
+    {isSelected: true, value: IDETheme.legacy, name: 'Legacy'},
     {isSelected: false, value: IDETheme.vscode, name: 'VS Code · Modern'},
     {isSelected: false, value: IDETheme.intellij, name: 'IntelliJ · Dracula'},
   ];

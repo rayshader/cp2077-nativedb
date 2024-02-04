@@ -5,7 +5,7 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {LazyLoaderService} from "./lazy-loader.service";
 
 export enum IDETheme {
-  vanilla,
+  legacy,
   vscode,
   intellij
 }

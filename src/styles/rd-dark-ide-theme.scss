@@ -1,7 +1,7 @@
-@use './ide/vanilla' as *;
+@use './ide/legacy' as *;
 @use './ide/vscode' as *;
 @use './ide/intellij' as *;
 
-@include ide-vanilla-theme($is-light: false);
+@include ide-legacy-theme($is-light: false);
 @include ide-vscode-theme($is-light: false);
 @include ide-intellij-theme($is-light: false);

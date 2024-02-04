@@ -1,5 +1,5 @@
 @use './ide/mixins' as *;
-@use './ide/vanilla' as *;
+@use './ide/legacy' as *;
 @use './ide/vscode' as *;
 @use './ide/intellij' as *;
 
@@ -7,6 +7,6 @@
 @include rd-ide-background();
 @include rd-ide-theme();
 
-@include ide-vanilla-theme($is-light: true);
+@include ide-legacy-theme($is-light: true);
 @include ide-vscode-theme($is-light: true);
 @include ide-intellij-theme($is-light: true);
