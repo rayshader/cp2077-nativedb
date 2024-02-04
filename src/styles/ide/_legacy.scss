@@ -1,10 +1,10 @@
 @use 'sass:color';
 
-@mixin ide-vanilla-theme($is-light: true) {
+@mixin ide-legacy-theme($is-light: true) {
   @if $is-light {
     @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
 
-    .ide-vanilla-theme {
+    .ide-legacy-theme {
       --ndb-ide-typography-family: #{'Fira Code', monospace};
       --ndb-ide-typography-size: 1rem;
 
@@ -25,7 +25,7 @@
       --ndb-ide-primitive-type: var(--ndb-ide-language);
     }
   } @else {
-    .ide-vanilla-theme {
+    .ide-legacy-theme {
       &.dark-theme {
         --ndb-ide-background: #2B2B2B;
         --ndb-ide-toolbar: #161B22;

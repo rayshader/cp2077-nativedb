@@ -33,11 +33,11 @@ describe('SettingsService', () => {
       showDocumentation: true,
       highlightEmptyObject: true,
       showEmptyAccordion: false,
-      mergeObject: false,
+      mergeObject: true,
       tabsWidth: 320,
       isBarPinned: true,
       clipboardSyntax: CodeSyntax.lua,
-      codeSyntax: CodeSyntax.vanilla
+      codeSyntax: CodeSyntax.redscript
     });
   });
 
@@ -51,11 +51,11 @@ describe('SettingsService', () => {
       'show-documentation': false,
       'highlight-empty-object': true,
       'show-empty-accordion': true,
-      'merge-object': true,
+      'merge-object': false,
       'tabs-width': 400,
       'is-bar-pinned': false,
       'clipboard-syntax': CodeSyntax.lua,
-      'code-syntax': CodeSyntax.redscript
+      'code-syntax': CodeSyntax.pseudocode
     });
 
     // WHEN
@@ -72,11 +72,11 @@ describe('SettingsService', () => {
       showDocumentation: false,
       highlightEmptyObject: true,
       showEmptyAccordion: true,
-      mergeObject: true,
+      mergeObject: false,
       tabsWidth: 400,
       isBarPinned: false,
       clipboardSyntax: CodeSyntax.lua,
-      codeSyntax: CodeSyntax.redscript
+      codeSyntax: CodeSyntax.pseudocode
     });
   });
 
@@ -89,11 +89,11 @@ describe('SettingsService', () => {
       'show-documentation': true,
       'highlight-empty-object': false,
       'show-empty-accordion': false,
-      'merge-object': false,
+      'merge-object': true,
       'tabs-width': 500,
       'is-bar-pinned': true,
       'clipboard-syntax': CodeSyntax.cppRedLib,
-      'code-syntax': CodeSyntax.redscript
+      'code-syntax': CodeSyntax.pseudocode
     });
 
     // WHEN
@@ -137,11 +137,11 @@ describe('SettingsService', () => {
       showDocumentation: true,
       highlightEmptyObject: false,
       showEmptyAccordion: false,
-      mergeObject: false,
+      mergeObject: true,
       tabsWidth: 500,
       isBarPinned: true,
       clipboardSyntax: CodeSyntax.cppRedLib,
-      codeSyntax: CodeSyntax.redscript
+      codeSyntax: CodeSyntax.pseudocode
     });
   });
 
@@ -153,10 +153,11 @@ describe('SettingsService', () => {
       {name: 'showDocumentation', key: 'show-documentation', change: false, expect: 'false'},
       {name: 'highlightEmptyObject', key: 'highlight-empty-object', change: false, expect: 'false'},
       {name: 'showEmptyAccordion', key: 'show-empty-accordion', change: true, expect: 'true'},
+      {name: 'mergeObject', key: 'merge-object', change: false, expect: 'false'},
       {name: 'tabsWidth', key: 'tabs-width', change: 400, expect: '400'},
       {name: 'isBarPinned', key: 'is-bar-pinned', change: false, expect: 'false'},
       {name: 'clipboard', key: 'clipboard-syntax', change: CodeSyntax.lua, expect: CodeSyntax.lua.toString()},
-      {name: 'code', key: 'code-syntax', change: CodeSyntax.vanilla, expect: CodeSyntax.vanilla.toString()},
+      {name: 'code', key: 'code-syntax', change: CodeSyntax.pseudocode, expect: CodeSyntax.pseudocode.toString()},
     ];
 
     beforeAll(() => {

@@ -17,7 +17,7 @@ export interface Settings {
 }
 
 export enum CodeSyntax {
-  vanilla,
+  pseudocode,
   redscript,
   lua,
   cppRED4ext,
@@ -36,11 +36,11 @@ export class SettingsService {
   private readonly showDocumentationSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly highlightEmptyObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly showEmptyAccordionSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  private readonly mergeObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private readonly mergeObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly tabsWidthSubject: BehaviorSubject<number> = new BehaviorSubject<number>(320);
   private readonly isBarPinnedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly clipboardSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.lua);
-  private readonly codeSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.vanilla);
+  private readonly codeSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
 
   /**
    * Whether this application is used for the first time on this device?
@@ -112,11 +112,11 @@ export class SettingsService {
     const showDocumentation: boolean = (localStorage.getItem('show-documentation') ?? 'true') === 'true';
     const highlightEmptyObject: boolean = (localStorage.getItem('highlight-empty-object') ?? 'true') === 'true';
     const showEmptyAccordion: boolean = (localStorage.getItem('show-empty-accordion') ?? 'false') === 'true';
-    const mergeObject: boolean = (localStorage.getItem('merge-object') ?? 'false') === 'true';
+    const mergeObject: boolean = (localStorage.getItem('merge-object') ?? 'true') === 'true';
     const tabsWidth: number = +(localStorage.getItem('tabs-width') ?? '320');
     const isBarPinned: boolean = (localStorage.getItem('is-bar-pinned') ?? 'true') === 'true';
     const clipboard: string = localStorage.getItem('clipboard-syntax') ?? CodeSyntax.lua.toString();
-    const code: string = localStorage.getItem('code-syntax') ?? CodeSyntax.vanilla.toString();
+    const code: string = localStorage.getItem('code-syntax') ?? CodeSyntax.redscript.toString();
 
     this.ignoreDuplicateSubject.next(ignoreDuplicate);
     this.scriptOnlySubject.next(scriptOnly);
