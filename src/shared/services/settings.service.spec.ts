@@ -37,7 +37,7 @@ describe('SettingsService', () => {
       tabsWidth: 320,
       isBarPinned: true,
       clipboardSyntax: CodeSyntax.lua,
-      codeSyntax: CodeSyntax.vanilla
+      codeSyntax: CodeSyntax.redscript
     });
   });
 
@@ -55,7 +55,7 @@ describe('SettingsService', () => {
       'tabs-width': 400,
       'is-bar-pinned': false,
       'clipboard-syntax': CodeSyntax.lua,
-      'code-syntax': CodeSyntax.redscript
+      'code-syntax': CodeSyntax.vanilla
     });
 
     // WHEN
@@ -76,7 +76,7 @@ describe('SettingsService', () => {
       tabsWidth: 400,
       isBarPinned: false,
       clipboardSyntax: CodeSyntax.lua,
-      codeSyntax: CodeSyntax.redscript
+      codeSyntax: CodeSyntax.vanilla
     });
   });
 
@@ -93,7 +93,7 @@ describe('SettingsService', () => {
       'tabs-width': 500,
       'is-bar-pinned': true,
       'clipboard-syntax': CodeSyntax.cppRedLib,
-      'code-syntax': CodeSyntax.redscript
+      'code-syntax': CodeSyntax.vanilla
     });
 
     // WHEN
@@ -141,7 +141,7 @@ describe('SettingsService', () => {
       tabsWidth: 500,
       isBarPinned: true,
       clipboardSyntax: CodeSyntax.cppRedLib,
-      codeSyntax: CodeSyntax.redscript
+      codeSyntax: CodeSyntax.vanilla
     });
   });
 

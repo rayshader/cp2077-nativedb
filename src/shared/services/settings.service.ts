@@ -40,7 +40,7 @@ export class SettingsService {
   private readonly tabsWidthSubject: BehaviorSubject<number> = new BehaviorSubject<number>(320);
   private readonly isBarPinnedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly clipboardSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.lua);
-  private readonly codeSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.vanilla);
+  private readonly codeSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
 
   /**
    * Whether this application is used for the first time on this device?
@@ -116,7 +116,7 @@ export class SettingsService {
     const tabsWidth: number = +(localStorage.getItem('tabs-width') ?? '320');
     const isBarPinned: boolean = (localStorage.getItem('is-bar-pinned') ?? 'true') === 'true';
     const clipboard: string = localStorage.getItem('clipboard-syntax') ?? CodeSyntax.lua.toString();
-    const code: string = localStorage.getItem('code-syntax') ?? CodeSyntax.vanilla.toString();
+    const code: string = localStorage.getItem('code-syntax') ?? CodeSyntax.redscript.toString();
 
     this.ignoreDuplicateSubject.next(ignoreDuplicate);
     this.scriptOnlySubject.next(scriptOnly);
