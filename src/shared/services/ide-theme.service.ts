@@ -20,10 +20,10 @@ export interface IDEThemeChanged {
 })
 export class IDEThemeService {
   private theme: BehaviorSubject<IDEThemeChanged> = new BehaviorSubject<IDEThemeChanged>({
-    old: IDETheme.vanilla,
-    current: IDETheme.vanilla,
+    old: IDETheme.vscode,
+    current: IDETheme.vscode,
   });
-  private currentTheme: IDETheme = IDETheme.vanilla;
+  private currentTheme: IDETheme = IDETheme.vscode;
   private isDarkLoaded: boolean = false;
 
   constructor(private readonly themeService: ThemeService,
@@ -32,7 +32,7 @@ export class IDEThemeService {
     let ideTheme: IDETheme;
 
     if (!localIdeTheme) {
-      ideTheme = IDETheme.vanilla;
+      ideTheme = IDETheme.vscode;
     } else {
       ideTheme = +localIdeTheme;
     }
