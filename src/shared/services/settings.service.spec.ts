@@ -55,7 +55,7 @@ describe('SettingsService', () => {
       'tabs-width': 400,
       'is-bar-pinned': false,
       'clipboard-syntax': CodeSyntax.lua,
-      'code-syntax': CodeSyntax.vanilla
+      'code-syntax': CodeSyntax.pseudocode
     });
 
     // WHEN
@@ -76,7 +76,7 @@ describe('SettingsService', () => {
       tabsWidth: 400,
       isBarPinned: false,
       clipboardSyntax: CodeSyntax.lua,
-      codeSyntax: CodeSyntax.vanilla
+      codeSyntax: CodeSyntax.pseudocode
     });
   });
 
@@ -93,7 +93,7 @@ describe('SettingsService', () => {
       'tabs-width': 500,
       'is-bar-pinned': true,
       'clipboard-syntax': CodeSyntax.cppRedLib,
-      'code-syntax': CodeSyntax.vanilla
+      'code-syntax': CodeSyntax.pseudocode
     });
 
     // WHEN
@@ -141,7 +141,7 @@ describe('SettingsService', () => {
       tabsWidth: 500,
       isBarPinned: true,
       clipboardSyntax: CodeSyntax.cppRedLib,
-      codeSyntax: CodeSyntax.vanilla
+      codeSyntax: CodeSyntax.pseudocode
     });
   });
 
@@ -157,7 +157,7 @@ describe('SettingsService', () => {
       {name: 'tabsWidth', key: 'tabs-width', change: 400, expect: '400'},
       {name: 'isBarPinned', key: 'is-bar-pinned', change: false, expect: 'false'},
       {name: 'clipboard', key: 'clipboard-syntax', change: CodeSyntax.lua, expect: CodeSyntax.lua.toString()},
-      {name: 'code', key: 'code-syntax', change: CodeSyntax.vanilla, expect: CodeSyntax.vanilla.toString()},
+      {name: 'code', key: 'code-syntax', change: CodeSyntax.pseudocode, expect: CodeSyntax.pseudocode.toString()},
     ];
 
     beforeAll(() => {

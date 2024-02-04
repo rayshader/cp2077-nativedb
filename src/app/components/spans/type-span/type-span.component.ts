@@ -25,7 +25,7 @@ export class TypeSpanComponent {
   isEmpty: boolean = false;
 
   protected readonly syntax$: Observable<number>;
-  protected readonly vanilla: number = CodeSyntax.vanilla + 1;
+  protected readonly vanilla: number = CodeSyntax.pseudocode + 1;
   protected readonly redscript: number = CodeSyntax.redscript + 1;
   protected readonly cpp: number = CodeSyntax.cppRED4ext + 1;
 

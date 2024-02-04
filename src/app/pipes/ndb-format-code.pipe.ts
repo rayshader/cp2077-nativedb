@@ -12,7 +12,7 @@ export class NDBFormatCodePipe implements PipeTransform {
   transform(type: RedTypeAst, syntax: CodeSyntax): string {
     syntax = syntax - 1;
     switch (syntax) {
-      case CodeSyntax.vanilla:
+      case CodeSyntax.pseudocode:
         if (type.flag === RedTemplateDef.ref) {
           return 'handle';
         } else if (type.flag === RedTemplateDef.wref) {

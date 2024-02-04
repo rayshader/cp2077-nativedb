@@ -17,7 +17,7 @@ export interface Settings {
 }
 
 export enum CodeSyntax {
-  vanilla,
+  pseudocode,
   redscript,
   lua,
   cppRED4ext,

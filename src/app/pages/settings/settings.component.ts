@@ -37,9 +37,7 @@ export class SettingsComponent implements OnInit {
   ];
 
   readonly codeOptions: AItem<CodeSyntax>[] = [
-    {value: CodeSyntax.vanilla, name: 'Vanilla', disabled: false},
-    {value: CodeSyntax.redscript, name: 'Red · Scripts', disabled: false},
-    {value: CodeSyntax.cppRED4ext, name: 'C++ · RED4ext / RedLib', disabled: false}
+    {value: CodeSyntax.pseudocode, name: 'Pseudocode · Legacy', disabled: false},
     {value: CodeSyntax.redscript, name: 'Redscript', disabled: false},
   ];
 
