@@ -54,13 +54,6 @@ export class NDBTabsComponent implements AfterViewInit {
   readonly viewports?: QueryList<CdkVirtualScrollViewport>;
 
   readonly data$: Observable<ViewData>;
-  readonly skeletons: TabItem[] = [
-    {icon: 'class', alt: 'Classes', nodes: []},
-    {icon: 'struct', alt: 'Structs', nodes: []},
-    {icon: 'function', alt: 'Global functions', nodes: []},
-    {icon: 'enum', alt: 'Enums', nodes: []},
-    {icon: 'bitfield', alt: 'Bitfields', nodes: []},
-  ];
 
   width: string = '320px';
 
