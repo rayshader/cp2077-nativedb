@@ -9,13 +9,15 @@
       @if (canCopy) {
         <button mat-icon-button
                 class="badge clipboard"
-                matTooltip="Copy to clipboard"
+                matTooltip="Copy code to clipboard"
+                matTooltipShowDelay="1500"
                 (click)="copyToClipboard()"><mat-icon>content_copy</mat-icon></button>
       }
       @if (canDocument) {
         <button mat-icon-button
                 class="badge"
                 matTooltip="Documentation"
+                matTooltipShowDelay="1500"
                 [class.stx-doc]="hasDocumentation"
                 (click)="toggleDocumentation()"
                 [disabled]="documentation === undefined">
@@ -25,6 +27,8 @@
       @if (canShare) {
         <button mat-icon-button
                 class="badge"
+                matTooltip="Copy URL to clipboard"
+                matTooltipShowDelay="1500"
                 (click)="copyUrlToClipboard()">
           <mat-icon>share</mat-icon>
         </button>
@@ -62,6 +66,7 @@
         <span class="stx-function"
               [matTooltip]="hasFullName ? 'Click to copy full name' : ''"
               [class.stx-highlight]="hasFullName"
+              matTooltipShowDelay="200"
               (click)="copyFullName()">{{node.name}}</span>
         <span class="stx-parenthesis">(</span>
       </div>
