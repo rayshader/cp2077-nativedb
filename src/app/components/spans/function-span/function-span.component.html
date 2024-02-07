@@ -60,8 +60,8 @@
     <div class="prototype stx" [class.break]="node.arguments.length > 0">
       <div class="group">
         <span class="stx-function"
-              [class.stx-function-fullname]="hasFullName"
               [matTooltip]="hasFullName ? 'Click to copy full name' : ''"
+              [class.stx-highlight]="hasFullName"
               (click)="copyFullName()">{{node.name}}</span>
         <span class="stx-parenthesis">(</span>
       </div>
