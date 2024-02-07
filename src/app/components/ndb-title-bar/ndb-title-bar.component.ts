@@ -27,6 +27,9 @@ export class NDBTitleBarComponent {
   title: string = '';
 
   @Input()
+  altTitle?: string;
+
+  @Input()
   hideDocumentation: boolean = false;
 
   @Input()
@@ -70,6 +73,13 @@ export class NDBTitleBarComponent {
     }
     this.isBookmarked = !this.isBookmarked;
     this.bookmarkService.toggleBookmark(this._node.id);
+  }
+
+  copyAltTitle(): void {
+    if (!this.altTitle) {
+      return;
+    }
+    navigator.clipboard.writeText(this.altTitle);
   }
 
   copyUrl(): void {

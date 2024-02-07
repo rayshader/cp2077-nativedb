@@ -1,5 +1,11 @@
 <div class="title">
-  <h1 class="stx stx-type">{{title}}</h1>
+  <h1 class="stx stx-type"
+      [class.stx-highlight]="!!altTitle"
+      [attr.clickable]="!!altTitle"
+      [matTooltip]="altTitle ?? ''"
+      matTooltipPosition="right"
+      matTooltipShowDelay="500"
+      (click)="copyAltTitle()">{{title}}</h1>
   <div class="prototype">
     <ng-content></ng-content>
   </div>
