@@ -90,8 +90,10 @@
 
   <p>
     All definitions are using native names like <span class="stx-type">vehicleBaseObject</span>. But some also contains
-    an alias name from scripts like <span class="stx-type">VehicleObject</span>. If you select
-    <em>Redscript</em> as a code syntax in Settings, it will show aliases when possible.
+    an alias name from scripts like <span class="stx-type">VehicleObject</span>. If you select <em>Redscript</em> as a
+    code syntax in Settings, it will show aliases when possible. Independently of this option, the name will be
+    <span class="stx stx-type stx-highlight">highlighted</span> to indicate there is a native/alias name. You can hover
+    the name to show it in a tooltip, and click on it to copy the name in your clipboard.
   </p>
 
   <p>
@@ -101,9 +103,9 @@
   <p>
     Functions are defined with a (short) name and a full name. Most of the time, both are equivalent, but not always.
     When a function is defined with a different full name, it will be
-    <span class="stx stx-function stx-function-fullname">highlighted</span>. This is useful if you are writing a mod
-    with C++ or Lua. In both languages, you may have to use the full name. You can get it by clicking on a function's
-    name to copy the full name to your clipboard. Here an example:
+    <span class="stx stx-function stx-highlight">highlighted</span>. This is useful if you are writing a mod with C++
+    or Lua. In both languages, you may have to use the full name. You can get it by clicking on a function's name to
+    copy the full name to your clipboard. Here an example:
   </p>
 
   @if (addFact$ | async; as func) {

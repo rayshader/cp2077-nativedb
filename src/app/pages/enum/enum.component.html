@@ -1,5 +1,6 @@
 @if (data$ | async; as data) {
   <ndb-title-bar [title]="data.name"
+                 [altTitle]="data.altName"
                  [node]="data.node"
                  [hideDocumentation]="true">
     <mat-icon class="badge-enum" svgIcon="enum" matTooltip="enum"></mat-icon>

@@ -1,5 +1,6 @@
 @if (data$ | async; as data) {
   <ndb-title-bar [title]="data.name"
+                 [altTitle]="data.altName"
                  [node]="data.object"
                  [hideDocumentation]="data.hideDocumentation"
                  [hasDocumentation]="data.hasBodyDocumentation"

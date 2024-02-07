@@ -69,10 +69,6 @@
 
   .stx-function {
     color: var(--ndb-ide-function);
-
-    &.stx-function-fullname {
-      text-decoration: underline dotted;
-    }
   }
 
   .stx-arg {
@@ -97,5 +93,13 @@
 
   .stx-primitive-type {
     color: var(--ndb-ide-primitive-type);
+  }
+
+  .stx-highlight {
+    text-decoration: underline dotted 1px;
+
+    &[clickable] {
+      cursor: pointer;
+    }
   }
 }

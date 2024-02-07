@@ -16,6 +16,7 @@ import {CodeSyntax, SettingsService} from "../../../shared/services/settings.ser
 interface BitfieldData {
   readonly node: RedBitfieldAst;
   readonly name: string;
+  readonly altName?: string;
 }
 
 @Component({
@@ -55,13 +56,16 @@ export class BitfieldComponent {
       filter(([node,]) => !!node),
       map(([node, syntax]) => {
         let name: string = node!.name;
+        let altName: string | undefined = node!.aliasName;
 
         if (syntax === CodeSyntax.redscript && node!.aliasName) {
           name = node!.aliasName;
+          altName = node!.name;
         }
         return <BitfieldData>{
           node: node,
-          name: name
+          name: name,
+          altName: altName
         };
       })
     );

@@ -50,6 +50,7 @@ export interface InheritData extends RedTypeAst {
 interface ObjectData {
   readonly object: RedClassAst;
   readonly name: string;
+  readonly altName?: string;
 
   readonly scope: string;
   readonly isAbstract: boolean;
@@ -239,11 +240,13 @@ export class ObjectComponent {
            ]) => {
         const showEmptyAccordion: boolean = settings.showEmptyAccordion;
         let name: string = object.name;
+        let altName: string | undefined = object.aliasName;
         let properties: RedPropertyAst[] = object.properties;
         let functions: RedFunctionAst[] = object.functions;
 
         if (settings.codeSyntax === CodeSyntax.redscript && object.aliasName) {
           name = object.aliasName;
+          altName = object.name;
         }
         if (this.isPropertiesFiltered) {
           properties = properties.filter(this.hasPropertyFlag.bind(this));
@@ -259,6 +262,7 @@ export class ObjectComponent {
         return <ObjectData>{
           object: object,
           name: name,
+          altName: altName,
           scope: RedVisibilityDef[object.visibility],
           isAbstract: object.isAbstract,
           parents: object.parents,
