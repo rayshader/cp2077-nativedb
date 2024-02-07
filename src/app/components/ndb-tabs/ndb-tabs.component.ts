@@ -1,6 +1,16 @@
-import {AfterViewInit, Component, DestroyRef, HostListener, QueryList, Renderer2, ViewChildren} from '@angular/core';
-import {MatTabsModule} from "@angular/material/tabs";
-import {combineLatest, map, Observable, take} from "rxjs";
+import {
+  AfterViewInit,
+  ApplicationRef,
+  Component,
+  DestroyRef,
+  HostListener,
+  QueryList,
+  Renderer2,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
+import {MatTabGroup, MatTabsModule} from "@angular/material/tabs";
+import {combineLatest, filter, first, map, Observable} from "rxjs";
 import {MatIconModule} from "@angular/material/icon";
 import {AsyncPipe, NgTemplateOutlet} from "@angular/common";
 import {RouterLink} from "@angular/router";
@@ -50,28 +60,25 @@ interface ViewData {
 })
 export class NDBTabsComponent implements AfterViewInit {
 
+  @ViewChild(MatTabGroup)
+  readonly group?: MatTabGroup;
+
   @ViewChildren(CdkVirtualScrollViewport)
   readonly viewports?: QueryList<CdkVirtualScrollViewport>;
 
   readonly data$: Observable<ViewData>;
-  readonly skeletons: TabItem[] = [
-    {icon: 'class', alt: 'Classes', nodes: []},
-    {icon: 'struct', alt: 'Structs', nodes: []},
-    {icon: 'function', alt: 'Global functions', nodes: []},
-    {icon: 'enum', alt: 'Enums', nodes: []},
-    {icon: 'bitfield', alt: 'Bitfields', nodes: []},
-  ];
 
   width: string = '320px';
 
   private isResizing: boolean = false;
 
-  constructor(private readonly renderer: Renderer2,
+  constructor(private readonly app: ApplicationRef,
+              private readonly renderer: Renderer2,
               private readonly searchService: SearchService,
               private readonly settingsService: SettingsService,
               private readonly responsiveService: ResponsiveService,
               private readonly dr: DestroyRef) {
-    this.settingsService.tabsWidth$.pipe(take(1), takeUntilDestroyed()).subscribe(this.onWidthLoaded.bind(this));
+    this.settingsService.tabsWidth$.pipe(first(), takeUntilDestroyed()).subscribe(this.onWidthLoaded.bind(this));
     this.data$ = combineLatest([
       this.getTabs(),
       this.responsiveService.mobile$
@@ -86,14 +93,23 @@ export class NDBTabsComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.viewports?.changes.pipe(takeUntilDestroyed(this.dr)).subscribe(() => {
-      const viewports = this.viewports?.toArray();
+    this.app.isStable.pipe(
+      filter((stable: boolean) => stable),
+      first(),
+      takeUntilDestroyed(this.dr)
+    ).subscribe(this.updateViewport.bind(this));
+  }
 
-      if (!viewports || viewports.length === 0) {
-        return;
-      }
-      viewports[0].checkViewportSize();
-    });
+  // NOTE: Fix issue where viewport isn't filling its parent's height on first
+  //       session. Used on desktop and mobile. Issue only seems to arise when
+  //       project is build in production.
+  updateViewport(): void {
+    const viewports: CdkVirtualScrollViewport[] = this.viewports?.toArray() ?? [];
+
+    if (viewports.length === 0) {
+      return;
+    }
+    viewports[0].checkViewportSize();
   }
 
   protected onStartResizing(): void {
