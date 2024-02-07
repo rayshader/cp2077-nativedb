@@ -12,6 +12,10 @@
 
     & .title {
       flex: 1;
+
+      & h1 {
+        width: fit-content;
+      }
     }
 
     & .prototype {

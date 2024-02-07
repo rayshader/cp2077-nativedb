@@ -5,6 +5,7 @@
 @use './mat/icon' as *;
 @use './mat/button' as *;
 @use './mat/slide-toggle' as *;
+@use './mat/tooltip' as *;
 @use './cdk/virtual-scroll' as *;
 
 // App components
@@ -70,6 +71,7 @@
   @include title-bar-theme($theme);
   @include documentation-theme($theme);
   @include highlight-theme($theme);
+  @include tooltip-theme($theme);
 
   @include virtual-scroll-theme($theme);
 }
@@ -84,4 +86,5 @@
   @include title-bar-color($theme);
   @include documentation-color($theme);
   @include highlight-color($theme);
+  @include tooltip-color($theme);
 }

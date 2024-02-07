@@ -1,0 +1,16 @@
+@mixin tooltip-theme($theme) {
+  .mdc-tooltip {
+    @media (min-width: 1025px) {
+      &.tooltip-highlight {
+        & .mdc-tooltip__surface {
+          min-width: unset;
+          max-width: unset;
+        }
+      }
+    }
+  }
+}
+
+@mixin tooltip-color($theme) {
+
+}
