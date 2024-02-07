@@ -17,7 +17,7 @@ import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from "@angular/material/form-field";
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {NDBToolbarComponent} from "./components/ndb-toolbar/ndb-toolbar.component";
 import {NDBBottomBarComponent} from "./components/ndb-bottom-bar/ndb-bottom-bar.component";
-import {combineLatestWith, filter, map, OperatorFunction, pipe, take} from "rxjs";
+import {combineLatestWith, filter, first, map, OperatorFunction, pipe} from "rxjs";
 import {ResponsiveService} from "../shared/services/responsive.service";
 import {DocumentationDatabase} from "../shared/repositories/documentation.database";
 
@@ -151,12 +151,10 @@ export class AppComponent implements OnInit {
       combineLatestWith(
         this.app.isStable.pipe(
           filter((stable: boolean) => stable),
-          take(1)
-        ),
+          first()
+        )
       ),
-      map(([isMobile,]) => {
-        return isMobile;
-      })
+      map(([isMobile,]) => isMobile)
     );
   }
 

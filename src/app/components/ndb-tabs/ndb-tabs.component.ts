@@ -1,6 +1,6 @@
 import {AfterViewInit, Component, DestroyRef, HostListener, QueryList, Renderer2, ViewChildren} from '@angular/core';
 import {MatTabsModule} from "@angular/material/tabs";
-import {combineLatest, map, Observable, take} from "rxjs";
+import {combineLatest, filter, first, map, Observable} from "rxjs";
 import {MatIconModule} from "@angular/material/icon";
 import {AsyncPipe, NgTemplateOutlet} from "@angular/common";
 import {RouterLink} from "@angular/router";
@@ -64,7 +64,7 @@ export class NDBTabsComponent implements AfterViewInit {
               private readonly settingsService: SettingsService,
               private readonly responsiveService: ResponsiveService,
               private readonly dr: DestroyRef) {
-    this.settingsService.tabsWidth$.pipe(take(1), takeUntilDestroyed()).subscribe(this.onWidthLoaded.bind(this));
+    this.settingsService.tabsWidth$.pipe(first(), takeUntilDestroyed()).subscribe(this.onWidthLoaded.bind(this));
     this.data$ = combineLatest([
       this.getTabs(),
       this.responsiveService.mobile$
