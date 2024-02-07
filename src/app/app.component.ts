@@ -50,8 +50,11 @@ export interface AppData {
   styleUrl: './app.component.scss'
 })
 export class AppComponent implements OnInit {
+  @ViewChild(NDBTabsComponent)
+  readonly tabs?: NDBTabsComponent;
+
   @ViewChild('page')
-  page?: ElementRef;
+  readonly page?: ElementRef;
 
   showTabs: boolean = true;
   isMobile: boolean = false;
@@ -103,6 +106,11 @@ export class AppComponent implements OnInit {
       return;
     }
     this.showTabs = !this.showTabs;
+    if (this.showTabs) {
+      setTimeout(() => {
+        this.tabs?.updateViewport();
+      });
+    }
   }
 
   private onRouteChanged(): void {

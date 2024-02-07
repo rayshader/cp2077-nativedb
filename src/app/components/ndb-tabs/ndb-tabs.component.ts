@@ -1,5 +1,15 @@
-import {AfterViewInit, Component, DestroyRef, HostListener, QueryList, Renderer2, ViewChildren} from '@angular/core';
-import {MatTabsModule} from "@angular/material/tabs";
+import {
+  AfterViewInit,
+  ApplicationRef,
+  Component,
+  DestroyRef,
+  HostListener,
+  QueryList,
+  Renderer2,
+  ViewChild,
+  ViewChildren
+} from '@angular/core';
+import {MatTabGroup, MatTabsModule} from "@angular/material/tabs";
 import {combineLatest, filter, first, map, Observable} from "rxjs";
 import {MatIconModule} from "@angular/material/icon";
 import {AsyncPipe, NgTemplateOutlet} from "@angular/common";
@@ -50,6 +60,9 @@ interface ViewData {
 })
 export class NDBTabsComponent implements AfterViewInit {
 
+  @ViewChild(MatTabGroup)
+  readonly group?: MatTabGroup;
+
   @ViewChildren(CdkVirtualScrollViewport)
   readonly viewports?: QueryList<CdkVirtualScrollViewport>;
 
@@ -59,7 +72,8 @@ export class NDBTabsComponent implements AfterViewInit {
 
   private isResizing: boolean = false;
 
-  constructor(private readonly renderer: Renderer2,
+  constructor(private readonly app: ApplicationRef,
+              private readonly renderer: Renderer2,
               private readonly searchService: SearchService,
               private readonly settingsService: SettingsService,
               private readonly responsiveService: ResponsiveService,
@@ -79,14 +93,23 @@ export class NDBTabsComponent implements AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.viewports?.changes.pipe(takeUntilDestroyed(this.dr)).subscribe(() => {
-      const viewports = this.viewports?.toArray();
+    this.app.isStable.pipe(
+      filter((stable: boolean) => stable),
+      first(),
+      takeUntilDestroyed(this.dr)
+    ).subscribe(this.updateViewport.bind(this));
+  }
 
-      if (!viewports || viewports.length === 0) {
-        return;
-      }
-      viewports[0].checkViewportSize();
-    });
+  // NOTE: Fix issue where viewport isn't filling its parent's height on first
+  //       session. Used on desktop and mobile. Issue only seems to arise when
+  //       project is build in production.
+  updateViewport(): void {
+    const viewports: CdkVirtualScrollViewport[] = this.viewports?.toArray() ?? [];
+
+    if (viewports.length === 0) {
+      return;
+    }
+    viewports[0].checkViewportSize();
   }
 
   protected onStartResizing(): void {
