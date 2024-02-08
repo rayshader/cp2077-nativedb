@@ -20,22 +20,12 @@
     display: flex;
 
     & .badge {
-      cursor: pointer;
+      &:not(.empty) {
+        cursor: pointer;
+      }
 
       &[data-scope="private"] {
         margin-right: 24px;
-      }
-    }
-
-    & mat-icon:last-child {
-      cursor: pointer;
-      margin-left: 24px;
-
-      color: black;
-
-      &.disabled {
-        cursor: default;
-        color: #7F7F7F;
       }
     }
 
@@ -103,19 +93,5 @@
     justify-content: center;
     align-items: center;
     height: 48px;
-  }
-}
-
-.dark-theme {
-  :host {
-    & [actions] {
-      & mat-icon:last-child {
-        color: white;
-
-        &.disabled {
-          color: #7F7F7F;
-        }
-      }
-    }
   }
 }

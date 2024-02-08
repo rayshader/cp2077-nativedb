@@ -78,7 +78,11 @@ interface ObjectData {
 }
 
 interface BadgeFilterItem<T> {
+  // Whether filtering is active?
   isEnabled: boolean;
+
+  // Whether no items contain this filter?
+  isEmpty: boolean;
 
   readonly icon: string;
   readonly title: string;
@@ -111,9 +115,16 @@ interface BadgeFilterItem<T> {
 export class ObjectComponent {
 
   readonly badgesProperty: BadgeFilterItem<RedPropertyAst>[] = [
-    {isEnabled: true, icon: 'scope', title: 'public', filter: (prop) => prop.visibility === RedVisibilityDef.public},
     {
       isEnabled: true,
+      isEmpty: false,
+      icon: 'scope',
+      title: 'public',
+      filter: (prop) => prop.visibility === RedVisibilityDef.public
+    },
+    {
+      isEnabled: true,
+      isEmpty: false,
       icon: 'scope',
       title: 'protected',
       dataScope: 'protected',
@@ -121,18 +132,26 @@ export class ObjectComponent {
     },
     {
       isEnabled: true,
+      isEmpty: false,
       icon: 'scope',
       title: 'private',
       dataScope: 'private',
       filter: (prop) => prop.visibility === RedVisibilityDef.private
     },
 
-    {isEnabled: true, icon: 'scope', title: 'persistent', filter: (prop) => prop.isPersistent}
+    {isEnabled: true, isEmpty: false, icon: 'scope', title: 'persistent', filter: (prop) => prop.isPersistent}
   ];
   readonly badgesFunction: BadgeFilterItem<RedFunctionAst>[] = [
-    {isEnabled: true, icon: 'scope', title: 'public', filter: (func) => func.visibility === RedVisibilityDef.public},
     {
       isEnabled: true,
+      isEmpty: false,
+      icon: 'scope',
+      title: 'public',
+      filter: (func) => func.visibility === RedVisibilityDef.public
+    },
+    {
+      isEnabled: true,
+      isEmpty: false,
       icon: 'scope',
       title: 'protected',
       dataScope: 'protected',
@@ -140,20 +159,21 @@ export class ObjectComponent {
     },
     {
       isEnabled: true,
+      isEmpty: false,
       icon: 'scope',
       title: 'private',
       dataScope: 'private',
       filter: (func) => func.visibility === RedVisibilityDef.private
     },
 
-    {isEnabled: true, icon: 'native', title: 'native', filter: (func) => func.isNative},
-    {isEnabled: true, icon: 'static', title: 'static', filter: (func) => func.isStatic},
-    {isEnabled: true, icon: 'final', title: 'final', filter: (func) => func.isFinal},
-    {isEnabled: true, icon: 'timer', title: 'threadsafe', filter: (func) => func.isThreadSafe},
-    {isEnabled: true, icon: 'callback', title: 'callback', filter: (func) => func.isCallback},
-    {isEnabled: true, icon: 'const', title: 'const', filter: (func) => func.isConst},
-    {isEnabled: true, icon: 'quest', title: 'quest', filter: (func) => func.isQuest},
-    {isEnabled: true, icon: 'timer', title: 'timer', filter: (func) => func.isTimer}
+    {isEnabled: true, isEmpty: false, icon: 'native', title: 'native', filter: (func) => func.isNative},
+    {isEnabled: true, isEmpty: false, icon: 'static', title: 'static', filter: (func) => func.isStatic},
+    {isEnabled: true, isEmpty: false, icon: 'final', title: 'final', filter: (func) => func.isFinal},
+    {isEnabled: true, isEmpty: false, icon: 'timer', title: 'threadsafe', filter: (func) => func.isThreadSafe},
+    {isEnabled: true, isEmpty: false, icon: 'callback', title: 'callback', filter: (func) => func.isCallback},
+    {isEnabled: true, isEmpty: false, icon: 'const', title: 'const', filter: (func) => func.isConst},
+    {isEnabled: true, isEmpty: false, icon: 'quest', title: 'quest', filter: (func) => func.isQuest},
+    {isEnabled: true, isEmpty: false, icon: 'timer', title: 'timer', filter: (func) => func.isTimer}
   ];
 
   data$: Observable<ObjectData | undefined> = EMPTY;
@@ -171,9 +191,7 @@ export class ObjectComponent {
 
   protected readonly cyrb53 = cyrb53;
 
-  protected disableResetFilterProperties: boolean = false;
   protected isPropertiesFiltered: boolean = false;
-  protected disableResetFilterFunctions: boolean = false;
   protected isFunctionsFiltered: boolean = false;
 
   private readonly isDocumentedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -200,8 +218,7 @@ export class ObjectComponent {
       this.pageService.restoreScroll();
     }
     this.recentVisitService.pushLastVisit(+id);
-    this.resetPropertiesFilter();
-    this.resetFunctionsFilter();
+    this.resetFilters();
     const object$ = of(this.kind).pipe(
       switchMap((kind) => {
         if (kind === RedNodeKind.class) {
@@ -248,6 +265,8 @@ export class ObjectComponent {
           name = object.aliasName;
           altName = object.name;
         }
+        this.computePropertyFilters(object.properties);
+        this.computeFunctionFilters(object.functions);
         if (this.isPropertiesFiltered) {
           properties = properties.filter(this.hasPropertyFlag.bind(this));
         }
@@ -286,6 +305,16 @@ export class ObjectComponent {
     );
   }
 
+  getFilterTooltip(badge: BadgeFilterItem<any>, isFiltered: boolean): string {
+    if (!badge.isEnabled) {
+      return `Filter by ${badge.title}`;
+    }
+    if (!isFiltered) {
+      return `Filter by ${badge.title}`;
+    }
+    return 'Reset filter';
+  }
+
   changeDocumentation(isDocumented: boolean): void {
     this.isDocumentedSubject.next(isDocumented);
   }
@@ -294,34 +323,120 @@ export class ObjectComponent {
     this.showDocumentation = !this.showDocumentation;
   }
 
-  togglePropertyFilter(badge: BadgeFilterItem<RedPropertyAst>): void {
-    this.badgesProperty.forEach((badge) => badge.isEnabled = false);
-    badge.isEnabled = !badge.isEnabled;
-    this.disableResetFilterProperties = this.badgesProperty.filter((badge) => badge.isEnabled).length === this.badgesProperty.length;
-    this.isPropertiesFiltered = this.badgesProperty.filter((badge) => badge.isEnabled).length === 1;
-    this.filterBadgesSubject.next();
+  computePropertyFilters(properties: RedPropertyAst[]): void {
+    this.badgesProperty.forEach((badge) => {
+      badge.isEmpty = true;
+    });
+    this.badgesProperty.forEach((badge) => {
+      for (const prop of properties) {
+        if (prop.visibility === RedVisibilityDef.public && badge.title === 'public') {
+          badge.isEmpty = false;
+          return;
+        } else if (prop.visibility === RedVisibilityDef.protected && badge.title === 'protected') {
+          badge.isEmpty = false;
+          return;
+        } else if (prop.visibility === RedVisibilityDef.private && badge.title === 'private') {
+          badge.isEmpty = false;
+          return;
+        } else if (prop.isPersistent && badge.title === 'persistent') {
+          badge.isEmpty = false;
+          return;
+        }
+      }
+    });
   }
 
-  resetPropertiesFilter(): void {
-    this.badgesProperty.forEach((badge) => badge.isEnabled = true);
-    this.disableResetFilterProperties = this.badgesProperty.filter((badge) => badge.isEnabled).length === this.badgesProperty.length;
+  computeFunctionFilters(functions: RedFunctionAst[]): void {
+    this.badgesFunction.forEach((badge) => {
+      badge.isEmpty = true;
+    });
+    this.badgesFunction.forEach((badge) => {
+      for (const func of functions) {
+        if (func.visibility === RedVisibilityDef.public && badge.title === 'public') {
+          badge.isEmpty = false;
+          return;
+        } else if (func.visibility === RedVisibilityDef.protected && badge.title === 'protected') {
+          badge.isEmpty = false;
+          return;
+        } else if (func.visibility === RedVisibilityDef.private && badge.title === 'private') {
+          badge.isEmpty = false;
+          return;
+        } else if (func.isNative && badge.title === 'native') {
+          badge.isEmpty = false;
+          return;
+        } else if (func.isStatic && badge.title === 'static') {
+          badge.isEmpty = false;
+          return;
+        } else if (func.isFinal && badge.title === 'final') {
+          badge.isEmpty = false;
+          return;
+        } else if (func.isThreadSafe && badge.title === 'threadsafe') {
+          badge.isEmpty = false;
+          return;
+        } else if (func.isCallback && badge.title === 'callback') {
+          badge.isEmpty = false;
+          return;
+        } else if (func.isConst && badge.title === 'const') {
+          badge.isEmpty = false;
+          return;
+        } else if (func.isQuest && badge.title === 'quest') {
+          badge.isEmpty = false;
+          return;
+        } else if (func.isTimer && badge.title === 'timer') {
+          badge.isEmpty = false;
+          return;
+        }
+      }
+    });
+  }
+
+  togglePropertyFilter(badge: BadgeFilterItem<RedPropertyAst>): void {
+    if (badge.isEmpty) {
+      return;
+    }
+    let isEnabled: boolean = false;
+
+    if (!this.isPropertiesFiltered && badge.isEnabled) {
+      isEnabled = false;
+    } else if (this.isPropertiesFiltered && badge.isEnabled) {
+      isEnabled = true;
+    } else if (this.isPropertiesFiltered && !badge.isEnabled) {
+      badge.isEnabled = true;
+      isEnabled = false;
+    }
+    this.badgesProperty
+      .filter((item) => item !== badge)
+      .forEach((item) => item.isEnabled = isEnabled);
     this.isPropertiesFiltered = this.badgesProperty.filter((badge) => badge.isEnabled).length === 1;
     this.filterBadgesSubject.next();
   }
 
   toggleFunctionFilter(badge: BadgeFilterItem<RedFunctionAst>): void {
-    this.badgesFunction.forEach((badge) => badge.isEnabled = false);
-    badge.isEnabled = !badge.isEnabled;
-    this.disableResetFilterFunctions = this.badgesFunction.filter((badge) => badge.isEnabled).length === this.badgesFunction.length;
+    if (badge.isEmpty) {
+      return;
+    }
+    let isEnabled: boolean = false;
+
+    if (!this.isFunctionsFiltered && badge.isEnabled) {
+      isEnabled = false;
+    } else if (this.isFunctionsFiltered && badge.isEnabled) {
+      isEnabled = true;
+    } else if (this.isFunctionsFiltered && !badge.isEnabled) {
+      badge.isEnabled = true;
+      isEnabled = false;
+    }
+    this.badgesFunction
+      .filter((item) => item !== badge)
+      .forEach((item) => item.isEnabled = isEnabled);
     this.isFunctionsFiltered = this.badgesFunction.filter((badge) => badge.isEnabled).length === 1;
     this.filterBadgesSubject.next();
   }
 
-  resetFunctionsFilter(): void {
+  resetFilters(): void {
+    this.badgesProperty.forEach((badge) => badge.isEnabled = true);
     this.badgesFunction.forEach((badge) => badge.isEnabled = true);
-    this.disableResetFilterFunctions = this.badgesFunction.filter((badge) => badge.isEnabled).length === this.badgesFunction.length;
-    this.isFunctionsFiltered = this.badgesFunction.filter((badge) => badge.isEnabled).length === 1;
-    this.filterBadgesSubject.next();
+    this.isPropertiesFiltered = false;
+    this.isFunctionsFiltered = false;
   }
 
   private hasPropertyFlag(prop: RedPropertyAst): boolean {

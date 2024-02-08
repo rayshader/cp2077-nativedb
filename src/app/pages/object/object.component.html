@@ -87,16 +87,13 @@
           @for (badge of badgesProperty; track badge.title) {
             <mat-icon class="badge"
                       [svgIcon]="badge.icon"
-                      matTooltip="Filter by {{badge.title}}"
+                      [matTooltip]="getFilterTooltip(badge, isPropertiesFiltered)"
+                      [matTooltipDisabled]="badge.isEmpty"
                       [attr.data-scope]="badge.dataScope"
                       [class.disabled]="!badge.isEnabled"
+                      [class.empty]="badge.isEmpty"
                       (click)="togglePropertyFilter(badge)"></mat-icon>
           }
-
-          <mat-icon class="button"
-                    matTooltip="Reset filter"
-                    [class.disabled]="disableResetFilterProperties"
-                    (click)="resetPropertiesFilter()">highlight_off</mat-icon>
         </div>
 
         @for (prop of data.properties; track prop.name) {
@@ -126,16 +123,13 @@
           @for (badge of badgesFunction; track badge.title) {
             <mat-icon class="badge"
                       [svgIcon]="badge.icon"
-                      matTooltip="Filter by {{badge.title}}"
+                      [matTooltip]="getFilterTooltip(badge, isFunctionsFiltered)"
+                      [matTooltipDisabled]="badge.isEmpty"
                       [attr.data-scope]="badge.dataScope"
                       [class.disabled]="!badge.isEnabled"
+                      [class.empty]="badge.isEmpty"
                       (click)="toggleFunctionFilter(badge)"></mat-icon>
           }
-
-          <mat-icon class="button"
-                    matTooltip="Reset filter"
-                    [class.disabled]="disableResetFilterFunctions"
-                    (click)="resetFunctionsFilter()">highlight_off</mat-icon>
         </div>
 
         <!-- NOTE: tracking with id will crash webapp when filtering per badge several times. -->
