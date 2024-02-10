@@ -17,7 +17,7 @@ interface RecentVisitData {
 }
 
 @Component({
-  selector: 'recent-visits',
+  selector: 'ndb-page-recent-visits',
   standalone: true,
   imports: [
     AsyncPipe,

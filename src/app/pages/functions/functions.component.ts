@@ -16,7 +16,7 @@ interface FunctionsData {
 }
 
 @Component({
-  selector: 'functions',
+  selector: 'ndb-page-functions',
   standalone: true,
   imports: [
     AsyncPipe,

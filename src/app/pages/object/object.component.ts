@@ -91,7 +91,7 @@ interface BadgeFilterItem<T> {
 }
 
 @Component({
-  selector: 'object',
+  selector: 'ndb-page-object',
   standalone: true,
   imports: [
     AsyncPipe,

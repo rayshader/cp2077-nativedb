@@ -16,7 +16,7 @@ interface BookmarkItem {
 }
 
 @Component({
-  selector: 'bookmarks',
+  selector: 'ndb-page-bookmarks',
   standalone: true,
   imports: [
     AsyncPipe,

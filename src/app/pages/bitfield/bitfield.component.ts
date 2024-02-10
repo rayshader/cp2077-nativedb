@@ -20,7 +20,7 @@ interface BitfieldData {
 }
 
 @Component({
-  selector: 'bitfield',
+  selector: 'ndb-page-bitfield',
   standalone: true,
   imports: [
     AsyncPipe,
