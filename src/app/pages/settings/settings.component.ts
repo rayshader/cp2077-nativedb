@@ -16,7 +16,7 @@ interface AItem<T> {
 }
 
 @Component({
-  selector: 'settings',
+  selector: 'ndb-page-settings',
   standalone: true,
   imports: [
     MatFormFieldModule,

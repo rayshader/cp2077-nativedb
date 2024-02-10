@@ -16,7 +16,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {NDBGuidelinesDialogComponent} from "../../components/ndb-guidelines-dialog/ndb-guidelines-dialog.component";
 
 @Component({
-  selector: 'readme',
+  selector: 'ndb-page-readme',
   standalone: true,
   imports: [
     AsyncPipe,

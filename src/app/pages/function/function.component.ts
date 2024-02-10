@@ -11,7 +11,7 @@ import {RecentVisitService} from "../../../shared/services/recent-visit.service"
 import {MatTooltip} from "@angular/material/tooltip";
 
 @Component({
-  selector: 'function',
+  selector: 'ndb-page-function',
   standalone: true,
   imports: [
     AsyncPipe,

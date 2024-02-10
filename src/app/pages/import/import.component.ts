@@ -32,7 +32,7 @@ interface BehaviorItem {
 }
 
 @Component({
-  selector: 'import',
+  selector: 'ndb-page-import',
   standalone: true,
   imports: [
     AsyncPipe,

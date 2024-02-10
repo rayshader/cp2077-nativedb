@@ -20,7 +20,7 @@ interface EnumData {
 }
 
 @Component({
-  selector: 'enum',
+  selector: 'ndb-page-enum',
   standalone: true,
   imports: [
     AsyncPipe,
