@@ -41,8 +41,15 @@ export class TypeSpanComponent {
     return RedTypeAst.isPrimitive(this.node);
   }
 
-  onRedirect(): void {
-    this.routerService.navigateTo(this.node!.id);
+  /**
+   * Navigate to node's page on a simple click.
+   * Open node's page in a new tab on CTRL+CLICK, CMD+CLICK or Middle Mouse Button.
+   * @param event
+   */
+  onRedirect(event: MouseEvent): void {
+    let inTab: boolean = event.ctrlKey || event.metaKey || event.button === 1;
+
+    this.routerService.navigateTo(this.node!.id, inTab);
   }
 
 }

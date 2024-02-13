@@ -7,6 +7,10 @@ export function mockLocation(path: string): void {
   window.location = new URL(`https://nativedb.com${path}`);
 }
 
+export function mockWindowOpen(): any {
+  return jest.spyOn(window, 'open').mockImplementation();
+}
+
 export interface MatchMediaMock {
   mediaQuery: Mock<MediaQueryList>;
   listener?: Function;

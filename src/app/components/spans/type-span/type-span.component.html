@@ -35,12 +35,12 @@
         @case (redscript) {
           <span class="stx-type redirect"
                 [class.disabled]="isEmpty"
-                (click)="onRedirect()">{{node.aliasName ?? node.name}}</span>
+                (mouseup)="onRedirect($event)">{{node.aliasName ?? node.name}}</span>
         }
         @default {
           <span class="stx-type redirect"
                 [class.disabled]="isEmpty"
-                (click)="onRedirect()">{{node.name}}</span>
+                (mouseup)="onRedirect($event)">{{node.name}}</span>
         }
       }
     }
