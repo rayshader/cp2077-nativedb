@@ -1,7 +1,7 @@
 import {Injectable} from "@angular/core";
 import {RedDumpService} from "./red-dump.service";
 import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
-import {Router} from "@angular/router";
+import {Router, UrlTree} from "@angular/router";
 import {firstValueFrom} from "rxjs";
 
 @Injectable({
@@ -13,7 +13,7 @@ export class RouterService {
               private readonly router: Router) {
   }
 
-  async navigateTo(id: number): Promise<void> {
+  async navigateTo(id: number, inTab: boolean = false): Promise<void> {
     const node: RedNodeAst | undefined = await firstValueFrom(this.dumpService.getById(id));
 
     if (node === undefined) {
@@ -22,7 +22,14 @@ export class RouterService {
     }
     const root: string = RedNodeKind[node.kind][0];
 
-    await this.router.navigate([root, id]);
+    if (inTab) {
+      const urlTree: UrlTree = this.router.createUrlTree([root, id]);
+      const url: string = this.router.serializeUrl(urlTree);
+
+      window.open(url, '_blank');
+    } else {
+      await this.router.navigate([root, id]);
+    }
   }
 
 }
