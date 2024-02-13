@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import {Injectable, NgZone} from "@angular/core";
 import {
   BehaviorSubject,
   combineLatest,
@@ -21,7 +21,7 @@ import {RedClassAst} from "../red-ast/red-class.ast";
 import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {SettingsService} from "./settings.service";
 import {cyrb53} from "../string";
-import {NDBCommand, NDBCommandHandler, NDBMessage} from "../worker.common";
+import {NDBCommand, NDBCommandHandler, NDBMessage, NDBWorker} from "../worker.common";
 import {InheritData} from "../../app/pages/object/object.component";
 
 export interface RedDumpWorkerLoad {
@@ -64,7 +64,7 @@ export class RedDumpService {
   private readonly nodes$: Observable<RedNodeAst[]>;
   private readonly inheritance$: Observable<RedClassAst> = this.inheritance.asObservable();
 
-  private worker?: Worker;
+  private worker?: NDBWorker;
   private readonly commands: NDBCommandHandler[] = [
     {command: NDBCommand.rd_load, fn: this.onWorkerLoad.bind(this)},
     {command: NDBCommand.rd_load_aliases, fn: this.onWorkerLoadAliases.bind(this)},
@@ -72,7 +72,8 @@ export class RedDumpService {
     {command: NDBCommand.dispose, fn: this.onWorkerDispose.bind(this)},
   ];
 
-  constructor(private readonly settingsService: SettingsService) {
+  constructor(private readonly settingsService: SettingsService,
+              private readonly ngZone: NgZone) {
     this.enums$ = this.enums.asObservable();
     this.bitfields$ = this.bitfields.asObservable();
     this.functions$ = this.functions.asObservable().pipe(
@@ -186,10 +187,17 @@ export class RedDumpService {
   }
 
   private loadWorker(): void {
-    if (typeof Worker === 'undefined') {
+    if (!NDBWorker.isCompatible()) {
       return;
     }
-    this.worker = new Worker(new URL('./red-dump.worker', import.meta.url));
+    let instance: Worker | SharedWorker;
+
+    if (typeof SharedWorker !== 'undefined') {
+      instance = new SharedWorker(new URL('./red-dump.worker', import.meta.url));
+    } else {
+      instance = new Worker(new URL('./red-dump.worker', import.meta.url));
+    }
+    this.worker = new NDBWorker(instance!, this.ngZone);
     this.worker.onmessage = this.onMessage.bind(this);
   }
 
