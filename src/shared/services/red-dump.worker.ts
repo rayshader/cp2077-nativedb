@@ -30,7 +30,7 @@ const data: RedDumpData = {
 let isReady: boolean = false;
 
 (async () => {
-  if (('onconnect' in self)) {
+  if ('onconnect' in self) {
     // SharedWorker
     addEventListener('connect', onConnection);
   } else {
@@ -52,8 +52,9 @@ async function onConnection(event: any): Promise<void> {
 }
 
 function onMessage(event: MessageEvent, port?: MessagePort): void {
-  const message: NDBMessage = event.data as NDBMessage;
-  const handler: NDBCommandHandler | undefined = commands.find((item) => item.command === message.command);
+  const message: NDBMessage = event.data;
+  const command: NDBCommand = message.command;
+  const handler: NDBCommandHandler | undefined = commands.find((item) => item.command === command);
 
   if (!handler) {
     console.warn('RedDumpWorker: unknown command.');
