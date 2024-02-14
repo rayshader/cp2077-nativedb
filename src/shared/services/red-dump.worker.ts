@@ -15,6 +15,7 @@ interface RedDumpData {
   objects: RedClassAst[];
   classes: RedClassAst[];
   structs: RedClassAst[];
+  badges: number;
 }
 
 const data: RedDumpData = {
@@ -23,45 +24,34 @@ const data: RedDumpData = {
   functions: [],
   objects: [],
   classes: [],
-  structs: []
+  structs: [],
+  badges: 0
 };
+let isReady: boolean = false;
 
 (async () => {
-  addEventListener('message', onMessage);
-
-  data.enums = await loadEnums();
-  data.bitfields = await loadBitfields();
-  data.functions = await loadFunctions();
-  data.objects = await loadObjects();
-  const nodes: RedNodeAst[] = [...data.enums, ...data.bitfields, ...data.functions, ...data.objects];
-
-  data.classes = data.objects.filter((object) => !object.isStruct);
-  data.structs = data.objects.filter((object) => object.isStruct);
-  const badges: number = computeBadges(data.objects);
-
-  send(NDBCommand.rd_load, <RedDumpWorkerLoad>{
-    enums: data.enums,
-    bitfields: data.bitfields,
-    functions: data.functions,
-    classes: data.classes,
-    structs: data.structs,
-    badges: badges
-  });
-
-  loadAliases(nodes);
-
-  send(NDBCommand.rd_load_aliases, <RedDumpWorkerLoadAliases>{
-    functions: data.functions,
-    classes: data.classes,
-    structs: data.structs
-  });
+  if (typeof SharedWorker !== 'undefined') {
+    // SharedWorker
+    addEventListener('connect', onConnection);
+  } else {
+    // Worker
+    addEventListener('message', onMessage);
+    await load();
+  }
 })();
 
 const commands: NDBCommandHandler[] = [
   {command: NDBCommand.rd_load_inheritance, fn: onLoadInheritance}
 ];
 
-function onMessage(event: MessageEvent): void {
+async function onConnection(event: any): Promise<void> {
+  const port: MessagePort = event.ports[0];
+
+  port.onmessage = (message: MessageEvent) => onMessage(message, port);
+  await load(port);
+}
+
+function onMessage(event: MessageEvent, port?: MessagePort): void {
   const message: NDBMessage = event.data as NDBMessage;
   const handler: NDBCommandHandler | undefined = commands.find((item) => item.command === message.command);
 
@@ -69,29 +59,78 @@ function onMessage(event: MessageEvent): void {
     console.warn('RedDumpWorker: unknown command.');
     return;
   }
-  handler.fn(message.data);
+  handler.fn(message.data, port);
 }
 
-function onLoadInheritance(id: number): void {
+async function load(port?: MessagePort): Promise<void> {
+  if (isReady) {
+    send(NDBCommand.rd_load, port, <RedDumpWorkerLoad>{
+      enums: data.enums,
+      bitfields: data.bitfields,
+      functions: data.functions,
+      classes: data.classes,
+      structs: data.structs,
+      badges: data.badges
+    });
+    return;
+  }
+  data.enums = await loadEnums();
+  data.bitfields = await loadBitfields();
+  data.functions = await loadFunctions();
+  data.objects = await loadObjects();
+
+  data.classes = data.objects.filter((object) => !object.isStruct);
+  data.structs = data.objects.filter((object) => object.isStruct);
+  data.badges = computeBadges(data.objects);
+
+  send(NDBCommand.rd_load, port, <RedDumpWorkerLoad>{
+    enums: data.enums,
+    bitfields: data.bitfields,
+    functions: data.functions,
+    classes: data.classes,
+    structs: data.structs,
+    badges: data.badges
+  });
+
+  const nodes: RedNodeAst[] = [...data.enums, ...data.bitfields, ...data.functions, ...data.objects];
+
+  loadAliases(nodes);
+
+  send(NDBCommand.rd_load_aliases, port, <RedDumpWorkerLoadAliases>{
+    functions: data.functions,
+    classes: data.classes,
+    structs: data.structs
+  });
+  isReady = true;
+}
+
+function onLoadInheritance(id: number, port?: MessagePort): void {
   const object: RedClassAst | undefined = data.objects.find((object) => object.id === id);
 
   if (!object) {
     return;
   }
   if (object.isInheritanceLoaded) {
+    send(NDBCommand.rd_load_inheritance, port, [object.id, object.parents, object.children]);
     return;
   }
   loadParents(data.objects, object);
   loadChildren(data.objects, object);
   object.isInheritanceLoaded = true;
-  send(NDBCommand.rd_load_inheritance, [object.id, object.parents, object.children]);
+  send(NDBCommand.rd_load_inheritance, port, [object.id, object.parents, object.children]);
 }
 
-function send(command: NDBCommand, data?: any): void {
-  postMessage(<NDBMessage>{
+function send(command: NDBCommand, port?: MessagePort, data?: any): void {
+  const message: NDBMessage = <NDBMessage>{
     command: command,
     data: data
-  });
+  };
+
+  if (port) {
+    port.postMessage(message);
+  } else {
+    postMessage(message);
+  }
 }
 
 function computeBadges(objects: RedClassAst[]): number {
