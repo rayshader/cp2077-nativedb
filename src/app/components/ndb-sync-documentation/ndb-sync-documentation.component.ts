@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  NgZone,
   OnDestroy,
   OnInit,
   ViewChild
@@ -16,7 +17,7 @@ import {DocumentationParser} from "../../../shared/parsers/documentation.parser"
 import {MatMenuModule} from "@angular/material/menu";
 import {Router, RouterLink} from "@angular/router";
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
-import {NDBCommand, NDBCommandHandler, NDBMessage} from "../../../shared/worker.common";
+import {NDBCommand, NDBCommandHandler, NDBMessage, NDBWorker} from "../../../shared/worker.common";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatSnackBar} from "@angular/material/snack-bar";
 
@@ -46,7 +47,7 @@ export class NDBSyncDocumentationComponent implements OnInit, OnDestroy {
   isReady: false | 'sync' | 'async' = false;
   isLoading: boolean = false;
 
-  private worker?: Worker;
+  private worker?: NDBWorker;
   private readonly commands: NDBCommandHandler[] = [
     {command: NDBCommand.ready, fn: this.onWorkerReady.bind(this)},
     {command: NDBCommand.export, fn: this.onWorkerExport.bind(this)},
@@ -60,6 +61,7 @@ export class NDBSyncDocumentationComponent implements OnInit, OnDestroy {
               private readonly documentationParser: DocumentationParser,
               private readonly toast: MatSnackBar,
               private readonly router: Router,
+              private readonly ngZone: NgZone,
               private readonly cdr: ChangeDetectorRef,
               private readonly dr: DestroyRef) {
   }
@@ -135,7 +137,7 @@ export class NDBSyncDocumentationComponent implements OnInit, OnDestroy {
   }
 
   private async loadWorker(): Promise<void> {
-    if (typeof Worker === 'undefined') {
+    if (!NDBWorker.isCompatible()) {
       // Fallback to blocking import/export operations.
       await this.documentationParser.load();
       this.isReady = 'sync';
@@ -143,7 +145,14 @@ export class NDBSyncDocumentationComponent implements OnInit, OnDestroy {
       console.info('WebWorker not supported, falling back to blocking operations.');
       return;
     }
-    this.worker = new Worker(new URL('./ndb-sync-documentation.worker', import.meta.url));
+    let instance: Worker | SharedWorker;
+
+    if (typeof SharedWorker !== 'undefined') {
+      instance = new SharedWorker(new URL('./ndb-sync-documentation.worker', import.meta.url));
+    } else {
+      instance = new Worker(new URL('./ndb-sync-documentation.worker', import.meta.url));
+    }
+    this.worker = new NDBWorker(instance, this.ngZone);
     this.worker.onmessage = this.onMessage.bind(this);
   }
 

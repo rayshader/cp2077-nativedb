@@ -12,16 +12,27 @@ const commands: NDBCommandHandler[] = [
 
 const brotliService: BrotliService = new BrotliService();
 const parser: DocumentationParser = new DocumentationParser(brotliService);
+let isReady: boolean = false;
 
 (async () => {
-  await parser.load();
-
-  postMessage(<NDBMessage>{
-    command: NDBCommand.ready
-  });
+  if ('onconnect' in self) {
+    // SharedWorker
+    addEventListener('connect', onConnection);
+  } else {
+    // Worker
+    addEventListener('message', onMessage);
+    await load();
+  }
 })();
 
-addEventListener('message', (event: MessageEvent) => {
+async function onConnection(event: any): Promise<void> {
+  const port: MessagePort = event.ports[0];
+
+  port.onmessage = (message: MessageEvent) => onMessage(message, port);
+  await load(port);
+}
+
+function onMessage(event: MessageEvent, port?: MessagePort): void {
   const message: NDBMessage = event.data;
   const command: NDBCommand = message.command;
   const handler: NDBCommandHandler | undefined = commands.find((item) => item.command === command);
@@ -30,37 +41,59 @@ addEventListener('message', (event: MessageEvent) => {
     console.warn('DocumentationWorker: unknown command.');
     return;
   }
-  handler.fn(message.data);
-});
+  handler.fn(message.data, port);
+}
 
-function importDocumentation(buffer: Uint8Array): void {
-  try {
-    const data: ClassDocumentation[] = parser.read(buffer);
+async function load(port?: MessagePort): Promise<void> {
+  if (isReady) {
+    sendMessage(<NDBMessage>{
+      command: NDBCommand.ready
+    }, port);
+    return;
+  }
+  await parser.load();
+  isReady = true;
+  sendMessage(<NDBMessage>{
+    command: NDBCommand.ready
+  }, port);
+}
 
-    postMessage(<NDBMessage>{
-      command: NDBCommand.import,
-      data: data
-    });
-  } catch (error) {
-    postMessage(<NDBMessage>{
-      command: NDBCommand.importError,
-      data: error
-    });
+function sendMessage(message: NDBMessage, port?: MessagePort): void {
+  if (port) {
+    port.postMessage(message);
+  } else {
+    postMessage(message);
   }
 }
 
-function exportDocumentation(data: ClassDocumentation[]): void {
+function importDocumentation(buffer: Uint8Array, port?: MessagePort): void {
+  try {
+    const data: ClassDocumentation[] = parser.read(buffer);
+
+    sendMessage(<NDBMessage>{
+      command: NDBCommand.import,
+      data: data
+    }, port);
+  } catch (error) {
+    sendMessage(<NDBMessage>{
+      command: NDBCommand.importError,
+      data: error
+    }, port);
+  }
+}
+
+function exportDocumentation(data: ClassDocumentation[], port?: MessagePort): void {
   try {
     const file: Blob = parser.write(data);
 
-    postMessage(<NDBMessage>{
+    sendMessage(<NDBMessage>{
       command: NDBCommand.export,
       data: file
-    });
+    }, port);
   } catch (error) {
-    postMessage(<NDBMessage>{
+    sendMessage(<NDBMessage>{
       command: NDBCommand.exportError,
       data: error
-    });
+    }, port);
   }
 }
