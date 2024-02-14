@@ -30,7 +30,7 @@ const data: RedDumpData = {
 let isReady: boolean = false;
 
 (async () => {
-  if (typeof SharedWorker !== 'undefined') {
+  if (('onconnect' in self)) {
     // SharedWorker
     addEventListener('connect', onConnection);
   } else {
