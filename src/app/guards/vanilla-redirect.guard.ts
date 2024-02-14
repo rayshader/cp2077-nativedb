@@ -9,14 +9,17 @@ export function vanillaRedirectGuard(next: ActivatedRouteSnapshot) {
   const dumpService: RedDumpService = inject(RedDumpService);
   const router: Router = inject(Router);
   const name: string = next.paramMap.get('name') ?? '';
-  const nameOnly: boolean = (next.queryParamMap.get('name') ?? '') === 'only';
-  const fragment: string | undefined = next.fragment ?? undefined;
 
   if (name.length === 0) {
     return router.createUrlTree([]);
   }
+  const nameOnly: boolean = (next.queryParamMap.get('name') ?? '') === 'only';
   const id: number = cyrb53(name);
+  let fragment: string | undefined = next.fragment ?? undefined;
 
+  if (fragment) {
+    fragment = `${cyrb53(fragment)}`;
+  }
   return dumpService.isReady$.pipe(
     filter((isReady) => isReady),
     combineLatestWith(dumpService.getById(id, nameOnly)),

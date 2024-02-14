@@ -166,9 +166,15 @@ export class FunctionSpanComponent {
     if (!this.node) {
       return;
     }
-    let data: string = window.location.href;
+    let uri: string;
 
-    data += `#${cyrb53(this.node.name)}`
+    if (this.memberOf) {
+      uri = `${this.memberOf.name}#${this.node.name}`;
+    } else {
+      uri = this.node.name;
+    }
+    const data: string = `${window.location.origin}/${uri}`;
+
     await navigator.clipboard.writeText(data);
   }
 

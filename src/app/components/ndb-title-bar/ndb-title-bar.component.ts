@@ -83,7 +83,9 @@ export class NDBTitleBarComponent {
   }
 
   copyUrl(): void {
-    navigator.clipboard.writeText(window.location.href);
+    const data: string = `${window.location.origin}/${this.title}`;
+
+    navigator.clipboard.writeText(data);
   }
 
   private onSettingsLoaded(state: boolean): void {

@@ -89,7 +89,7 @@ describe('vanillaRedirectGuard', () => {
     expect(dumpMock.getById).toHaveBeenCalledWith(id, true);
   });
 
-  it('given route /Test#42 when node is found then redirect to route /c/:id#42', async () => {
+  it('given route /Test#Function when node is found then redirect to route /c/:id#:fragment', async () => {
     // GIVEN
     const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildClass('Test'));
 
@@ -99,13 +99,14 @@ describe('vanillaRedirectGuard', () => {
     // WHEN
     const harness: RouterTestingHarness = await RouterTestingHarness.create();
 
-    await harness.navigateByUrl('Test#42');
+    await harness.navigateByUrl('Test#Function');
     harness.detectChanges();
 
     // THEN
     const id: number = cyrb53('Test');
+    const hash: number = cyrb53('Function');
 
-    expect(router.url).toBe(`/c/${id}#42`);
+    expect(router.url).toBe(`/c/${id}#${hash}`);
   });
 
 });

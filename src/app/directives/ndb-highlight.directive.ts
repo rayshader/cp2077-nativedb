@@ -1,11 +1,14 @@
-import {Directive, ElementRef, HostBinding, HostListener} from '@angular/core';
+import {Directive, ElementRef, HostBinding, HostListener, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
 
 @Directive({
   selector: '[ndbHighlight]',
   standalone: true
 })
-export class NDBHighlightDirective {
+export class NDBHighlightDirective implements OnInit {
+
+  @HostBinding('class.highlight')
+  isHighlight: boolean = false;
 
   constructor(private readonly route: ActivatedRoute,
               private readonly router: Router,
@@ -18,14 +21,15 @@ export class NDBHighlightDirective {
     return +$element.id;
   }
 
-  @HostBinding('class.highlight')
-  get isHighlight(): boolean {
-    const fragment: number = parseInt(this.route.snapshot.fragment ?? '-1');
+  ngOnInit(): void {
+    let fragment: string | undefined = this.route.snapshot.fragment ?? undefined;
+    let id: number = parseInt(fragment ?? '-1');
 
-    return fragment === this.id;
+    this.isHighlight = id === this.id;
   }
 
   @HostListener('mouseenter')
+  @HostListener('click')
   onHover(): void {
     if (!this.isHighlight) {
       return;
@@ -33,16 +37,7 @@ export class NDBHighlightDirective {
     const url: string = this.getUrlWithoutFragment();
 
     this.router.navigateByUrl(url, {replaceUrl: true});
-  }
-
-  @HostListener('click')
-  onTap(): void {
-    if (!this.isHighlight) {
-      return;
-    }
-    const url: string = this.getUrlWithoutFragment();
-
-    this.router.navigateByUrl(url, {replaceUrl: true});
+    this.isHighlight = false;
   }
 
   private getUrlWithoutFragment(): string {
