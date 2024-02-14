@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, ElementRef, HostListener, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostListener, ViewChild} from '@angular/core';
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatInputModule} from "@angular/material/input";
 import {NDBFormatDocumentationPipe} from "../../../pipes/ndb-format-documentation.pipe";
@@ -10,6 +10,7 @@ import {Router} from "@angular/router";
 @Component({
   selector: 'ndb-guideline',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatInputModule,
     TextFieldModule,

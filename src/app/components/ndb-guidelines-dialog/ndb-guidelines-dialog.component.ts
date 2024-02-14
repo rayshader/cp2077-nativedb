@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
 import {
   MatDialogActions,
@@ -18,6 +18,7 @@ import {MatDividerModule} from "@angular/material/divider";
 @Component({
   selector: 'ndb-guidelines-dialog',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     TextFieldModule,
     MatInputModule,

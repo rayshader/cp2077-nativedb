@@ -1,4 +1,4 @@
-import {ApplicationRef, Component, DestroyRef, Input} from '@angular/core';
+import {ApplicationRef, ChangeDetectionStrategy, Component, DestroyRef, Input} from '@angular/core';
 import {AsyncPipe} from "@angular/common";
 import {CdkAccordionModule} from "@angular/cdk/accordion";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
@@ -93,6 +93,7 @@ interface BadgeFilterItem<T> {
 @Component({
   selector: 'ndb-page-object',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
     CdkAccordionModule,

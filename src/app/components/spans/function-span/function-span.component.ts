@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {ArgumentSpanComponent} from "../argument-span/argument-span.component";
 import {TypeSpanComponent} from "../type-span/type-span.component";
 
@@ -15,11 +15,11 @@ import {BehaviorSubject, combineLatest, Observable} from "rxjs";
 import {CodeFormatterService} from "../../../../shared/services/code-formatter.service";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {RouterLink} from "@angular/router";
-import {cyrb53} from "../../../../shared/string";
 
 @Component({
   selector: 'function-span',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink,
     MatIconModule,
@@ -44,7 +44,9 @@ export class FunctionSpanComponent {
    */
   isVisible: boolean = false;
 
-  @Input()
+  scope: string = '';
+  hasFullName: boolean = false;
+
   node?: RedFunctionAst;
 
   /**
@@ -84,6 +86,13 @@ export class FunctionSpanComponent {
     ]).pipe(takeUntilDestroyed()).subscribe(this.onShowDocumentation.bind(this));
   }
 
+  @Input('node')
+  set _node(value: RedFunctionAst | undefined) {
+    this.node = value;
+    this.scope = (this.node) ? RedVisibilityDef[this.node.visibility] : '';
+    this.hasFullName = !!this.node && !!this.node.fullName;
+  }
+
   @Input('documentation')
   set _documentation(value: ClassDocumentation | undefined) {
     this.documentation = value;
@@ -107,23 +116,6 @@ export class FunctionSpanComponent {
     if (this.node?.isThreadSafe) count--;
     count = Math.max(count, 0);
     this.align = `${count * 24 + 12}px`;
-  }
-
-  /**
-   * Return 'public', 'protected' or 'private'.
-   */
-  get scope(): string {
-    if (!this.node) {
-      return '';
-    }
-    return RedVisibilityDef[this.node.visibility];
-  }
-
-  get hasFullName(): boolean {
-    if (!this.node) {
-      return false;
-    }
-    return this.node.fullName !== this.node.name;
   }
 
   /**

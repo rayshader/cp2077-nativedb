@@ -1,4 +1,4 @@
-import {Component, DestroyRef, OnDestroy} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnDestroy} from '@angular/core';
 import {MatDividerModule} from "@angular/material/divider";
 import {
   ClassDocumentation,
@@ -34,6 +34,7 @@ interface BehaviorItem {
 @Component({
   selector: 'ndb-page-import',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
     RouterLink,

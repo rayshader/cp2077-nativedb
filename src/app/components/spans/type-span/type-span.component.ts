@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {RouterService} from "../../../../shared/services/router.service";
 import {RedTypeAst} from "../../../../shared/red-ast/red-type.ast";
 import {CodeSyntax, SettingsService} from "../../../../shared/services/settings.service";
@@ -9,6 +9,7 @@ import {NDBFormatCodePipe} from "../../../pipes/ndb-format-code.pipe";
 @Component({
   selector: 'type-span',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
     NDBFormatCodePipe
@@ -18,7 +19,8 @@ import {NDBFormatCodePipe} from "../../../pipes/ndb-format-code.pipe";
 })
 export class TypeSpanComponent {
 
-  @Input()
+  isPrimitive: boolean = false;
+
   node?: RedTypeAst;
 
   @Input()
@@ -34,11 +36,10 @@ export class TypeSpanComponent {
     this.syntax$ = this.settingsService.code$.pipe(map((value) => value + 1));
   }
 
-  get isPrimitive(): boolean {
-    if (!this.node) {
-      return false;
-    }
-    return RedTypeAst.isPrimitive(this.node);
+  @Input('node')
+  set _node(value: RedTypeAst | undefined) {
+    this.node = value;
+    this.isPrimitive = (this.node) ? RedTypeAst.isPrimitive(this.node) : false;
   }
 
   /**

@@ -1,4 +1,4 @@
-import {Component, Renderer2} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Renderer2} from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {MatMenuModule} from "@angular/material/menu";
@@ -15,6 +15,7 @@ interface ThemeItem {
 @Component({
   selector: 'ndb-ide-theme',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIconModule,
     MatMenuModule,

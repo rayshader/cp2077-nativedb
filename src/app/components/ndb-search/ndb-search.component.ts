@@ -1,4 +1,4 @@
-import {Component, DestroyRef, EventEmitter, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, OnInit, Output} from '@angular/core';
 import {MatInputModule} from "@angular/material/input";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatIconModule} from "@angular/material/icon";
@@ -18,6 +18,7 @@ interface FilterItem {
 @Component({
   selector: 'ndb-search',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIconModule,
     MatMenuModule,

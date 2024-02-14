@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Output} from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
 import {MatChipsModule} from "@angular/material/chips";
 import {MatIconModule} from "@angular/material/icon";
@@ -17,6 +17,7 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 @Component({
   selector: 'ndb-toolbar',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink,
     MatIconModule,
@@ -43,7 +44,8 @@ export class NDBToolbarComponent {
   private isMobile: boolean = false;
 
   constructor(private readonly responsiveService: ResponsiveService,
-              private readonly router: Router) {
+              private readonly router: Router,
+              private readonly cdr: ChangeDetectorRef) {
     this.responsiveService.mobile$.pipe(takeUntilDestroyed()).subscribe(this.onMobile.bind(this));
     this.router.events.pipe(
       filter((event) => event instanceof NavigationEnd),
@@ -77,6 +79,7 @@ export class NDBToolbarComponent {
       return;
     }
     this.isTabsOpen = false;
+    this.cdr.markForCheck();
   }
 
 }

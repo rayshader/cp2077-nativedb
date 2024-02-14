@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {AsyncPipe} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
@@ -19,6 +19,7 @@ interface RecentVisitData {
 @Component({
   selector: 'ndb-page-recent-visits',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
     MatIconModule,

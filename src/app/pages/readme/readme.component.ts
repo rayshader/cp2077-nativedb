@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {MatIconModule} from "@angular/material/icon";
 import {MatDividerModule} from "@angular/material/divider";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
@@ -18,6 +18,7 @@ import {NDBGuidelinesDialogComponent} from "../../components/ndb-guidelines-dial
 @Component({
   selector: 'ndb-page-readme',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
     RouterLink,

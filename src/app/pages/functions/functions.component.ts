@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {combineLatest, map, Observable} from "rxjs";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
@@ -18,6 +18,7 @@ interface FunctionsData {
 @Component({
   selector: 'ndb-page-functions',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
     MatTooltip,

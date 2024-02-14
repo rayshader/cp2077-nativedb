@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {MatIconModule} from "@angular/material/icon";
 import {TypeSpanComponent} from "../type-span/type-span.component";
 import {RedPropertyAst} from "../../../../shared/red-ast/red-property.ast";
@@ -8,6 +8,7 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 @Component({
   selector: 'property-span',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIconModule,
     MatTooltipModule,
@@ -23,11 +24,18 @@ export class PropertySpanComponent {
    */
   align: string = '12px';
 
-  @Input()
+  scope: string = '';
+
   node?: RedPropertyAst;
 
   @Input()
   documentation?: string;
+
+  @Input('node')
+  set _node(value: RedPropertyAst | undefined) {
+    this.node = value;
+    this.scope = (this.node) ? RedVisibilityDef[this.node.visibility] : '';
+  }
 
   /**
    * Total number of badges to align with.
@@ -45,16 +53,6 @@ export class PropertySpanComponent {
     */
     count = Math.max(count, 0);
     this.align = `${count * 24 + 12}px`;
-  }
-
-  /**
-   * Return 'public', 'protected' or 'private'.
-   */
-  get scope(): string {
-    if (!this.node) {
-      return '';
-    }
-    return RedVisibilityDef[this.node.visibility];
   }
 
 }

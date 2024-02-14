@@ -1,4 +1,4 @@
-import {Component, EventEmitter, HostBinding, Input, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, Output} from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {SettingsService} from "../../../shared/services/settings.service";
@@ -12,6 +12,7 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 @Component({
   selector: 'ndb-title-bar',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
     MatIconModule,
@@ -41,7 +42,9 @@ export class NDBTitleBarComponent {
   @Output()
   toggleDocumentation: EventEmitter<void> = new EventEmitter();
 
+  @HostBinding('class.pin')
   isPinned: boolean = true;
+
   isBookmarked: boolean = false;
 
   constructor(private readonly settingsService: SettingsService,
@@ -55,11 +58,6 @@ export class NDBTitleBarComponent {
   set node(value: RedNodeAst) {
     this._node = value;
     this.isBookmarked = this.bookmarkService.isBookmarked(value.id);
-  }
-
-  @HostBinding('class.pin')
-  get classPin(): boolean {
-    return this.isPinned;
   }
 
   togglePin(): void {

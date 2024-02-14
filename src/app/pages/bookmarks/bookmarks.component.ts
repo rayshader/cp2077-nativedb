@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {BookmarkService} from "../../../shared/services/bookmark.service";
 import {combineLatest, map, Observable, of} from "rxjs";
@@ -18,6 +18,7 @@ interface BookmarkItem {
 @Component({
   selector: 'ndb-page-bookmarks',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
     MatIconModule,

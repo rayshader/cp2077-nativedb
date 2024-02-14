@@ -1,4 +1,13 @@
-import {Component, DestroyRef, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {ClassDocumentation, DocumentationService} from "../../../shared/services/documentation.service";
@@ -14,6 +23,7 @@ import {MatSnackBar} from "@angular/material/snack-bar";
 @Component({
   selector: 'ndb-sync-documentation',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink,
     MatIconModule,
@@ -50,6 +60,7 @@ export class NDBSyncDocumentationComponent implements OnInit, OnDestroy {
               private readonly documentationParser: DocumentationParser,
               private readonly toast: MatSnackBar,
               private readonly router: Router,
+              private readonly cdr: ChangeDetectorRef,
               private readonly dr: DestroyRef) {
   }
 
@@ -85,6 +96,7 @@ export class NDBSyncDocumentationComponent implements OnInit, OnDestroy {
       return;
     }
     this.isLoading = true;
+    this.cdr.markForCheck();
     const file: File = this.$input.files[0];
     const buffer: Uint8Array = new Uint8Array(await file.arrayBuffer());
 
@@ -127,6 +139,7 @@ export class NDBSyncDocumentationComponent implements OnInit, OnDestroy {
       // Fallback to blocking import/export operations.
       await this.documentationParser.load();
       this.isReady = 'sync';
+      this.cdr.markForCheck();
       console.info('WebWorker not supported, falling back to blocking operations.');
       return;
     }
@@ -147,6 +160,7 @@ export class NDBSyncDocumentationComponent implements OnInit, OnDestroy {
 
   private onWorkerReady(): void {
     this.isReady = 'async';
+    this.cdr.markForCheck();
   }
 
   private onWorkerExport(file: Blob): void {
@@ -157,10 +171,12 @@ export class NDBSyncDocumentationComponent implements OnInit, OnDestroy {
     this.$link.click();
     URL.revokeObjectURL(url);
     this.isLoading = false;
+    this.cdr.markForCheck();
   }
 
   private onWorkerImport(data: ClassDocumentation[]): void {
     this.isLoading = false;
+    this.cdr.markForCheck();
     this.router.navigate(['import'], {state: data, skipLocationChange: true});
   }
 
@@ -169,6 +185,7 @@ export class NDBSyncDocumentationComponent implements OnInit, OnDestroy {
 
     this.toast.open(message, undefined, {duration: 3000});
     this.isLoading = false;
+    this.cdr.markForCheck();
   }
 
   private onWorkerImportFailed(error: any): void {
@@ -181,5 +198,6 @@ export class NDBSyncDocumentationComponent implements OnInit, OnDestroy {
     }
     this.toast.open(message, undefined, {duration: 3000});
     this.isLoading = false;
+    this.cdr.markForCheck();
   }
 }

@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   ApplicationRef,
+  ChangeDetectionStrategy,
   Component,
   DestroyRef,
   HostListener,
@@ -43,6 +44,7 @@ interface ViewData {
 @Component({
   selector: 'ndb-tabs',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
     RouterLink,

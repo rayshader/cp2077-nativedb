@@ -1,4 +1,4 @@
-import {Component, DestroyRef, OnInit, Renderer2} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, OnInit, Renderer2} from '@angular/core';
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {Theme, ThemeService} from "../../../shared/services/theme.service";
@@ -8,6 +8,7 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 @Component({
   selector: 'ndb-theme-mode',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIconModule,
     MatButtonModule,
@@ -18,19 +19,14 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 })
 export class NDBThemeModeComponent implements OnInit {
 
+  themeModeIcon: string = 'dark_mode';
+  themeModeTitle: string = 'Switch to dark mode';
+
   private theme: Theme = 'light-theme';
 
   constructor(private readonly themeService: ThemeService,
               private readonly renderer: Renderer2,
               private readonly dr: DestroyRef) {
-  }
-
-  get themeModeIcon(): string {
-    return (this.theme === 'light-theme') ? 'dark_mode' : 'light_mode';
-  }
-
-  get themeModeTitle(): string {
-    return `Switch to ${(this.theme === 'light-theme') ? 'dark' : 'light'} mode`;
   }
 
   ngOnInit(): void {
@@ -43,6 +39,8 @@ export class NDBThemeModeComponent implements OnInit {
 
   private onThemeChanged(theme: Theme): void {
     this.theme = theme;
+    this.themeModeIcon = (this.theme === 'light-theme') ? 'dark_mode' : 'light_mode';
+    this.themeModeTitle = `Switch to ${(this.theme === 'light-theme') ? 'dark' : 'light'} mode`;
     if (theme === 'light-theme') {
       this.renderer.removeClass(document.body, 'dark-theme');
     } else {

@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {combineLatest, EMPTY, filter, map, Observable} from "rxjs";
 import {AsyncPipe} from "@angular/common";
@@ -22,6 +22,7 @@ interface EnumData {
 @Component({
   selector: 'ndb-page-enum',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
     MatTooltip,

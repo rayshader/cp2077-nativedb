@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {combineLatest, EMPTY, filter, map, Observable} from "rxjs";
@@ -22,6 +22,7 @@ interface BitfieldData {
 @Component({
   selector: 'ndb-page-bitfield',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
     MatTooltip,
