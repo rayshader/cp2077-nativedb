@@ -373,7 +373,6 @@ export class DocumentationService {
       })
       .flatMap((operation) => {
         if (operation.operation === MergeOperation.add) {
-          console.log('<add />', operation);
           const documentation: ClassDocumentation = {
             id: operation.id,
             body: operation.body?.file,
