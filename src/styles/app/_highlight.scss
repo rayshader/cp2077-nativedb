@@ -9,8 +9,8 @@
     }
   }
 
-  enum,
-  bitfield {
+  ndb-page-enum,
+  ndb-page-bitfield {
     & .highlight {
       @extend %highlight;
 
@@ -18,7 +18,7 @@
     }
   }
 
-  object {
+  ndb-page-object {
     & property-span {
       @extend %highlight;
 
@@ -42,14 +42,14 @@
 @mixin highlight-color($theme) {
   $color: rgba(255, 255, 255, 0.1);
 
-  enum,
-  bitfield {
+  ndb-page-enum,
+  ndb-page-bitfield {
     & .highlight {
       background-color: $color;
     }
   }
 
-  object {
+  ndb-page-object {
     & property-span {
       &.highlight {
         background-color: $color;
