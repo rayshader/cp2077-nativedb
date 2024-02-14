@@ -7,6 +7,9 @@
   "id": "/",
   "scope": "./",
   "start_url": "./",
+  "launch_handler": {
+      "client_mode": ["navigate-existing", "auto"]
+  },
   "icons": [
      {
         "src": "./assets/logo/512.png",
