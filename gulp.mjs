@@ -1,16 +1,19 @@
 import gulp from 'gulp';
-import gzip from 'gulp-gzip';
 import brotli from 'gulp-brotli';
+import htmlmin from 'gulp-htmlmin';
 
 gulp.task('install-wasm', () => {
   return gulp.src('./node_modules/brotli-wasm/pkg.web/*.wasm')
     .pipe(gulp.dest('./src'));
 });
 
-gulp.task('compress-gzip', () => {
-  return gulp.src(['./dist/**/*.*'])
-    .pipe(gzip())
-    .pipe(gulp.dest('./dist'));
+gulp.task('gh-pages', () => {
+  return gulp.src('./src/404.html')
+    .pipe(htmlmin({
+      collapseWhitespace: true,
+      removeComments: true
+    }))
+    .pipe(gulp.dest('./dist/browser'));
 });
 
 gulp.task('compress-brotli', () => {
@@ -18,3 +21,5 @@ gulp.task('compress-brotli', () => {
     .pipe(brotli())
     .pipe(gulp.dest('./dist'));
 });
+
+gulp.task('deploy', gulp.series('gh-pages', 'compress-brotli'));
