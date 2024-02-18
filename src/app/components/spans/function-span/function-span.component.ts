@@ -90,7 +90,7 @@ export class FunctionSpanComponent {
   set _node(value: RedFunctionAst | undefined) {
     this.node = value;
     this.scope = (this.node) ? RedVisibilityDef[this.node.visibility] : '';
-    this.hasFullName = !!this.node && !!this.node.fullName;
+    this.hasFullName = !!this.node && (this.node.name !== this.node.fullName);
   }
 
   @Input('documentation')
