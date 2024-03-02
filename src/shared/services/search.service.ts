@@ -41,7 +41,7 @@ export class SearchService {
     query: '',
     filter: FilterBy.name
   });
-  private readonly query$: Observable<SearchRequest> = this.querySubject.asObservable();
+  public readonly query$: Observable<SearchRequest> = this.querySubject.asObservable();
 
   private readonly queries: Query[] = [
     {filter: FilterBy.name, fn: this.filterByName.bind(this)},
@@ -57,10 +57,6 @@ export class SearchService {
     this.classes$ = this.transformData(dumpService.classes$);
     this.structs$ = this.transformData(dumpService.structs$);
     this.functions$ = this.transformData(dumpService.functions$);
-  }
-
-  public get lastRequest$(): Observable<SearchRequest> {
-    return this.query$;
   }
 
   public static isProperty(request: SearchRequest) {

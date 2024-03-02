@@ -241,7 +241,7 @@ export class ObjectComponent {
       this.dumpService.badges$,
       this.settingsService.settings$,
       this.isMobile$,
-      this.searchService.lastRequest$,
+      this.searchService.query$,
       this.filters$
     ]).pipe(
       map(this.loadData.bind(this))
