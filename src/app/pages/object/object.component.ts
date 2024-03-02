@@ -30,7 +30,7 @@ import {RedPropertyAst} from "../../../shared/red-ast/red-property.ast";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {RedOriginDef, RedVisibilityDef} from "../../../shared/red-ast/red-definitions.ast";
 import {PageService} from "../../../shared/services/page.service";
-import {CodeSyntax, SettingsService} from "../../../shared/services/settings.service";
+import {CodeSyntax, Settings, SettingsService} from "../../../shared/services/settings.service";
 import {MatButtonModule} from "@angular/material/button";
 import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
 import {RecentVisitService} from "../../../shared/services/recent-visit.service";
@@ -220,18 +220,7 @@ export class ObjectComponent {
     }
     this.recentVisitService.pushLastVisit(+id);
     this.resetFilters();
-    const object$ = of(this.kind).pipe(
-      switchMap((kind) => {
-        if (kind === RedNodeKind.class) {
-          return this.dumpService.getClassById(+id);
-        } else if (kind === RedNodeKind.struct) {
-          return this.dumpService.getStructById(+id);
-        }
-        return EMPTY;
-      }),
-      map((object) => object as RedClassAst),
-      shareReplay(1)
-    );
+    const object$ = this.loadObject(+id);
     const documentation$ = object$.pipe(this.getDocumentation(), shareReplay(1));
 
     combineLatest([
@@ -248,61 +237,7 @@ export class ObjectComponent {
       this.isMobile$,
       this.filterBadges$
     ]).pipe(
-      map(([
-             object,
-             documentation,
-             isDocumented,
-             badges,
-             settings,
-             isMobile
-           ]) => {
-        const showEmptyAccordion: boolean = settings.showEmptyAccordion;
-        let name: string = object.name;
-        let altName: string | undefined = object.aliasName;
-        let properties: RedPropertyAst[] = object.properties;
-        let functions: RedFunctionAst[] = object.functions;
-
-        if (settings.codeSyntax === CodeSyntax.redscript && object.aliasName) {
-          name = object.aliasName;
-          altName = object.name;
-        }
-        this.computePropertyFilters(object.properties);
-        this.computeFunctionFilters(object.functions);
-        if (this.isPropertiesFiltered) {
-          properties = properties.filter(this.hasPropertyFlag.bind(this));
-        }
-        if (this.isFunctionsFiltered) {
-          functions = functions.filter(this.hasFunctionFlag.bind(this));
-        }
-        this.app.isStable.pipe(
-          filter((stable: boolean) => stable),
-          first(),
-          takeUntilDestroyed(this.dr)
-        ).subscribe(this.onScrollToFragment.bind(this));
-        return <ObjectData>{
-          object: object,
-          name: name,
-          altName: altName,
-          scope: RedVisibilityDef[object.visibility],
-          isAbstract: object.isAbstract,
-          parents: object.parents,
-          children: object.children,
-          properties: properties,
-          functions: functions,
-          badges: badges,
-          align: `${104 + badges * 24 + 12 - 30}px`,
-          documentation: documentation,
-          hideDocumentation: isMobile,
-          hasBodyDocumentation: !isMobile && documentation.body !== undefined,
-          isMobile: isMobile,
-          isPinned: settings.isBarPinned,
-          highlightEmpty: settings.highlightEmptyObject,
-          showParents: object.parents.length > 0 || showEmptyAccordion,
-          showChildren: object.children.length > 0 || showEmptyAccordion,
-          showProperties: properties.length > 0 || showEmptyAccordion || this.isPropertiesFiltered,
-          showFunctions: functions.length > 0 || showEmptyAccordion || this.isFunctionsFiltered,
-        };
-      })
+      map(this.loadData.bind(this))
     );
   }
 
@@ -440,6 +375,62 @@ export class ObjectComponent {
     this.isFunctionsFiltered = false;
   }
 
+  private loadData([
+                     object,
+                     documentation,
+                     isDocumented,
+                     badges,
+                     settings,
+                     isMobile,
+                   ]: [RedClassAst, ClassDocumentation, boolean, number, Settings, boolean, void]) {
+    const showEmptyAccordion: boolean = settings.showEmptyAccordion;
+    let name: string = object.name;
+    let altName: string | undefined = object.aliasName;
+    let properties: RedPropertyAst[] = object.properties;
+    let functions: RedFunctionAst[] = object.functions;
+
+    if (settings.codeSyntax === CodeSyntax.redscript && object.aliasName) {
+      name = object.aliasName;
+      altName = object.name;
+    }
+    this.computePropertyFilters(object.properties);
+    this.computeFunctionFilters(object.functions);
+    if (this.isPropertiesFiltered) {
+      properties = properties.filter(this.hasPropertyFlag.bind(this));
+    }
+    if (this.isFunctionsFiltered) {
+      functions = functions.filter(this.hasFunctionFlag.bind(this));
+    }
+    this.app.isStable.pipe(
+      filter((stable: boolean) => stable),
+      first(),
+      takeUntilDestroyed(this.dr)
+    ).subscribe(this.onScrollToFragment.bind(this));
+    return <ObjectData>{
+      object: object,
+      name: name,
+      altName: altName,
+      scope: RedVisibilityDef[object.visibility],
+      isAbstract: object.isAbstract,
+      parents: object.parents,
+      children: object.children,
+      properties: properties,
+      functions: functions,
+      badges: badges,
+      align: `${104 + badges * 24 + 12 - 30}px`,
+      documentation: documentation,
+      hideDocumentation: isMobile,
+      hasBodyDocumentation: !isMobile && documentation.body !== undefined,
+      isMobile: isMobile,
+      isPinned: settings.isBarPinned,
+      highlightEmpty: settings.highlightEmptyObject,
+      showParents: object.parents.length > 0 || showEmptyAccordion,
+      showChildren: object.children.length > 0 || showEmptyAccordion,
+      showProperties: properties.length > 0 || showEmptyAccordion || this.isPropertiesFiltered,
+      showFunctions: functions.length > 0 || showEmptyAccordion || this.isFunctionsFiltered,
+    };
+  }
+
   private hasPropertyFlag(prop: RedPropertyAst): boolean {
     const badges: BadgeFilterItem<RedPropertyAst>[] = this.badgesProperty.filter((badge) => badge.isEnabled);
     let match: boolean = false;
@@ -490,6 +481,21 @@ export class ObjectComponent {
         }
         return this.documentationService.getClassById(object.id);
       })
+    );
+  }
+
+  private loadObject(id: number): Observable<RedClassAst> {
+    return of(this.kind).pipe(
+      switchMap((kind) => {
+        if (kind === RedNodeKind.class) {
+          return this.dumpService.getClassById(+id);
+        } else if (kind === RedNodeKind.struct) {
+          return this.dumpService.getStructById(+id);
+        }
+        return EMPTY;
+      }),
+      map((object) => object as RedClassAst),
+      shareReplay(1)
     );
   }
 
