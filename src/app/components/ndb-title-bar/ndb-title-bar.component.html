@@ -12,6 +12,14 @@
 </div>
 
 <div class="actions">
+  @if (_node !== undefined && _node.kind !== RedNodeKind.function) {
+    <button mat-icon-button
+            matTooltip="Search by usage"
+            (click)="searchByUsage()">
+      <mat-icon>search</mat-icon>
+    </button>
+  }
+
   <button mat-icon-button
           matTooltip="Copy URL to clipboard"
           (click)="copyUrl()">

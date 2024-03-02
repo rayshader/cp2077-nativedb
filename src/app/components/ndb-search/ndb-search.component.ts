@@ -54,19 +54,28 @@ export class NDBSearchComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.query.valueChanges
-      .pipe(
-        debounceTime(300),
-        takeUntilDestroyed(this.dr)
-      )
-      .subscribe((query) => {
-        query ??= '';
-        query = query.trim();
-        this.searchService.search(query, this.filter);
-        if (query.length > 0) {
-          this.search.emit();
-        }
-      });
+    this.searchService.changeQuery$.pipe(
+      takeUntilDestroyed(this.dr)
+    ).subscribe((request) => {
+      const query: string = this.query.value ?? '';
+
+      if (query === request.query) {
+        return;
+      }
+      this.updateFilter(request.filter);
+      this.query.setValue(request.query);
+    });
+    this.query.valueChanges.pipe(
+      debounceTime(300),
+      takeUntilDestroyed(this.dr)
+    ).subscribe((query) => {
+      query ??= '';
+      query = query.trim();
+      this.searchService.search(query, this.filter);
+      if (query.length > 0) {
+        this.search.emit();
+      }
+    });
   }
 
   clear(): void {
@@ -77,12 +86,7 @@ export class NDBSearchComponent implements OnInit {
     if (filter.value === this.filter) {
       return;
     }
-    this.filter = filter.value;
-    if (this.filter === FilterBy.name) {
-      this.filterBadgeLabel = undefined;
-    } else {
-      this.filterBadgeLabel = FilterBy[this.filter][0].toUpperCase();
-    }
+    this.updateFilter(filter.value);
     let query: string = this.query.value ?? '';
 
     query = query.trim();
@@ -90,6 +94,15 @@ export class NDBSearchComponent implements OnInit {
       return;
     }
     this.query.setValue(query);
+  }
+
+  private updateFilter(filter: FilterBy): void {
+    this.filter = filter;
+    if (this.filter === FilterBy.name) {
+      this.filterBadgeLabel = undefined;
+    } else {
+      this.filterBadgeLabel = FilterBy[this.filter][0].toUpperCase();
+    }
   }
 
 }

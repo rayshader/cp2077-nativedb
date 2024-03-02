@@ -41,7 +41,13 @@ export class SearchService {
     query: '',
     filter: FilterBy.name
   });
+  private readonly changeQuerySubject: BehaviorSubject<SearchRequest> = new BehaviorSubject(<SearchRequest>{
+    query: '',
+    filter: FilterBy.name
+  });
+
   public readonly query$: Observable<SearchRequest> = this.querySubject.asObservable();
+  public readonly changeQuery$: Observable<SearchRequest> = this.changeQuerySubject.asObservable();
 
   private readonly queries: Query[] = [
     {filter: FilterBy.name, fn: this.filterByName.bind(this)},
@@ -89,6 +95,10 @@ export class SearchService {
 
   search(query: string, filter: FilterBy): void {
     this.querySubject.next({query: query, filter: filter});
+  }
+
+  requestSearch(query: string, filter: FilterBy): void {
+    this.changeQuerySubject.next({query: query, filter: filter});
   }
 
   private transformData<T extends RedNodeAst>(data$: Observable<T[]>): Observable<TabItemNode[]> {
