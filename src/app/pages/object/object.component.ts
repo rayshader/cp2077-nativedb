@@ -446,43 +446,17 @@ export class ObjectComponent {
                      badges,
                      settings,
                      isMobile,
-                     lastRequest
+                     request
                    ]: [RedClassAst, ClassDocumentation, boolean, number, Settings, boolean, SearchRequest, void]) {
+    const properties: RedPropertyAst[] = this.filterProperties(object.properties, request);
+    const functions: RedFunctionAst[] = this.filterFunctions(object.functions, request);
     const showEmptyAccordion: boolean = settings.showEmptyAccordion;
-    let name: string = object.name;
     let altName: string | undefined = object.aliasName;
-    let properties: RedPropertyAst[] = object.properties;
-    let functions: RedFunctionAst[] = object.functions;
+    let name: string = object.name;
 
     if (settings.codeSyntax === CodeSyntax.redscript && object.aliasName) {
       name = object.aliasName;
       altName = object.name;
-    }
-    this.computePropertyFilters(object.properties);
-    this.computeFunctionFilters(object.functions);
-    if (!SearchService.isProperty(lastRequest) && this.propertySearchFilter !== 'empty') {
-      this.propertySearchFilter = 'empty';
-      this.enableBadges('property');
-    }
-    if (!SearchService.isFunction(lastRequest) && this.functionSearchFilter !== 'empty') {
-      this.functionSearchFilter = 'empty';
-      this.enableBadges('function');
-    }
-    if (SearchService.isProperty(lastRequest) && this.propertySearchFilter !== 'disable') {
-      this.isPropertiesFiltered = true;
-      this.disableBadges('property');
-      properties = SearchService.filterProperties(properties, lastRequest.query);
-      this.propertySearchFilter = 'enable';
-    } else if (this.isPropertiesFiltered) {
-      properties = properties.filter(this.hasPropertyFlag.bind(this));
-    }
-    if (SearchService.isFunction(lastRequest) && this.functionSearchFilter !== 'disable') {
-      this.isFunctionsFiltered = true;
-      this.disableBadges('function');
-      functions = SearchService.filterFunctions(functions, lastRequest.query);
-      this.functionSearchFilter = 'enable';
-    } else if (this.isFunctionsFiltered) {
-      functions = functions.filter(this.hasFunctionFlag.bind(this));
     }
     this.app.isStable.pipe(
       filter((stable: boolean) => stable),
@@ -512,6 +486,40 @@ export class ObjectComponent {
       showProperties: properties.length > 0 || showEmptyAccordion || this.isPropertiesFiltered,
       showFunctions: functions.length > 0 || showEmptyAccordion || this.isFunctionsFiltered,
     };
+  }
+
+  private filterProperties(properties: RedPropertyAst[], request: SearchRequest): RedPropertyAst[] {
+    this.computePropertyFilters(properties);
+    if (!SearchService.isProperty(request) && this.propertySearchFilter !== 'empty') {
+      this.propertySearchFilter = 'empty';
+      this.enableBadges('property');
+    }
+    if (SearchService.isProperty(request) && this.propertySearchFilter !== 'disable') {
+      this.isPropertiesFiltered = true;
+      this.disableBadges('property');
+      properties = SearchService.filterProperties(properties, request.query);
+      this.propertySearchFilter = 'enable';
+    } else if (this.isPropertiesFiltered) {
+      properties = properties.filter(this.hasPropertyFlag.bind(this));
+    }
+    return properties;
+  }
+
+  private filterFunctions(functions: RedFunctionAst[], request: SearchRequest): RedFunctionAst[] {
+    this.computeFunctionFilters(functions);
+    if (!SearchService.isFunction(request) && this.functionSearchFilter !== 'empty') {
+      this.functionSearchFilter = 'empty';
+      this.enableBadges('function');
+    }
+    if (SearchService.isFunction(request) && this.functionSearchFilter !== 'disable') {
+      this.isFunctionsFiltered = true;
+      this.disableBadges('function');
+      functions = SearchService.filterFunctions(functions, request.query);
+      this.functionSearchFilter = 'enable';
+    } else if (this.isFunctionsFiltered) {
+      functions = functions.filter(this.hasFunctionFlag.bind(this));
+    }
+    return functions;
   }
 
   private hasPropertyFlag(prop: RedPropertyAst): boolean {
