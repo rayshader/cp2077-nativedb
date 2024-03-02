@@ -43,6 +43,9 @@
       & .actions {
         position: absolute;
         left: 272px;
+        display: flex;
+        align-items: center;
+        height: 100%;
 
         @media (max-width: 1024px) {
           position: unset;
