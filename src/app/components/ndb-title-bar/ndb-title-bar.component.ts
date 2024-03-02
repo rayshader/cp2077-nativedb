@@ -60,19 +60,6 @@ export class NDBTitleBarComponent {
     this.isBookmarked = this.bookmarkService.isBookmarked(value.id);
   }
 
-  togglePin(): void {
-    this.isPinned = !this.isPinned;
-    this.settingsService.updateIsBarPinned(this.isPinned);
-  }
-
-  toggleBookmark(): void {
-    if (!this._node) {
-      return;
-    }
-    this.isBookmarked = !this.isBookmarked;
-    this.bookmarkService.toggleBookmark(this._node.id);
-  }
-
   copyAltTitle(): void {
     if (!this.altTitle) {
       return;
@@ -84,6 +71,19 @@ export class NDBTitleBarComponent {
     const data: string = `${window.location.origin}/${this.title}`;
 
     navigator.clipboard.writeText(data);
+  }
+
+  toggleBookmark(): void {
+    if (!this._node) {
+      return;
+    }
+    this.isBookmarked = !this.isBookmarked;
+    this.bookmarkService.toggleBookmark(this._node.id);
+  }
+
+  togglePin(): void {
+    this.isPinned = !this.isPinned;
+    this.settingsService.updateIsBarPinned(this.isPinned);
   }
 
   private onSettingsLoaded(state: boolean): void {
