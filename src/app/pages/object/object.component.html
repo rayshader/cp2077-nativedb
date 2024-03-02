@@ -94,6 +94,12 @@
                       [class.empty]="badge.isEmpty"
                       (click)="togglePropertyFilter(badge)"></mat-icon>
           }
+          <mat-icon class="badge search"
+                    [matTooltip]="propertySearchFilter === 'enable' ? 'Reset filter' : 'Filter by query'"
+                    [matTooltipDisabled]="propertySearchFilter === 'empty'"
+                    [class.disabled]="propertySearchFilter === 'disable'"
+                    [class.empty]="propertySearchFilter === 'empty'"
+                    (click)="togglePropertySearchFilter()">search</mat-icon>
         </div>
 
         @for (prop of data.properties; track prop.name) {
@@ -130,6 +136,12 @@
                       [class.empty]="badge.isEmpty"
                       (click)="toggleFunctionFilter(badge)"></mat-icon>
           }
+          <mat-icon class="badge search"
+                    [matTooltip]="functionSearchFilter === 'enable' ? 'Reset filter' : 'Filter by query'"
+                    [matTooltipDisabled]="functionSearchFilter === 'empty'"
+                    [class.disabled]="functionSearchFilter === 'disable'"
+                    [class.empty]="functionSearchFilter === 'empty'"
+                    (click)="toggleFunctionSearchFilter()">search</mat-icon>
         </div>
 
         <!-- NOTE: tracking with id will crash webapp when filtering per badge several times. -->

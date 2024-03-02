@@ -59,6 +59,38 @@ export class SearchService {
     this.functions$ = this.transformData(dumpService.functions$);
   }
 
+  public get lastRequest$(): Observable<SearchRequest> {
+    return this.query$;
+  }
+
+  public static isProperty(request: SearchRequest) {
+    return request.query.length > 0 && request.filter === FilterBy.property;
+  }
+
+  public static isFunction(request: SearchRequest) {
+    return request.query.length > 0 && request.filter === FilterBy.function;
+  }
+
+  public static filterProperties(properties: RedPropertyAst[], query: string): RedPropertyAst[] {
+    const words: string[] = query.toLowerCase().split(' ');
+
+    return properties.filter((prop) => {
+      const name: string = prop.name.toLowerCase();
+
+      return words.every((word) => name.includes(word));
+    });
+  }
+
+  public static filterFunctions(functions: RedFunctionAst[], query: string): RedFunctionAst[] {
+    const words: string[] = query.toLowerCase().split(' ');
+
+    return functions.filter((func) => {
+      const name: string = func.name.toLowerCase();
+
+      return words.every((word) => name.includes(word));
+    });
+  }
+
   search(query: string, filter: FilterBy): void {
     this.querySubject.next({query: query, filter: filter});
   }

@@ -27,6 +27,10 @@
       &[data-scope="private"] {
         margin-right: 24px;
       }
+
+      &.search {
+        margin-left: 24px;
+      }
     }
 
     @media (max-width: 1024px) {

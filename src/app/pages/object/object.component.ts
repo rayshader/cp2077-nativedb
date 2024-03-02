@@ -42,6 +42,7 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
 import {NDBDocumentationComponent} from "../../components/ndb-documentation/ndb-documentation.component";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {SearchRequest, SearchService} from "../../../shared/services/search.service";
 
 export interface InheritData extends RedTypeAst {
   readonly isEmpty: boolean;
@@ -89,6 +90,8 @@ interface BadgeFilterItem<T> {
   readonly dataScope?: string;
   readonly filter: (node: T) => boolean;
 }
+
+type MemberFilter = 'empty' | 'disable' | 'enable';
 
 @Component({
   selector: 'ndb-page-object',
@@ -194,11 +197,13 @@ export class ObjectComponent {
 
   protected isPropertiesFiltered: boolean = false;
   protected isFunctionsFiltered: boolean = false;
+  protected propertySearchFilter: MemberFilter = 'empty';
+  protected functionSearchFilter: MemberFilter = 'empty';
 
   private readonly isDocumentedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private readonly isDocumented$: Observable<boolean> = this.isDocumentedSubject.asObservable();
-  private readonly filterBadgesSubject: BehaviorSubject<void> = new BehaviorSubject<void>(undefined);
-  private readonly filterBadges$: Observable<void> = this.filterBadgesSubject.asObservable();
+  private readonly filtersSubject: BehaviorSubject<void> = new BehaviorSubject<void>(undefined);
+  private readonly filters$: Observable<void> = this.filtersSubject.asObservable();
 
   constructor(private readonly dumpService: RedDumpService,
               private readonly documentationService: DocumentationService,
@@ -206,6 +211,7 @@ export class ObjectComponent {
               private readonly recentVisitService: RecentVisitService,
               private readonly settingsService: SettingsService,
               private readonly responsiveService: ResponsiveService,
+              private readonly searchService: SearchService,
               private readonly app: ApplicationRef,
               private readonly route: ActivatedRoute,
               private readonly dr: DestroyRef) {
@@ -235,7 +241,8 @@ export class ObjectComponent {
       this.dumpService.badges$,
       this.settingsService.settings$,
       this.isMobile$,
-      this.filterBadges$
+      this.searchService.lastRequest$,
+      this.filters$
     ]).pipe(
       map(this.loadData.bind(this))
     );
@@ -340,11 +347,30 @@ export class ObjectComponent {
       badge.isEnabled = true;
       isEnabled = false;
     }
+    if (this.propertySearchFilter === 'enable') {
+      this.propertySearchFilter = 'disable';
+      badge.isEnabled = true;
+      isEnabled = false;
+    }
     this.badgesProperty
       .filter((item) => item !== badge)
       .forEach((item) => item.isEnabled = isEnabled);
     this.isPropertiesFiltered = this.badgesProperty.filter((badge) => badge.isEnabled).length === 1;
-    this.filterBadgesSubject.next();
+    this.filtersSubject.next();
+  }
+
+  togglePropertySearchFilter(): void {
+    if (this.propertySearchFilter === 'empty') {
+      return;
+    }
+    if (this.propertySearchFilter === 'enable') {
+      this.propertySearchFilter = 'disable';
+      this.enableBadges('property');
+    } else {
+      this.propertySearchFilter = 'enable';
+      this.disableBadges('property');
+    }
+    this.filtersSubject.next();
   }
 
   toggleFunctionFilter(badge: BadgeFilterItem<RedFunctionAst>): void {
@@ -361,18 +387,56 @@ export class ObjectComponent {
       badge.isEnabled = true;
       isEnabled = false;
     }
+    if (this.functionSearchFilter === 'enable') {
+      this.functionSearchFilter = 'disable';
+      badge.isEnabled = true;
+      isEnabled = false;
+    }
     this.badgesFunction
       .filter((item) => item !== badge)
       .forEach((item) => item.isEnabled = isEnabled);
     this.isFunctionsFiltered = this.badgesFunction.filter((badge) => badge.isEnabled).length === 1;
-    this.filterBadgesSubject.next();
+    this.filtersSubject.next();
+  }
+
+  toggleFunctionSearchFilter(): void {
+    if (this.functionSearchFilter === 'empty') {
+      return;
+    }
+    if (this.functionSearchFilter === 'enable') {
+      this.functionSearchFilter = 'disable';
+      this.enableBadges('function');
+    } else {
+      this.functionSearchFilter = 'enable';
+      this.disableBadges('function');
+    }
+    this.filtersSubject.next();
   }
 
   resetFilters(): void {
-    this.badgesProperty.forEach((badge) => badge.isEnabled = true);
-    this.badgesFunction.forEach((badge) => badge.isEnabled = true);
-    this.isPropertiesFiltered = false;
-    this.isFunctionsFiltered = false;
+    this.enableBadges();
+    this.propertySearchFilter = 'empty';
+    this.functionSearchFilter = 'empty';
+  }
+
+  private enableBadges(member?: 'property' | 'function'): void {
+    if (member === undefined || member === 'property') {
+      this.badgesProperty.forEach((badge) => badge.isEnabled = true);
+      this.isPropertiesFiltered = false;
+    }
+    if (member === undefined || member === 'function') {
+      this.badgesFunction.forEach((badge) => badge.isEnabled = true);
+      this.isFunctionsFiltered = false;
+    }
+  }
+
+  private disableBadges(member?: 'property' | 'function'): void {
+    if (member === undefined || member === 'property') {
+      this.badgesProperty.forEach((badge) => badge.isEnabled = false);
+    }
+    if (member === undefined || member === 'function') {
+      this.badgesFunction.forEach((badge) => badge.isEnabled = false);
+    }
   }
 
   private loadData([
@@ -382,7 +446,8 @@ export class ObjectComponent {
                      badges,
                      settings,
                      isMobile,
-                   ]: [RedClassAst, ClassDocumentation, boolean, number, Settings, boolean, void]) {
+                     lastRequest
+                   ]: [RedClassAst, ClassDocumentation, boolean, number, Settings, boolean, SearchRequest, void]) {
     const showEmptyAccordion: boolean = settings.showEmptyAccordion;
     let name: string = object.name;
     let altName: string | undefined = object.aliasName;
@@ -395,10 +460,28 @@ export class ObjectComponent {
     }
     this.computePropertyFilters(object.properties);
     this.computeFunctionFilters(object.functions);
-    if (this.isPropertiesFiltered) {
+    if (!SearchService.isProperty(lastRequest) && this.propertySearchFilter !== 'empty') {
+      this.propertySearchFilter = 'empty';
+      this.enableBadges('property');
+    }
+    if (!SearchService.isFunction(lastRequest) && this.functionSearchFilter !== 'empty') {
+      this.functionSearchFilter = 'empty';
+      this.enableBadges('function');
+    }
+    if (SearchService.isProperty(lastRequest) && this.propertySearchFilter !== 'disable') {
+      this.isPropertiesFiltered = true;
+      this.disableBadges('property');
+      properties = SearchService.filterProperties(properties, lastRequest.query);
+      this.propertySearchFilter = 'enable';
+    } else if (this.isPropertiesFiltered) {
       properties = properties.filter(this.hasPropertyFlag.bind(this));
     }
-    if (this.isFunctionsFiltered) {
+    if (SearchService.isFunction(lastRequest) && this.functionSearchFilter !== 'disable') {
+      this.isFunctionsFiltered = true;
+      this.disableBadges('function');
+      functions = SearchService.filterFunctions(functions, lastRequest.query);
+      this.functionSearchFilter = 'enable';
+    } else if (this.isFunctionsFiltered) {
       functions = functions.filter(this.hasFunctionFlag.bind(this));
     }
     this.app.isStable.pipe(
