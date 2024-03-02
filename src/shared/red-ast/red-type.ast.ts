@@ -21,6 +21,20 @@ export class RedTypeAst {
     return type.flag !== undefined && type.flag >= RedPrimitiveDef.Void && type.flag <= RedPrimitiveDef.Variant;
   }
 
+  static hasType(type: RedTypeAst, words: string[]): boolean {
+    if (RedTypeAst.isPrimitive(type)) {
+      return false;
+    }
+    if (type.innerType) {
+      return this.hasType(type.innerType, words);
+    }
+    const name: string = type.name.toLowerCase();
+    const aliasName: string | undefined = type.aliasName?.toLowerCase();
+
+    return words.every((word) => name.includes(word)) ||
+      (!!aliasName && words.every((word) => aliasName.includes(word)));
+  }
+
   static toString(type: RedTypeAst, syntax?: CodeSyntax): string {
     let name: string = type.name;
     let str: string = '';

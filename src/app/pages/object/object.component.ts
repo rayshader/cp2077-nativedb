@@ -490,11 +490,11 @@ export class ObjectComponent {
 
   private filterProperties(properties: RedPropertyAst[], request: SearchRequest): RedPropertyAst[] {
     this.computePropertyFilters(properties);
-    if (!SearchService.isProperty(request) && this.propertySearchFilter !== 'empty') {
+    if (!SearchService.isPropertyOrUsage(request) && this.propertySearchFilter !== 'empty') {
       this.propertySearchFilter = 'empty';
       this.enableBadges('property');
     }
-    if (SearchService.isProperty(request) && this.propertySearchFilter !== 'disable') {
+    if (SearchService.isPropertyOrUsage(request) && this.propertySearchFilter !== 'disable') {
       this.isPropertiesFiltered = true;
       this.disableBadges('property');
       properties = SearchService.filterProperties(properties, request);
@@ -507,11 +507,11 @@ export class ObjectComponent {
 
   private filterFunctions(functions: RedFunctionAst[], request: SearchRequest): RedFunctionAst[] {
     this.computeFunctionFilters(functions);
-    if (!SearchService.isFunction(request) && this.functionSearchFilter !== 'empty') {
+    if (!SearchService.isFunctionOrUsage(request) && this.functionSearchFilter !== 'empty') {
       this.functionSearchFilter = 'empty';
       this.enableBadges('function');
     }
-    if (SearchService.isFunction(request) && this.functionSearchFilter !== 'disable') {
+    if (SearchService.isFunctionOrUsage(request) && this.functionSearchFilter !== 'disable') {
       this.isFunctionsFiltered = true;
       this.disableBadges('function');
       functions = SearchService.filterFunctions(functions, request);

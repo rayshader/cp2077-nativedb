@@ -30,6 +30,10 @@ export class RedPropertyAst {
     return a.name.localeCompare(b.name);
   }
 
+  static filterByUsage(prop: RedPropertyAst, words: string[]): boolean {
+    return RedTypeAst.hasType(prop.type, words);
+  }
+
   static computeBadges(prop: RedPropertyAst): number {
     let badges: number = 1;
 

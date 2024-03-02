@@ -40,6 +40,15 @@ export class RedFunctionAst {
     return a.name.localeCompare(b.name);
   }
 
+  static filterByUsage(func: RedFunctionAst, words: string[]): boolean {
+    if (func.returnType && RedTypeAst.hasType(func.returnType!, words)) {
+      return true;
+    }
+    const args: RedArgumentAst[] = func.arguments.filter((arg) => RedTypeAst.hasType(arg.type, words));
+
+    return args.length > 0;
+  }
+
   static computeBadges(func: RedFunctionAst): number {
     let badges: number = 1;
 

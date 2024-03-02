@@ -7,7 +7,6 @@ import {RedClassAst} from "../red-ast/red-class.ast";
 import {CodeSyntax, SettingsService} from "./settings.service";
 import {RedPropertyAst} from "../red-ast/red-property.ast";
 import {RedFunctionAst} from "../red-ast/red-function.ast";
-import {RedTypeAst} from "../red-ast/red-type.ast";
 import {RedOriginDef} from "../red-ast/red-definitions.ast";
 
 export enum FilterBy {
@@ -64,54 +63,30 @@ export class SearchService {
     this.functions$ = this.transformData(dumpService.functions$);
   }
 
-  public static isProperty(request: SearchRequest) {
-    return request.query.length > 0 && request.filter === FilterBy.property;
+  public static isPropertyOrUsage(request: SearchRequest) {
+    return request.query.length > 0 && (request.filter === FilterBy.property || request.filter === FilterBy.usage);
   }
 
-  public static isFunction(request: SearchRequest) {
-    return request.query.length > 0 && request.filter === FilterBy.function;
-  }
-
-  public static isUsage(request: SearchRequest) {
-    return request.query.length > 0 && request.filter === FilterBy.usage;
+  public static isFunctionOrUsage(request: SearchRequest) {
+    return request.query.length > 0 && (request.filter === FilterBy.function || request.filter === FilterBy.usage);
   }
 
   public static filterProperties(properties: RedPropertyAst[], request: SearchRequest): RedPropertyAst[] {
     const words: string[] = request.query.toLowerCase().split(' ');
 
-    return properties.filter((prop) => SearchService.filterProperty(prop, words));
+    if (request.filter === FilterBy.usage) {
+      return properties.filter((prop) => RedPropertyAst.filterByUsage(prop, words));
+    }
+    return properties.filter((prop) => RedNodeAst.hasName(prop, words));
   }
 
   public static filterFunctions(functions: RedFunctionAst[], request: SearchRequest): RedFunctionAst[] {
     const words: string[] = request.query.toLowerCase().split(' ');
 
-    return functions.filter((func) => SearchService.filterFunction(func, words));
-  }
-
-  private static filterProperty(prop: RedPropertyAst, words: string[]): boolean {
-    const name: string = prop.name.toLowerCase();
-
-    return words.every((word) => name.includes(word));
-  }
-
-  private static filterFunction(func: RedFunctionAst, words: string[]): boolean {
-    const name: string = func.name.toLowerCase();
-
-    return words.every((word) => name.includes(word));
-  }
-
-  private static hasType(type: RedTypeAst, words: string[]): boolean {
-    if (RedTypeAst.isPrimitive(type)) {
-      return false;
+    if (request.filter === FilterBy.usage) {
+      return functions.filter((func) => RedFunctionAst.filterByUsage(func, words));
     }
-    if (type.innerType) {
-      return this.hasType(type.innerType, words);
-    }
-    const name: string = type.name.toLowerCase();
-    const aliasName: string | undefined = type.aliasName?.toLowerCase();
-
-    return words.every((word) => name.includes(word)) ||
-      (!!aliasName && words.every((word) => aliasName.includes(word)));
+    return functions.filter((func) => RedNodeAst.hasName(func, words));
   }
 
   search(query: string, filter: FilterBy): void {
@@ -211,7 +186,7 @@ export class SearchService {
       }
       const object: RedClassAst = node as unknown as RedClassAst;
       const properties: RedPropertyAst[] = object.properties
-        .filter((prop) => SearchService.filterProperty(prop, words));
+        .filter((prop) => RedNodeAst.hasName(prop, words));
 
       return properties.length > 0;
     });
@@ -226,7 +201,7 @@ export class SearchService {
       }
       const object: RedClassAst = node as unknown as RedClassAst;
       const functions: RedFunctionAst[] = object.functions
-        .filter((func) => SearchService.filterFunction(func, words));
+        .filter((func) => RedNodeAst.hasName(func, words));
 
       return functions.length > 0;
     });
@@ -240,16 +215,14 @@ export class SearchService {
         return false;
       }
       if (node.kind === RedNodeKind.function) {
-        const func: RedFunctionAst = node as unknown as RedFunctionAst;
-
-        return func.returnType ? SearchService.hasType(func.returnType!, words) : false;
+        return RedFunctionAst.filterByUsage(node as unknown as RedFunctionAst, words);
       }
       const object: RedClassAst = node as unknown as RedClassAst;
       const properties: RedPropertyAst[] = object.properties.filter((prop) => {
-        return SearchService.hasType(prop.type, words);
+        return RedPropertyAst.filterByUsage(prop, words);
       });
       const functions: RedFunctionAst[] = object.functions.filter((func) => {
-        return func.returnType ? SearchService.hasType(func.returnType!, words) : false;
+        return RedFunctionAst.filterByUsage(func, words);
       });
 
       return properties.length > 0 || functions.length > 0;

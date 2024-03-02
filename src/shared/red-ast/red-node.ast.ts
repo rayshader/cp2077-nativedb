@@ -27,6 +27,12 @@ export function getRedNodeKindName(kind: RedNodeKind): string {
 
 export class RedNodeAst {
 
+  static hasName(node: RedNodeAst, words: string[]): boolean {
+    const name: string = node.name.toLowerCase();
+
+    return words.every((word) => name.includes(word));
+  }
+
   static isEmpty(node: RedNodeAst): boolean {
     if (node.kind !== RedNodeKind.class && node.kind !== RedNodeKind.struct) {
       return false;
