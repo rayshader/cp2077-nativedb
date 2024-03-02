@@ -41,12 +41,11 @@ export class SearchService {
     query: '',
     filter: FilterBy.name
   });
+  public readonly query$: Observable<SearchRequest> = this.querySubject.asObservable();
   private readonly changeQuerySubject: BehaviorSubject<SearchRequest> = new BehaviorSubject(<SearchRequest>{
     query: '',
     filter: FilterBy.name
   });
-
-  public readonly query$: Observable<SearchRequest> = this.querySubject.asObservable();
   public readonly changeQuery$: Observable<SearchRequest> = this.changeQuerySubject.asObservable();
 
   private readonly queries: Query[] = [
@@ -73,24 +72,46 @@ export class SearchService {
     return request.query.length > 0 && request.filter === FilterBy.function;
   }
 
-  public static filterProperties(properties: RedPropertyAst[], query: string): RedPropertyAst[] {
-    const words: string[] = query.toLowerCase().split(' ');
-
-    return properties.filter((prop) => {
-      const name: string = prop.name.toLowerCase();
-
-      return words.every((word) => name.includes(word));
-    });
+  public static isUsage(request: SearchRequest) {
+    return request.query.length > 0 && request.filter === FilterBy.usage;
   }
 
-  public static filterFunctions(functions: RedFunctionAst[], query: string): RedFunctionAst[] {
-    const words: string[] = query.toLowerCase().split(' ');
+  public static filterProperties(properties: RedPropertyAst[], request: SearchRequest): RedPropertyAst[] {
+    const words: string[] = request.query.toLowerCase().split(' ');
 
-    return functions.filter((func) => {
-      const name: string = func.name.toLowerCase();
+    return properties.filter((prop) => SearchService.filterProperty(prop, words));
+  }
 
-      return words.every((word) => name.includes(word));
-    });
+  public static filterFunctions(functions: RedFunctionAst[], request: SearchRequest): RedFunctionAst[] {
+    const words: string[] = request.query.toLowerCase().split(' ');
+
+    return functions.filter((func) => SearchService.filterFunction(func, words));
+  }
+
+  private static filterProperty(prop: RedPropertyAst, words: string[]): boolean {
+    const name: string = prop.name.toLowerCase();
+
+    return words.every((word) => name.includes(word));
+  }
+
+  private static filterFunction(func: RedFunctionAst, words: string[]): boolean {
+    const name: string = func.name.toLowerCase();
+
+    return words.every((word) => name.includes(word));
+  }
+
+  private static hasType(type: RedTypeAst, words: string[]): boolean {
+    if (RedTypeAst.isPrimitive(type)) {
+      return false;
+    }
+    if (type.innerType) {
+      return this.hasType(type.innerType, words);
+    }
+    const name: string = type.name.toLowerCase();
+    const aliasName: string | undefined = type.aliasName?.toLowerCase();
+
+    return words.every((word) => name.includes(word)) ||
+      (!!aliasName && words.every((word) => aliasName.includes(word)));
   }
 
   search(query: string, filter: FilterBy): void {
@@ -189,11 +210,8 @@ export class SearchService {
         return false;
       }
       const object: RedClassAst = node as unknown as RedClassAst;
-      const properties: RedPropertyAst[] = object.properties.filter((prop) => {
-        const name: string = prop.name.toLowerCase();
-
-        return words.every((word) => name.includes(word));
-      });
+      const properties: RedPropertyAst[] = object.properties
+        .filter((prop) => SearchService.filterProperty(prop, words));
 
       return properties.length > 0;
     });
@@ -207,11 +225,8 @@ export class SearchService {
         return false;
       }
       const object: RedClassAst = node as unknown as RedClassAst;
-      const functions: RedFunctionAst[] = object.functions.filter((func) => {
-        const name: string = func.name.toLowerCase();
-
-        return words.every((word) => name.includes(word));
-      });
+      const functions: RedFunctionAst[] = object.functions
+        .filter((func) => SearchService.filterFunction(func, words));
 
       return functions.length > 0;
     });
@@ -227,32 +242,18 @@ export class SearchService {
       if (node.kind === RedNodeKind.function) {
         const func: RedFunctionAst = node as unknown as RedFunctionAst;
 
-        return func.returnType ? this.hasType(words, func.returnType!) : false;
+        return func.returnType ? SearchService.hasType(func.returnType!, words) : false;
       }
       const object: RedClassAst = node as unknown as RedClassAst;
       const properties: RedPropertyAst[] = object.properties.filter((prop) => {
-        return this.hasType(words, prop.type);
+        return SearchService.hasType(prop.type, words);
       });
       const functions: RedFunctionAst[] = object.functions.filter((func) => {
-        return func.returnType ? this.hasType(words, func.returnType!) : false;
+        return func.returnType ? SearchService.hasType(func.returnType!, words) : false;
       });
 
       return properties.length > 0 || functions.length > 0;
     });
-  }
-
-  private hasType(words: string[], type: RedTypeAst): boolean {
-    if (RedTypeAst.isPrimitive(type)) {
-      return false;
-    }
-    if (type.innerType) {
-      return this.hasType(words, type.innerType);
-    }
-    const name: string = type.name.toLowerCase();
-    const aliasName: string | undefined = type.aliasName?.toLowerCase();
-
-    return words.every((word) => name.includes(word)) ||
-      (!!aliasName && words.every((word) => aliasName.includes(word)));
   }
 
 }

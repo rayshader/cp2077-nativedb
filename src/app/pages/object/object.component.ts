@@ -497,7 +497,7 @@ export class ObjectComponent {
     if (SearchService.isProperty(request) && this.propertySearchFilter !== 'disable') {
       this.isPropertiesFiltered = true;
       this.disableBadges('property');
-      properties = SearchService.filterProperties(properties, request.query);
+      properties = SearchService.filterProperties(properties, request);
       this.propertySearchFilter = 'enable';
     } else if (this.isPropertiesFiltered) {
       properties = properties.filter(this.hasPropertyFlag.bind(this));
@@ -514,7 +514,7 @@ export class ObjectComponent {
     if (SearchService.isFunction(request) && this.functionSearchFilter !== 'disable') {
       this.isFunctionsFiltered = true;
       this.disableBadges('function');
-      functions = SearchService.filterFunctions(functions, request.query);
+      functions = SearchService.filterFunctions(functions, request);
       this.functionSearchFilter = 'enable';
     } else if (this.isFunctionsFiltered) {
       functions = functions.filter(this.hasFunctionFlag.bind(this));
