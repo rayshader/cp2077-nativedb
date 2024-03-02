@@ -13,7 +13,9 @@
           mat-icon-button
           matTooltip="Search by..."
           [matMenuTriggerFor]="menu">
-    <mat-icon>tune</mat-icon>
+    <mat-icon [matBadge]="filterBadgeLabel"
+              matBadgePosition="below after"
+              matBadgeSize="small">tune</mat-icon>
   </button>
 </mat-form-field>
 

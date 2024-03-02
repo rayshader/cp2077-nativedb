@@ -9,6 +9,7 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {MatButtonModule} from "@angular/material/button";
 import {MatMenuModule} from "@angular/material/menu";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {MatBadgeModule} from "@angular/material/badge";
 
 interface FilterItem {
   value: FilterBy;
@@ -22,6 +23,7 @@ interface FilterItem {
   imports: [
     MatIconModule,
     MatMenuModule,
+    MatBadgeModule,
     MatInputModule,
     MatButtonModule,
     MatTooltipModule,
@@ -38,6 +40,7 @@ export class NDBSearchComponent implements OnInit {
 
   query: FormControl<string | null> = new FormControl('');
   filter: FilterBy = FilterBy.name;
+  filterBadgeLabel?: string;
 
   readonly filters: FilterItem[] = [
     {value: FilterBy.name, name: 'Name'},
@@ -75,6 +78,11 @@ export class NDBSearchComponent implements OnInit {
       return;
     }
     this.filter = filter.value;
+    if (this.filter === FilterBy.name) {
+      this.filterBadgeLabel = undefined;
+    } else {
+      this.filterBadgeLabel = FilterBy[this.filter][0].toUpperCase();
+    }
     let query: string = this.query.value ?? '';
 
     query = query.trim();
