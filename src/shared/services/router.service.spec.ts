@@ -6,26 +6,29 @@ import {RedNodeAst} from "../red-ast/red-node.ast";
 import {AstHelper} from "../../../tests/ast.helper";
 import {cyrb53} from "../string";
 import {mockWindowOpen} from "../../../tests/window.mock";
-import Spy = jasmine.Spy;
-import Mock = jest.Mock;
+import {SearchServiceMock} from "../../../tests/services/search.service.mock";
+import {FilterBy} from "./search.service";
 
 jest.mock("./red-dump.service");
 
 describe('RouterService', () => {
   let dumpMock: any;
+  let searchMock: any;
   let routerMock: any;
 
   let service: RouterService;
 
   beforeAll(() => {
     dumpMock = RedDumpServiceMock;
+    searchMock = SearchServiceMock;
     routerMock = RouterMock;
 
-    service = new RouterService(dumpMock, routerMock);
+    service = new RouterService(dumpMock, searchMock, routerMock);
   });
 
   afterEach(() => {
     dumpMock.mockResetAll();
+    searchMock.mockResetAll();
     routerMock.mockResetAll();
   });
 
@@ -178,6 +181,16 @@ describe('RouterService', () => {
 
       // THEN
       expect(openMock).toHaveBeenCalledWith(`/s/${id}`, '_blank');
+    });
+  });
+
+  describe('navigateByUsage(name)', () => {
+    it('given a name then request search by name and filter by usage', async () => {
+      // WHEN
+      await service.navigateByUsage('GameInstance');
+
+      // THEN
+      expect(searchMock.requestSearch).toHaveBeenCalledWith('GameInstance', FilterBy.usage);
     });
   });
 });
