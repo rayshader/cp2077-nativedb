@@ -3,6 +3,7 @@ import {RedDumpService} from "./red-dump.service";
 import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
 import {Router, UrlTree} from "@angular/router";
 import {firstValueFrom} from "rxjs";
+import {FilterBy, SearchService} from "./search.service";
 
 @Injectable({
   providedIn: 'root'
@@ -10,6 +11,7 @@ import {firstValueFrom} from "rxjs";
 export class RouterService {
 
   constructor(private readonly dumpService: RedDumpService,
+              private readonly searchService: SearchService,
               private readonly router: Router) {
   }
 
@@ -30,6 +32,11 @@ export class RouterService {
     } else {
       await this.router.navigate([root, id]);
     }
+  }
+
+  async navigateByUsage(name: string, inTab: boolean = false): Promise<void> {
+    // TODO: implement search by usage feature in a new tab?
+    this.searchService.requestSearch(name, FilterBy.usage);
   }
 
 }

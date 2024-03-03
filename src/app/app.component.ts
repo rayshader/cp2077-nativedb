@@ -4,6 +4,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  HostListener,
   OnInit,
   ViewChild
 } from '@angular/core';
@@ -28,6 +29,7 @@ import {NDBBottomBarComponent} from "./components/ndb-bottom-bar/ndb-bottom-bar.
 import {combineLatestWith, filter, first, map, OperatorFunction, pipe} from "rxjs";
 import {ResponsiveService} from "../shared/services/responsive.service";
 import {DocumentationDatabase} from "../shared/repositories/documentation.database";
+import {ShortcutService} from "../shared/services/shortcut.service";
 
 export interface AppData {
   appVersion: string;
@@ -72,6 +74,7 @@ export class AppComponent implements OnInit {
               private readonly pageService: PageService,
               private readonly documentationDB: DocumentationDatabase,
               private readonly responsiveService: ResponsiveService,
+              private readonly shortcutService: ShortcutService,
               private readonly app: ApplicationRef,
               private readonly dialog: MatDialog,
               private readonly router: Router,
@@ -108,6 +111,16 @@ export class AppComponent implements OnInit {
       this.swService.versionUpdates.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onUpdate.bind(this));
     }
     this.documentationDB.init().pipe(takeUntilDestroyed(this.dr)).subscribe();
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onKeyPress(event: KeyboardEvent): void {
+    this.shortcutService.pushKey(event.key);
+  }
+
+  @HostListener('document:keyup', ['$event'])
+  onKeyRelease(event: KeyboardEvent): void {
+    this.shortcutService.pushKey(event.key);
   }
 
   onToggleTabs(): void {
