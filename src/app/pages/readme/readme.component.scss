@@ -35,3 +35,15 @@ button {
     margin: 0;
   }
 }
+
+ul {
+  line-height: 1.75rem;
+}
+
+.keyboard {
+  padding: 0 8px;
+
+  border: 1px solid grey;
+  border-bottom-width: 2px;
+  border-radius: 6px;
+}
