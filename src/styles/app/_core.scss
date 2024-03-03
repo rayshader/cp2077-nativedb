@@ -1,0 +1,14 @@
+@use 'sass:map';
+
+@mixin core-theme($theme) {
+  $primary: map.get($theme, primary);
+
+  a {
+    color: map.get($primary, 500);
+  }
+}
+
+@mixin core-color($theme) {
+  $primary: map.get($theme, primary);
+
+}

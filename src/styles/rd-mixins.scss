@@ -16,6 +16,7 @@
 @use './app/title-bar' as *;
 @use './app/documentation' as *;
 @use './app/highlight' as *;
+@use './app/core' as *;
 
 @mixin mat-component-themes($theme) {
   //@include mat.all-component-themes($theme);
@@ -62,6 +63,7 @@
 }
 
 @mixin rd-component-themes($theme) {
+  @include core-theme($theme);
   @include tab-theme($theme);
   @include icon-theme($theme);
   @include button-theme($theme);
@@ -79,6 +81,7 @@
 }
 
 @mixin rd-component-colors($theme) {
+  @include core-color($theme);
   @include icon-color($theme);
   @include button-color($theme);
   @include article-color($theme);
