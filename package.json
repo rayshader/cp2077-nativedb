@@ -31,7 +31,7 @@
     "@angular/material": "^17.2.1",
     "@angular/platform-browser": "^17.2.3",
     "@angular/platform-browser-dynamic": "^17.2.3",
-    "@angular/router": "^17.2.3",
+    "@angular/router": "^17.2.4",
     "@angular/service-worker": "^17.2.3",
     "brotli-wasm": "^2.0.1",
     "rxjs": "~7.8.1",
