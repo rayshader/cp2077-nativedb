@@ -14,7 +14,7 @@ import {
   switchMap,
   take
 } from "rxjs";
-import {RedNodeAst} from "../red-ast/red-node.ast";
+import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
 import {RedEnumAst} from "../red-ast/red-enum.ast";
 import {RedBitfieldAst} from "../red-ast/red-bitfield.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
@@ -109,7 +109,7 @@ export class RedDumpService {
       map((nodes) => nodes.find((node) => {
         let match: boolean;
 
-        if (nameOnly) {
+        if (nameOnly || node.kind === RedNodeKind.function) {
           match = cyrb53(node.name) === id;
         } else {
           match = node.id === id;
