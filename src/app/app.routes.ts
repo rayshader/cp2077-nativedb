@@ -37,5 +37,6 @@ export const routes: Routes = [
 
   // NOTE: Vanilla route to prevent dead links.
   {path: 'Globals', redirectTo: 'f'},
+  {path: 'Global functions', redirectTo: 'f'},
   {path: ':name', children: [], canActivate: [vanillaRedirectGuard]}
 ];
