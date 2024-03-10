@@ -118,9 +118,9 @@ export class AppComponent implements OnInit {
     this.shortcutService.pushKey(event.key);
   }
 
-  @HostListener('document:keyup', ['$event'])
-  onKeyRelease(event: KeyboardEvent): void {
-    this.shortcutService.pushKey(event.key);
+  @HostListener('document:keyup')
+  onKeyRelease(): void {
+    this.shortcutService.pushKey('');
   }
 
   onToggleTabs(): void {
