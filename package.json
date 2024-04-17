@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^17.3.4",
-    "@angular/cli": "^17.3.4",
+    "@angular/cli": "^17.3.5",
     "@angular/compiler-cli": "^17.3.4",
     "@types/jest": "^29.5.12",
     "gulp": "^5.0.0",
