@@ -37,7 +37,8 @@
             }
           } @else if (fmtService.syntax === CodeSyntax.lua) {
             <mat-divider></mat-divider>
-            <button mat-menu-item (click)="copySpecial('Observable')">Copy Observable</button>
+            <button mat-menu-item (click)="copySpecial('Observe')">Copy Observe</button>
+            <button mat-menu-item (click)="copySpecial('ObserveAfter')">Copy ObserveAfter</button>
             <button mat-menu-item (click)="copySpecial('Override')">Copy Override</button>
             <button mat-menu-item (click)="copySpecial('NewProxy')">Copy NewProxy</button>
           }

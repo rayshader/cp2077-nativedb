@@ -19,8 +19,8 @@ export class LuaFormatter extends CodeFormatter {
   }
 
   override formatSpecial(type: string, func: RedFunctionAst, memberOf: RedClassAst): string {
-    if (type === 'Observable') {
-      return this.formatObservable(func, memberOf);
+    if (type.startsWith('Observe')) {
+      return this.formatObserve(func, memberOf, type === 'ObserveAfter');
     } else if (type === 'Override') {
       return this.formatOverride(func, memberOf);
     } else if (type === 'NewProxy') {
@@ -93,12 +93,86 @@ export class LuaFormatter extends CodeFormatter {
     return name;
   }
 
-  private formatObservable(func: RedFunctionAst, memberOf: RedClassAst): string {
-    return '';
+  private formatObserve(func: RedFunctionAst, memberOf: RedClassAst, isAfter: boolean): string {
+    let funcName: string = func.isStatic ? func.fullName : func.name;
+    let nativePrefix: number = funcName.indexOf('::');
+
+    if (nativePrefix !== -1) {
+      funcName = funcName.substring(nativePrefix + 2);
+    }
+    let callback: string = '';
+
+    if (!func.isStatic) {
+      callback += 'this';
+      if (func.arguments.length > 0) {
+        callback += ', ';
+      }
+    }
+    callback += func.arguments.map((arg) => arg.name).join(', ');
+    let code: string = '';
+    let after: string = isAfter ? 'After' : '';
+
+    code += `Observe${after}('${memberOf.aliasName ?? memberOf.name}', '${funcName}', function(${callback})\n`;
+    if (!isAfter) {
+      code += `    -- method has just been called with:\n`;
+    } else {
+      code += `    -- method has been called and fully executed with:\n`;
+    }
+    if (!func.isStatic) {
+      code += `    -- this: ${memberOf.aliasName ?? memberOf.name}\n`;
+    }
+    for (const argument of func.arguments) {
+      code += `    -- ${argument.name}: ${RedTypeAst.toString(argument.type, CodeSyntax.redscript)}\n`;
+    }
+    code += 'end)\n';
+    return code;
   }
 
   private formatOverride(func: RedFunctionAst, memberOf: RedClassAst): string {
-    return '';
+    let funcName: string = func.isStatic ? func.fullName : func.name;
+    let nativePrefix: number = funcName.indexOf('::');
+
+    if (nativePrefix !== -1) {
+      funcName = funcName.substring(nativePrefix + 2);
+    }
+    let callback: string = '';
+
+    if (!func.isStatic) {
+      callback += 'this';
+      if (func.arguments.length > 0) {
+        callback += ', ';
+      }
+    }
+    callback += func.arguments.map((arg) => arg.name).join(', ');
+    if (callback.length !== 0) {
+      callback += ', ';
+    }
+    callback += 'wrappedMethod';
+    const args: string = func.arguments.map((arg) => arg.name).join(', ');
+    let code: string = '';
+
+    code += `Override('${memberOf.aliasName ?? memberOf.name}', '${funcName}', function(${callback})\n`;
+    code += '    -- rewrite method with:\n';
+    if (!func.isStatic) {
+      code += `    -- this: ${memberOf.aliasName ?? memberOf.name}\n`;
+    }
+    for (const argument of func.arguments) {
+      code += `    -- ${argument.name}: ${RedTypeAst.toString(argument.type, CodeSyntax.redscript)}\n`;
+    }
+    code += '    \n';
+    if (func.returnType) {
+      code += `    -- Do stuff before\n`;
+      code += `    local result = wrappedMethod(${args})\n`;
+      code += '    \n';
+      code += `    -- Do stuff after\n`;
+      code += `    return result\n`;
+    } else {
+      code += `    -- Do stuff before\n`;
+      code += `    wrappedMethod(${args})\n`;
+      code += `    -- Do stuff after\n`;
+    }
+    code += 'end)\n';
+    return code;
   }
 
   private formatNewProxy(func: RedFunctionAst, memberOf: RedClassAst): string {
