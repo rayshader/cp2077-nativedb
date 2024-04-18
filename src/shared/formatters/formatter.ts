@@ -17,6 +17,13 @@ export abstract class CodeFormatter {
   }
 
   /**
+   * Format prototype of a function to code based on implementation syntax.
+   * @param func to format prototype of.
+   * undefined.
+   */
+  abstract formatPrototype(func: RedFunctionAst): string;
+
+  /**
    * Format call of a function to code based on implementation syntax.
    * @param func to call and format to code.
    * @param memberOf optionally provide scope of the function: static, member of a class/struct or global when
@@ -66,6 +73,15 @@ export abstract class CodeFormatter {
     code += '\n';
     return code;
   }
+
+  /**
+   * Format function to code based on implementation syntax for a special feature.
+   * @param type of special feature to format to.
+   * @param func to format to code.
+   * @param memberOf optionally provide scope of the function: static, member of a class/struct or global when
+   * undefined.
+   */
+  abstract formatSpecial(type: string, func: RedFunctionAst, memberOf?: RedClassAst): string;
 
   protected formatReturnName(func: RedFunctionAst): string {
     let fnName: string = func.name;

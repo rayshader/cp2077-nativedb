@@ -11,7 +11,37 @@
                 class="badge clipboard"
                 matTooltip="Copy code to clipboard"
                 matTooltipShowDelay="1500"
-                (click)="copyToClipboard()"><mat-icon>content_copy</mat-icon></button>
+                [matMenuTriggerFor]="copyMenu"><mat-icon>content_copy</mat-icon></button>
+        <mat-menu #copyMenu="matMenu">
+          <button mat-menu-item (click)="copyPrototype()">Copy prototype</button>
+          <button mat-menu-item (click)="copyCall()">Copy call</button>
+          @if (fmtService.syntax === CodeSyntax.redscript) {
+            <mat-divider></mat-divider>
+            @if (!memberOf) {
+              <button mat-menu-item
+                      [disabled]="node.isNative"
+                      matTooltip="You cannot replace a native global method."
+                      [matTooltipDisabled]="!node.isNative"
+                      (click)="copySpecial('replaceGlobal')">Copy replaceGlobal</button>
+            } @else {
+              <button mat-menu-item
+                      [disabled]="node.isNative"
+                      matTooltip="You cannot wrap a native method."
+                      [matTooltipDisabled]="!node.isNative"
+                      (click)="copySpecial('wrapMethod')">Copy wrapMethod</button>
+              <button mat-menu-item
+                      [disabled]="node.isNative"
+                      matTooltip="You cannot replace a native method."
+                      [matTooltipDisabled]="!node.isNative"
+                      (click)="copySpecial('replaceMethod')">Copy replaceMethod</button>
+            }
+          } @else if (fmtService.syntax === CodeSyntax.lua) {
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="copySpecial('Observable')">Copy Observable</button>
+            <button mat-menu-item (click)="copySpecial('Override')">Copy Override</button>
+            <button mat-menu-item (click)="copySpecial('NewProxy')">Copy NewProxy</button>
+          }
+        </mat-menu>
       }
       @if (canDocument) {
         <button mat-icon-button

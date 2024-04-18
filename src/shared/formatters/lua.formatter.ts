@@ -11,6 +11,24 @@ export class LuaFormatter extends CodeFormatter {
     super(false);
   }
 
+  override formatPrototype(func: RedFunctionAst): string {
+    const args: string = func.arguments.map((arg) => RedArgumentAst.toString(arg, CodeSyntax.lua)).join(', ');
+    const returnType: string = func.returnType ? RedTypeAst.toString(func.returnType, CodeSyntax.lua) : 'Void';
+
+    return `${func.name}(${args}) -> ${returnType}`;
+  }
+
+  override formatSpecial(type: string, func: RedFunctionAst, memberOf: RedClassAst): string {
+    if (type === 'Observable') {
+      return this.formatObservable(func, memberOf);
+    } else if (type === 'Override') {
+      return this.formatOverride(func, memberOf);
+    } else if (type === 'NewProxy') {
+      return this.formatNewProxy(func, memberOf);
+    }
+    return '';
+  }
+
   protected override formatSelf(func: RedFunctionAst, memberOf?: RedClassAst): CodeVariableFormat | undefined {
     if (func.isStatic || !memberOf) {
       return undefined;
@@ -73,6 +91,18 @@ export class LuaFormatter extends CodeFormatter {
       return 'Game';
     }
     return name;
+  }
+
+  private formatObservable(func: RedFunctionAst, memberOf: RedClassAst): string {
+    return '';
+  }
+
+  private formatOverride(func: RedFunctionAst, memberOf: RedClassAst): string {
+    return '';
+  }
+
+  private formatNewProxy(func: RedFunctionAst, memberOf: RedClassAst): string {
+    return '';
   }
 
 }

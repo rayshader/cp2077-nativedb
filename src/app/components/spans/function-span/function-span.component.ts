@@ -9,12 +9,14 @@ import {RedClassAst} from "../../../../shared/red-ast/red-class.ast";
 import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
 import {NDBDocumentationComponent} from "../../ndb-documentation/ndb-documentation.component";
 import {ClassDocumentation} from "../../../../shared/services/documentation.service";
-import {SettingsService} from "../../../../shared/services/settings.service";
+import {CodeSyntax, SettingsService} from "../../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {BehaviorSubject, combineLatest, Observable} from "rxjs";
 import {CodeFormatterService} from "../../../../shared/services/code-formatter.service";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {RouterLink} from "@angular/router";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'function-span',
@@ -22,6 +24,10 @@ import {RouterLink} from "@angular/router";
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink,
+    MatMenu,
+    MatMenuItem,
+    MatMenuTrigger,
+    MatDivider,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule,
@@ -75,10 +81,12 @@ export class FunctionSpanComponent {
 
   documentation?: ClassDocumentation;
 
+  protected readonly CodeSyntax = CodeSyntax;
+
   private readonly documentationSubject: BehaviorSubject<ClassDocumentation | undefined> = new BehaviorSubject<ClassDocumentation | undefined>(undefined);
   private readonly documentation$: Observable<ClassDocumentation | undefined> = this.documentationSubject.asObservable();
 
-  constructor(private readonly fmtService: CodeFormatterService,
+  constructor(protected readonly fmtService: CodeFormatterService,
               private readonly settingsService: SettingsService) {
     combineLatest([
       this.settingsService.showDocumentation$,
@@ -145,11 +153,29 @@ export class FunctionSpanComponent {
     await navigator.clipboard.writeText(this.node.fullName);
   }
 
-  protected async copyToClipboard(): Promise<void> {
+  protected async copyPrototype(): Promise<void> {
+    if (!this.node) {
+      return;
+    }
+    const code: string = this.fmtService.formatPrototype(this.node);
+
+    await navigator.clipboard.writeText(code);
+  }
+
+  protected async copyCall(): Promise<void> {
     if (!this.node) {
       return;
     }
     const code: string = this.fmtService.formatCall(this.node, this.memberOf);
+
+    await navigator.clipboard.writeText(code);
+  }
+
+  protected async copySpecial(type: string): Promise<void> {
+    if (!this.node) {
+      return;
+    }
+    const code: string = this.fmtService.formatSpecial(type, this.node, this.memberOf);
 
     await navigator.clipboard.writeText(code);
   }

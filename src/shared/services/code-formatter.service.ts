@@ -23,10 +23,20 @@ export class CodeFormatterService {
     {syntax: CodeSyntax.cppRedLib, fmt: new CppRedLibFormatter()},
   ];
 
-  private syntax: CodeSyntax = CodeSyntax.lua;
+  private _syntax: CodeSyntax = CodeSyntax.lua;
 
   constructor(private readonly settingsService: SettingsService) {
     this.settingsService.clipboard$.subscribe(this.onClipboardChanged.bind(this));
+  }
+
+  public get syntax(): CodeSyntax {
+    return this._syntax;
+  }
+
+  formatPrototype(func: RedFunctionAst): string {
+    const formatter: CodeFormatter = this.getCodeFormatter();
+
+    return formatter.formatPrototype(func);
   }
 
   formatCall(func: RedFunctionAst, memberOf?: RedClassAst): string {
@@ -35,8 +45,14 @@ export class CodeFormatterService {
     return formatter.formatCall(func, memberOf);
   }
 
+  formatSpecial(type: string, func: RedFunctionAst, memberOf?: RedClassAst): string {
+    const formatter: CodeFormatter = this.getCodeFormatter();
+
+    return formatter.formatSpecial(type, func, memberOf);
+  }
+
   private getCodeFormatter(): CodeFormatter {
-    const item = this.formatters.find((item) => item.syntax === this.syntax);
+    const item = this.formatters.find((item) => item.syntax === this._syntax);
 
     if (!item) {
       throw Error();
@@ -45,6 +61,6 @@ export class CodeFormatterService {
   }
 
   private onClipboardChanged(syntax: CodeSyntax): void {
-    this.syntax = syntax;
+    this._syntax = syntax;
   }
 }
