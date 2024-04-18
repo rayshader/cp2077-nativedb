@@ -196,7 +196,7 @@ export class FunctionSpanComponent {
     await navigator.clipboard.writeText(data);
   }
 
-  private onShowDocumentation([state, ]: [boolean, ClassDocumentation | undefined]): void {
+  private onShowDocumentation([state,]: [boolean, ClassDocumentation | undefined]): void {
     if (!this.hasDocumentation) {
       return;
     }
