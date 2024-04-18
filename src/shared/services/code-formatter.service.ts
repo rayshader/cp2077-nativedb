@@ -29,10 +29,10 @@ export class CodeFormatterService {
     this.settingsService.clipboard$.subscribe(this.onClipboardChanged.bind(this));
   }
 
-  formatCode(func: RedFunctionAst, memberOf?: RedClassAst): string {
+  formatCall(func: RedFunctionAst, memberOf?: RedClassAst): string {
     const formatter: CodeFormatter = this.getCodeFormatter();
 
-    return formatter.formatCode(func, memberOf);
+    return formatter.formatCall(func, memberOf);
   }
 
   private getCodeFormatter(): CodeFormatter {

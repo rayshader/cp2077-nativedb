@@ -21,7 +21,7 @@ describe('LuaFormatter', () => {
     );
 
     // WHEN
-    const code: string = fmt.formatCode(globalFn);
+    const code: string = fmt.formatCall(globalFn);
 
     // THEN
     expect(code).toBe('local player -- ref<PlayerPuppet>\n' +
@@ -41,7 +41,7 @@ describe('LuaFormatter', () => {
     );
 
     // WHEN
-    const code: string = fmt.formatCode(staticFn, object);
+    const code: string = fmt.formatCall(staticFn, object);
 
     // THEN
     expect(code).toBe('local other -- GameTime\n' +
@@ -63,7 +63,7 @@ describe('LuaFormatter', () => {
     );
 
     // WHEN
-    const code: string = fmt.formatCode(staticFn, systemObj);
+    const code: string = fmt.formatCall(staticFn, systemObj);
 
     // THEN
     expect(code).toBe('local game -- ScriptGameInstance\n' +
@@ -87,7 +87,7 @@ describe('LuaFormatter', () => {
     );
 
     // WHEN
-    const code: string = fmt.formatCode(memberFn, vehicleObj);
+    const code: string = fmt.formatCall(memberFn, vehicleObj);
 
     // THEN
     expect(code).toBe('local vehicleobject -- VehicleObject\n' +
@@ -113,7 +113,7 @@ describe('LuaFormatter', () => {
     );
 
     // WHEN
-    const code: string = fmt.formatCode(memberFn, vehicleObj);
+    const code: string = fmt.formatCall(memberFn, vehicleObj);
 
     // THEN
     expect(code).toBe('local vehicleobject -- VehicleObject\n' +
@@ -132,7 +132,7 @@ describe('LuaFormatter', () => {
     );
 
     // WHEN
-    const code: string = fmt.formatCode(globalFn, gameInstanceObj);
+    const code: string = fmt.formatCall(globalFn, gameInstanceObj);
 
     // THEN
     expect(code).toBe('local blackboardSystem -- ref<BlackboardSystem>\n' +
@@ -161,7 +161,7 @@ describe('LuaFormatter', () => {
     );
 
     // WHEN
-    const code: string = fmt.formatCode(memberFn, vehicleComponentObj);
+    const code: string = fmt.formatCall(memberFn, vehicleComponentObj);
 
     // THEN
     expect(code).toEqual('local gi -- GameInstance\n' +

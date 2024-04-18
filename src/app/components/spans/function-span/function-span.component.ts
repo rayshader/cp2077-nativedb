@@ -149,7 +149,7 @@ export class FunctionSpanComponent {
     if (!this.node) {
       return;
     }
-    const code: string = this.fmtService.formatCode(this.node, this.memberOf);
+    const code: string = this.fmtService.formatCall(this.node, this.memberOf);
 
     await navigator.clipboard.writeText(code);
   }

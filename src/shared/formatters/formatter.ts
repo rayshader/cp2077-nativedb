@@ -23,7 +23,7 @@ export abstract class CodeFormatter {
    * @param memberOf optionally provide scope of the function: static, member of a class/struct or global when
    * undefined.
    */
-  formatCode(func: RedFunctionAst, memberOf?: RedClassAst): string {
+  formatCall(func: RedFunctionAst, memberOf?: RedClassAst): string {
     const hasFullName: boolean = func.name !== func.fullName;
     const selfVar: CodeVariableFormat | undefined = this.formatSelf(func, memberOf);
     const selfName: string | undefined = (hasFullName && selfVar && !func.isStatic) ? selfVar.name : undefined;
