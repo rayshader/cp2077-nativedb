@@ -176,7 +176,22 @@ export class LuaFormatter extends CodeFormatter {
   }
 
   private formatNewProxy(func: RedFunctionAst, memberOf: RedClassAst): string {
-    return '';
+    const pseudoArgs: string = func.arguments
+      .map((arg) => RedTypeAst.toString(arg.type, CodeSyntax.pseudocode))
+      .map((arg) => `"${arg}"`)
+      .join(', ');
+    const args: string = func.arguments.map((arg) => arg.name).join(', ');
+    let code: string = '';
+
+    code += `listener = NewProxy("${memberOf.aliasName ?? memberOf.name}", {\n`;
+    code += `    ${func.name} = {\n`;
+    code += `        args = {${pseudoArgs}},\n`;
+    code += `        callback = function(${args})\n`;
+    code += '            -- Do stuff\n';
+    code += '        end\n';
+    code += '    }\n';
+    code += '})\n';
+    return code;
   }
 
 }

@@ -40,7 +40,11 @@
             <button mat-menu-item (click)="copySpecial('Observe')">Copy Observe</button>
             <button mat-menu-item (click)="copySpecial('ObserveAfter')">Copy ObserveAfter</button>
             <button mat-menu-item (click)="copySpecial('Override')">Copy Override</button>
-            <button mat-menu-item (click)="copySpecial('NewProxy')">Copy NewProxy</button>
+            <button mat-menu-item
+                    matTooltip="Only for Listener classes"
+                    [matTooltipDisabled]="isListener"
+                    [disabled]="!isListener"
+                    (click)="copySpecial('NewProxy')">Copy NewProxy</button>
           }
         </mat-menu>
       }

@@ -52,13 +52,13 @@ export class FunctionSpanComponent {
 
   scope: string = '';
   hasFullName: boolean = false;
+  isListener: boolean = false;
 
   node?: RedFunctionAst;
 
   /**
    * Optional, when this function is a member of a class or a struct.
    */
-  @Input()
   memberOf?: RedClassAst;
 
   /**
@@ -99,6 +99,12 @@ export class FunctionSpanComponent {
     this.node = value;
     this.scope = (this.node) ? RedVisibilityDef[this.node.visibility] : '';
     this.hasFullName = !!this.node && (this.node.name !== this.node.fullName);
+  }
+
+  @Input('memberOf')
+  set _memberOf(value: RedClassAst | undefined) {
+    this.memberOf = value;
+    this.isListener = !!this.memberOf && (this.memberOf.aliasName ?? this.memberOf.name).endsWith('Listener');
   }
 
   @Input('documentation')
