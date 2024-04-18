@@ -92,15 +92,11 @@ export class RedscriptFormatter extends CodeFormatter {
     code += `@wrapMethod(${memberOf.aliasName ?? memberOf.name})\n`;
     code += `${RedVisibilityDef[func.visibility]} ${flags}func ${func.name}(${args}) -> ${returnType} {\n`;
     if (func.returnType) {
-      code += '    // Do stuff before\n';
       code += `    let result: ${returnType} = wrappedMethod(${callArgs});\n`;
       code += '    \n';
-      code += '    // Do stuff after\n';
       code += '    return result;\n';
     } else {
-      code += '    // Do stuff before\n';
       code += `    wrappedMethod(${callArgs});\n`;
-      code += '    // Do stuff after\n';
     }
     code += '}';
     return code;
@@ -120,10 +116,9 @@ export class RedscriptFormatter extends CodeFormatter {
     if (func.returnType) {
       code += `    let result: ${returnType};\n`;
       code += '    \n';
-      code += '    // Do stuff\n';
       code += '    return result;\n';
     } else {
-      code += '    // Do stuff\n';
+      code += '    \n';
     }
     code += '}';
     return code;
@@ -143,10 +138,9 @@ export class RedscriptFormatter extends CodeFormatter {
     if (func.returnType) {
       code += `    let result: ${returnType};\n`;
       code += '    \n';
-      code += '    // Do stuff\n';
       code += '    return result;\n';
     } else {
-      code += '    // Do stuff\n';
+      code += '    \n';
     }
     code += '}';
     return code;

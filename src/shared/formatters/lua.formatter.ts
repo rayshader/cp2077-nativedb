@@ -112,7 +112,7 @@ export class LuaFormatter extends CodeFormatter {
     let code: string = '';
     let after: string = isAfter ? 'After' : '';
 
-    code += `Observe${after}('${memberOf.aliasName ?? memberOf.name}', '${funcName}', function(${callback})\n`;
+    code += `Observe${after}("${memberOf.aliasName ?? memberOf.name}", "${funcName}", function(${callback})\n`;
     if (!isAfter) {
       code += `    -- method has just been called with:\n`;
     } else {
@@ -151,7 +151,7 @@ export class LuaFormatter extends CodeFormatter {
     const args: string = func.arguments.map((arg) => arg.name).join(', ');
     let code: string = '';
 
-    code += `Override('${memberOf.aliasName ?? memberOf.name}', '${funcName}', function(${callback})\n`;
+    code += `Override("${memberOf.aliasName ?? memberOf.name}", "${funcName}", function(${callback})\n`;
     code += '    -- rewrite method with:\n';
     if (!func.isStatic) {
       code += `    -- this: ${memberOf.aliasName ?? memberOf.name}\n`;
@@ -161,15 +161,11 @@ export class LuaFormatter extends CodeFormatter {
     }
     code += '    \n';
     if (func.returnType) {
-      code += `    -- Do stuff before\n`;
       code += `    local result = wrappedMethod(${args})\n`;
       code += '    \n';
-      code += `    -- Do stuff after\n`;
       code += `    return result\n`;
     } else {
-      code += `    -- Do stuff before\n`;
       code += `    wrappedMethod(${args})\n`;
-      code += `    -- Do stuff after\n`;
     }
     code += 'end)\n';
     return code;
