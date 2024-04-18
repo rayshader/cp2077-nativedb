@@ -1,6 +1,5 @@
 import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
-import {RedArgumentAst} from "../red-ast/red-argument.ast";
 
 export interface CodeVariableFormat {
   readonly prefix: string;
