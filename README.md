@@ -6,7 +6,7 @@ custom tool to write / merge documentation.
 
 ## Setup
 
-You must install RTTI dump assets yourself. You will need [RTTIDumper]:
+You can generate RTTI dump assets yourself. You will need [RTTIDumper]:
 1. Clone it
 2. Build it by following its README.
 3. Install it like any other RED4ext plugin.
