@@ -1,5 +1,6 @@
 import {RedPropertyJson} from "./red-property.ast";
 import {RedTypeAst} from "./red-type.ast";
+import {CodeSyntax} from "../services/settings.service";
 
 export interface RedArgumentAst {
   //readonly isConst: boolean;
@@ -10,6 +11,17 @@ export interface RedArgumentAst {
 }
 
 export class RedArgumentAst {
+  static toString(argument: RedArgumentAst, syntax?: CodeSyntax): string {
+    let flag: string = '';
+
+    if (argument.isOut) {
+      flag = 'out ';
+    } else if (argument.isOptional) {
+      flag = 'opt ';
+    }
+    return `${flag}${argument.name}: ${RedTypeAst.toString(argument.type, syntax)}`;
+  }
+
   static fromJson(json: RedPropertyJson): RedArgumentAst {
     const flags: number = json.c;
 

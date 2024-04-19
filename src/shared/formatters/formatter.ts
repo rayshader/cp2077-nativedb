@@ -1,6 +1,5 @@
 import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
-import {RedArgumentAst} from "../red-ast/red-argument.ast";
 
 export interface CodeVariableFormat {
   readonly prefix: string;
@@ -18,12 +17,19 @@ export abstract class CodeFormatter {
   }
 
   /**
+   * Format prototype of a function to code based on implementation syntax.
+   * @param func to format prototype of.
+   * undefined.
+   */
+  abstract formatPrototype(func: RedFunctionAst): string;
+
+  /**
    * Format call of a function to code based on implementation syntax.
    * @param func to call and format to code.
    * @param memberOf optionally provide scope of the function: static, member of a class/struct or global when
    * undefined.
    */
-  formatCode(func: RedFunctionAst, memberOf?: RedClassAst): string {
+  formatCall(func: RedFunctionAst, memberOf?: RedClassAst): string {
     const hasFullName: boolean = func.name !== func.fullName;
     const selfVar: CodeVariableFormat | undefined = this.formatSelf(func, memberOf);
     const selfName: string | undefined = (hasFullName && selfVar && !func.isStatic) ? selfVar.name : undefined;
@@ -67,6 +73,15 @@ export abstract class CodeFormatter {
     code += '\n';
     return code;
   }
+
+  /**
+   * Format function to code based on implementation syntax for a special feature.
+   * @param type of special feature to format to.
+   * @param func to format to code.
+   * @param memberOf optionally provide scope of the function: static, member of a class/struct or global when
+   * undefined.
+   */
+  abstract formatSpecial(type: string, func: RedFunctionAst, memberOf?: RedClassAst): string;
 
   protected formatReturnName(func: RedFunctionAst): string {
     let fnName: string = func.name;

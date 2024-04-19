@@ -19,6 +19,14 @@ export class CppRedLibFormatter extends CodeFormatter {
     this.formatCodePipe = new NDBFormatCodePipe();
   }
 
+  override formatPrototype(func: RedFunctionAst): string {
+    return '';
+  }
+
+  override formatSpecial(type: string, func: RedFunctionAst, memberOf?: RedClassAst): string {
+    return '';
+  }
+
   protected override formatSelf(func: RedFunctionAst, memberOf?: RedClassAst | undefined): CodeVariableFormat | undefined {
     if (func.isStatic || !memberOf) {
       return undefined;

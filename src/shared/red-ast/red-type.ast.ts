@@ -21,6 +21,10 @@ export class RedTypeAst {
     return type.flag !== undefined && type.flag >= RedPrimitiveDef.Void && type.flag <= RedPrimitiveDef.Variant;
   }
 
+  static isTemplate(type: RedTypeAst): boolean {
+    return type.flag !== undefined && type.flag >= RedTemplateDef.ref && type.flag <= RedTemplateDef.multiChannelCurve;
+  }
+
   static hasType(type: RedTypeAst, words: string[]): boolean {
     if (RedTypeAst.isPrimitive(type)) {
       return false;
@@ -35,21 +39,53 @@ export class RedTypeAst {
       (!!aliasName && words.every((word) => aliasName.includes(word)));
   }
 
+  static primitiveToString(flag: RedPrimitiveDef): string {
+    return RedPrimitiveDef[flag];
+  }
+
+  static templateToString(flag: RedTemplateDef): string {
+    switch (flag) {
+      case RedTemplateDef.ref:
+        return 'handle';
+      case RedTemplateDef.wref:
+        return 'whandle';
+      case RedTemplateDef.ResRef:
+        return 'rRef';
+      case RedTemplateDef.ResAsyncRef:
+        return 'raRef';
+      default:
+        return RedTemplateDef[flag];
+    }
+  }
+
   static toString(type: RedTypeAst, syntax?: CodeSyntax): string {
     let name: string = type.name;
     let str: string = '';
 
-    if ((syntax === CodeSyntax.lua || syntax === CodeSyntax.redscript) && type.aliasName) {
+    if ((syntax === CodeSyntax.lua ||
+        syntax === CodeSyntax.redscript ||
+        syntax === CodeSyntax.pseudocode) && type.aliasName) {
       name = type.aliasName;
     }
     // TODO: ignore script_ref<T> when syntax is for Redscript / Lua ?
     if (type.innerType !== undefined) {
-      str += `${type.name}<`;
+      if (syntax === CodeSyntax.pseudocode) {
+        if (this.isPrimitive(type)) {
+          name = this.primitiveToString(type.flag as RedPrimitiveDef);
+        } else if (this.isTemplate(type)) {
+          name = this.templateToString(type.flag as RedTemplateDef);
+        }
+        str += `${name}:`;
+      } else {
+        str += `${name}<`;
+      }
       str += RedTypeAst.toString(type.innerType, syntax);
-      if (type.size !== undefined) {
+      if (type.size !== undefined && syntax !== CodeSyntax.pseudocode) {
         str += `; ${type.size}`;
       }
-      str += '>';
+      if (syntax !== CodeSyntax.pseudocode) {
+        str += '>';
+      }
     } else {
       str = name;
     }

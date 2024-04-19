@@ -32,7 +32,7 @@ interface AItem<T> {
 export class SettingsComponent implements OnInit {
 
   readonly clipboardOptions: AItem<CodeSyntax>[] = [
-    {value: CodeSyntax.redscript, name: 'Redscript', disabled: true},
+    {value: CodeSyntax.redscript, name: 'Redscript', disabled: false},
     {value: CodeSyntax.lua, name: 'Lua · CET', disabled: false},
     {value: CodeSyntax.cppRedLib, name: 'C++ · RedLib', disabled: false},
   ];
