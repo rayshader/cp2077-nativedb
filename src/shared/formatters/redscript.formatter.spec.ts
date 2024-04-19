@@ -12,7 +12,6 @@ describe('RedscriptFormatter', () => {
     fmt = new RedscriptFormatter();
   });
 
-  /*
   describe('formatCall()', () => {
     it('should format global function', () => {
       // GIVEN
@@ -26,9 +25,9 @@ describe('RedscriptFormatter', () => {
       const code: string = fmt.formatCall(globalFn);
 
       // THEN
-      expect(code).toBe('local player -- ref<PlayerPuppet>\n' +
+      expect(code).toBe('let player: ref<PlayerPuppet>;\n' +
         '\n' +
-        'player = Game.GetPlayer()\n');
+        'player = GetPlayer();\n');
     });
 
     it('should format static function', () => {
@@ -46,10 +45,10 @@ describe('RedscriptFormatter', () => {
       const code: string = fmt.formatCall(staticFn, object);
 
       // THEN
-      expect(code).toBe('local other -- GameTime\n' +
-        'local isAfter -- Bool\n' +
+      expect(code).toBe('let other: GameTime;\n' +
+        'let isAfter: Bool;\n' +
         '\n' +
-        'isAfter = GameTime.IsAfter(other)\n');
+        'isAfter = GameTime.IsAfter(other);\n');
     });
 
     it('should format static function and ignore full name', () => {
@@ -60,7 +59,7 @@ describe('RedscriptFormatter', () => {
         AstHelper.Bool,
         true,
         RedVisibilityDef.public,
-        [AstHelper.buildArg('game', 'ScriptGameInstance')],
+        [AstHelper.buildArg('game', AstHelper.buildType('ScriptGameInstance', 'GameInstance'))],
         'gameVehicleSystem::IsPlayerInVehicle;GameInstance'
       );
 
@@ -68,10 +67,10 @@ describe('RedscriptFormatter', () => {
       const code: string = fmt.formatCall(staticFn, systemObj);
 
       // THEN
-      expect(code).toBe('local game -- ScriptGameInstance\n' +
-        'local isPlayerInVehicle -- Bool\n' +
+      expect(code).toBe('let game: GameInstance;\n' +
+        'let isPlayerInVehicle: Bool;\n' +
         '\n' +
-        'isPlayerInVehicle = VehicleSystem.IsPlayerInVehicle(game)\n');
+        'isPlayerInVehicle = VehicleSystem.IsPlayerInVehicle(game);\n');
     });
 
     it('should format member function', () => {
@@ -82,7 +81,7 @@ describe('RedscriptFormatter', () => {
         false,
         RedVisibilityDef.public,
         [
-          AstHelper.buildArg('targetID', 'entEntityID'),
+          AstHelper.buildArg('targetID', AstHelper.buildType('entEntityID', 'EntityID')),
           AstHelper.buildArg('duration', AstHelper.Float),
           AstHelper.buildArg('invert', AstHelper.Bool)
         ]
@@ -92,13 +91,13 @@ describe('RedscriptFormatter', () => {
       const code: string = fmt.formatCall(memberFn, vehicleObj);
 
       // THEN
-      expect(code).toBe('local vehicleobject -- VehicleObject\n' +
-        'local targetID -- entEntityID\n' +
-        'local duration -- Float\n' +
-        'local invert -- Bool\n' +
-        'local navPathToTarget -- Bool\n' +
+      expect(code).toBe('let vehicleobject: VehicleObject;\n' +
+        'let targetID: EntityID;\n' +
+        'let duration: Float;\n' +
+        'let invert: Bool;\n' +
+        'let navPathToTarget: Bool;\n' +
         '\n' +
-        'navPathToTarget = vehicleobject:HasNavPathToTarget(targetID, duration, invert)\n');
+        'navPathToTarget = vehicleobject.HasNavPathToTarget(targetID, duration, invert);\n');
     });
 
     it('should format member function and ignore full name', () => {
@@ -118,10 +117,10 @@ describe('RedscriptFormatter', () => {
       const code: string = fmt.formatCall(memberFn, vehicleObj);
 
       // THEN
-      expect(code).toBe('local vehicleobject -- VehicleObject\n' +
-        'local maxDelayOverride -- Float, optional\n' +
+      expect(code).toBe('let vehicleobject: VehicleObject;\n' +
+        'let maxDelayOverride: Float; // Optional\n' +
         '\n' +
-        'vehicleobject:TriggerExitBehavior(maxDelayOverride)\n');
+        'vehicleobject.TriggerExitBehavior(maxDelayOverride);\n');
     });
 
     it('should format global function with an alias', () => {
@@ -130,16 +129,21 @@ describe('RedscriptFormatter', () => {
       const globalFn: RedFunctionAst = AstHelper.buildFunction(
         'GetBlackboardSystem',
         AstHelper.buildRef('gameBlackboardSystem', 'BlackboardSystem'),
-        true
+        true,
+        RedVisibilityDef.public,
+        [
+          AstHelper.buildArg('self', AstHelper.buildType('ScriptGameInstance', 'GameInstance'))
+        ]
       );
 
       // WHEN
       const code: string = fmt.formatCall(globalFn, gameInstanceObj);
 
       // THEN
-      expect(code).toBe('local blackboardSystem -- ref<BlackboardSystem>\n' +
+      expect(code).toBe('let self: GameInstance;\n' +
+        'let blackboardSystem: ref<BlackboardSystem>;\n' +
         '\n' +
-        'blackboardSystem = Game.GetBlackboardSystem()\n');
+        'blackboardSystem = GameInstance.GetBlackboardSystem(self);\n');
     });
 
     it('should format member function without name conflicts', () => {
@@ -166,15 +170,14 @@ describe('RedscriptFormatter', () => {
       const code: string = fmt.formatCall(memberFn, vehicleComponentObj);
 
       // THEN
-      expect(code).toEqual('local gi -- GameInstance\n' +
-        'local vehicle -- wref<VehicleObject>\n' +
-        'local seats -- array<wref<VehicleSeat_Record>>\n' +
-        'local result -- Bool\n' +
+      expect(code).toEqual('let gi: GameInstance;\n' +
+        'let vehicle: wref<VehicleObject>;\n' +
+        'let seats: array<wref<VehicleSeat_Record>>;\n' +
+        'let result: Bool;\n' +
         '\n' +
-        'result = VehicleComponent.GetSeats(gi, vehicle, seats)\n');
+        'result = VehicleComponent.GetSeats(gi, vehicle, seats);\n');
     });
   });
-  */
 
   describe('formatPrototype()', () => {
     it('should format empty function', () => {
