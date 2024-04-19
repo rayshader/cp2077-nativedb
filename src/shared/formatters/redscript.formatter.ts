@@ -34,10 +34,12 @@ export class RedscriptFormatter extends CodeFormatter {
     if (func.isStatic || !memberOf) {
       return undefined;
     }
+    let name: string = memberOf.aliasName ?? memberOf.name;
+
     return {
       prefix: 'let ',
-      name: memberOf.name.toLowerCase(),
-      suffix: `: ${memberOf.name};`
+      name: name.toLowerCase(),
+      suffix: `: ${name};`
     };
   }
 
@@ -45,7 +47,7 @@ export class RedscriptFormatter extends CodeFormatter {
     if (!func.returnType) {
       return undefined;
     }
-    const type: string = RedTypeAst.toString(func.returnType);
+    const type: string = RedTypeAst.toString(func.returnType, CodeSyntax.redscript);
 
     return {
       prefix: 'let ',
@@ -68,7 +70,9 @@ export class RedscriptFormatter extends CodeFormatter {
   }
 
   protected override formatMemberStaticCall(func: RedFunctionAst, memberOf: RedClassAst): string {
-    return `${memberOf.name}.${func.name}`;
+    let name: string = memberOf.aliasName ?? memberOf.name;
+
+    return `${name}.${func.name}`;
   }
 
   protected override formatMemberCall(selfVar: CodeVariableFormat, func: RedFunctionAst): string {
