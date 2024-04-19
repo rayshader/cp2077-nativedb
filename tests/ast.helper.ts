@@ -77,7 +77,8 @@ export class AstHelper {
                        isStatic: boolean = false,
                        visibility: RedVisibilityDef = RedVisibilityDef.public,
                        args: RedArgumentAst[] = [],
-                       fullName?: string): RedFunctionAst {
+                       fullName?: string,
+                       flags?: any): RedFunctionAst {
     let type: RedTypeAst | undefined;
 
     if (typeof returnType === 'string') {
@@ -93,14 +94,14 @@ export class AstHelper {
       visibility: visibility ?? RedVisibilityDef.public,
       returnType: type,
       arguments: args ?? [],
-      isNative: false,
+      isNative: flags?.isNative ?? false,
       isStatic: isStatic ?? false,
-      isFinal: false,
-      isThreadSafe: false,
-      isCallback: false,
-      isConst: false,
-      isQuest: false,
-      isTimer: false
+      isFinal: flags?.isFinal ?? false,
+      isThreadSafe: flags?.isThreadSafe ?? false,
+      isCallback: flags?.isCallback ?? false,
+      isConst: flags?.isConst ?? false,
+      isQuest: flags?.isQuest ?? false,
+      isTimer: flags?.isTimer ?? false
     };
   }
 
