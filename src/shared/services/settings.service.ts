@@ -21,7 +21,8 @@ export enum CodeSyntax {
   redscript,
   lua,
   cppRED4ext,
-  cppRedLib
+  cppRedLib,
+  rustRED4ext,
 }
 
 @Injectable({
