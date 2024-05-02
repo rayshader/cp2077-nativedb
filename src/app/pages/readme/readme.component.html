@@ -189,11 +189,46 @@
   </div>
 
   <p>
-    You can copy content of this database to your clipboard when you see this icon <mat-icon>content_copy</mat-icon>. It
-    will copy the declaration you want to extract based on its type. But you might work with Redscript, Lua or C++...
-    Different languages means different syntax. You can configure the current language you wish to use in the settings.
-    You can change it whenever you wish. So, after defining Lua, every time you use the grab icon, it will copy content
-    to your clipboard using Lua syntax.
+    You can generate code to your clipboard for different languages to quickly use special features. You can use this
+    icon <mat-icon>content_copy</mat-icon> which is present for all functions. You can change the option
+    <em>Clipboard syntax</em> in Settings with the language you are coding with.
+  </p>
+
+  <p>
+    A context menu allows you to pick the kind of code you want. For all languages, it will provide the following
+    options:
+  </p>
+
+  <ul>
+    <li>Copy prototype: of the function like seen in webapp (without breaks).</li>
+    <li>Copy call: of the function to use it in your code.</li>
+  </ul>
+
+  <p>
+    When option <em>Clipboard syntax</em> is <em>Redscript</em>:
+  </p>
+
+  <ul>
+    <li>Copy wrapMethod: append a new function on top of an existing function.</li>
+    <li>Copy replaceMethod: replace implementation of a function.</li>
+    <li>Copy replaceGlobal: replace implementation of a global function.</li>
+  </ul>
+
+  <p>
+    When option <em>Clipboard syntax</em> is <em>Lua · CET</em>:
+  </p>
+
+  <ul>
+    <li>Copy Observable: listen just before the execution of a function.</li>
+    <li>Copy ObservableAfter: listen after the execution of a function.</li>
+    <li>Copy Override: override implementation of a function.</li>
+    <li>Copy NewProxy: listen for game's script events.</li>
+  </ul>
+
+  <p>
+    You can learn more about these features for
+    <a href="https://wiki.redmodding.org/redscript/language/language-features/annotations">Redscript</a> and
+    <a href="https://wiki.redmodding.org/cyber-engine-tweaks/cet-functions/observers">CET</a> on the wiki.
   </p>
 </article>
 
