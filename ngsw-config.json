@@ -2,7 +2,7 @@
   "$schema": "./node_modules/@angular/service-worker/config/schema.json",
   "index": "/index.html",
   "appData": {
-    "appVersion": "1.5.0",
+    "appVersion": "1.5.1",
     "gameVersion": "2.12"
   },
   "assetGroups": [
