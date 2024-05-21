@@ -39,11 +39,53 @@ export class RedTypeAst {
       (!!aliasName && words.every((word) => aliasName.includes(word)));
   }
 
-  static primitiveToString(flag: RedPrimitiveDef): string {
+  static primitiveToString(flag: RedPrimitiveDef, syntax?: CodeSyntax): string {
+    if (syntax === CodeSyntax.rustRED4ext) {
+      switch (flag) {
+        case RedPrimitiveDef.Bool:
+          return 'bool';
+        case RedPrimitiveDef.Int8:
+          return 'i8';
+        case RedPrimitiveDef.Uint8:
+          return 'u8';
+        case RedPrimitiveDef.Int16:
+          return 'i16';
+        case RedPrimitiveDef.Uint16:
+          return 'u16';
+        case RedPrimitiveDef.Int32:
+          return 'i32';
+        case RedPrimitiveDef.Uint32:
+          return 'u32';
+        case RedPrimitiveDef.Int64:
+          return 'i64';
+        case RedPrimitiveDef.Uint64:
+          return 'u64';
+        case RedPrimitiveDef.Float:
+          return 'f32';
+        case RedPrimitiveDef.Double:
+          return 'f64';
+        case RedPrimitiveDef.TweakDBID:
+          return 'TweakDbId';
+        case RedPrimitiveDef.Void:
+          return '()';
+      }
+    }
     return RedPrimitiveDef[flag];
   }
 
-  static templateToString(flag: RedTemplateDef): string {
+  static templateToString(flag: RedTemplateDef, syntax?: CodeSyntax): string {
+    if (syntax === CodeSyntax.rustRED4ext) {
+      switch (flag) {
+        case RedTemplateDef.ref:
+        case RedTemplateDef.wref:
+          return 'MaybeUninitRef';
+        case RedTemplateDef.ResRef:
+        case RedTemplateDef.ResAsyncRef:
+          return 'ResRef';
+        default:
+          return RedTemplateDef[flag];
+      }
+    }
     switch (flag) {
       case RedTemplateDef.ref:
         return 'handle';
@@ -62,9 +104,13 @@ export class RedTypeAst {
     let name: string = type.name;
     let str: string = '';
 
-    if ((syntax === CodeSyntax.lua ||
+    if (
+      (syntax === CodeSyntax.lua ||
         syntax === CodeSyntax.redscript ||
-        syntax === CodeSyntax.pseudocode) && type.aliasName) {
+        syntax === CodeSyntax.rustRED4ext ||
+        syntax === CodeSyntax.pseudocode) &&
+      type.aliasName
+    ) {
       name = type.aliasName;
     }
     // TODO: ignore script_ref<T> when syntax is for Redscript / Lua ?
@@ -76,6 +122,13 @@ export class RedTypeAst {
           name = this.templateToString(type.flag as RedTemplateDef);
         }
         str += `${name}:`;
+      } else if (syntax === CodeSyntax.rustRED4ext) {
+        if (this.isPrimitive(type)) {
+          name = this.primitiveToString(type.flag as RedPrimitiveDef, syntax);
+        } else if (this.isTemplate(type)) {
+          name = this.templateToString(type.flag as RedTemplateDef, syntax);
+        }
+        str += `${name}<`;
       } else {
         str += `${name}<`;
       }
@@ -87,7 +140,11 @@ export class RedTypeAst {
         str += '>';
       }
     } else {
-      str = name;
+      if (this.isPrimitive(type) && syntax === CodeSyntax.rustRED4ext) {
+        str = this.primitiveToString(type.flag as RedPrimitiveDef, syntax);
+      } else {
+        str = name;
+      }
     }
     return str;
   }
