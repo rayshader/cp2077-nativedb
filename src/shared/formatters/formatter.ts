@@ -7,14 +7,13 @@ export interface CodeVariableFormat {
   readonly suffix: string;
 }
 
-export type ParenthesisRule = 'open-close' | 'close-only';
+export type ParenthesisRule = 'open-close' | 'close-only' | 'none';
 
 export abstract class CodeFormatter {
-
-  protected constructor(private readonly withSemiColon: boolean,
-                        private readonly withParenthesis: ParenthesisRule = 'open-close') {
-
-  }
+  protected constructor(
+    private readonly withSemiColon: boolean,
+    private readonly withParenthesis: ParenthesisRule = 'open-close'
+  ) {}
 
   /**
    * Format prototype of a function to code based on implementation syntax.
@@ -62,11 +61,16 @@ export abstract class CodeFormatter {
     } else if (func.isStatic) {
       code += this.formatStaticCall(func);
     }
-    if (this.withParenthesis !== 'close-only') {
+    if (
+      this.withParenthesis !== 'close-only' &&
+      this.withParenthesis !== 'none'
+    ) {
       code += '(';
     }
     code += argVars.map((argVar) => argVar.name).join(', ');
-    code += ')';
+    if (this.withParenthesis !== 'none') {
+      code += ')';
+    }
     if (this.withSemiColon) {
       code += ';';
     }
