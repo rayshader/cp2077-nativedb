@@ -1,5 +1,6 @@
 import { AstHelper } from '../../../tests/ast.helper';
 import { RedArgumentAst } from '../red-ast/red-argument.ast';
+import { RedClassAst } from '../red-ast/red-class.ast';
 import { RedVisibilityDef } from '../red-ast/red-definitions.ast';
 import { RedFunctionAst } from '../red-ast/red-function.ast';
 import { CodeFormatter } from './formatter';
@@ -63,6 +64,26 @@ describe('Red4extRsFormatter', () => {
 
       // THEN
       expect(code).toBe('#[redscript_global]\npub fn can_log() -> bool');
+    });
+
+    it('should format static function', () => {
+      // GIVEN
+      const object: RedClassAst = AstHelper.buildStruct('GameTime');
+      const staticFn: RedFunctionAst = AstHelper.buildFunction(
+        'IsAfter',
+        AstHelper.Bool,
+        true,
+        RedVisibilityDef.public,
+        [AstHelper.buildArg('other', 'GameTime')]
+      );
+
+      // WHEN
+      const code: string = fmt.formatCall(staticFn, object);
+
+      // THEN
+      expect(code).toBe(
+        '#[redscript_import]\nimpl GameTime {\n  pub fn is_after(other: GameTime) -> bool;\n}\n'
+      );
     });
   });
 });
