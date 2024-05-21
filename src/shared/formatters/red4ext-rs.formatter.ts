@@ -6,7 +6,7 @@ import { CodeFormatter, CodeVariableFormat } from './formatter';
 
 export class Red4extRsFormatter extends CodeFormatter {
   constructor() {
-    super(true);
+    super(false, 'none');
   }
   override formatPrototype(func: RedFunctionAst): string {
     const args: string = this.formatPrototypeArguments(func);
@@ -52,7 +52,15 @@ export class Red4extRsFormatter extends CodeFormatter {
     func: RedFunctionAst,
     memberOf: RedClassAst
   ): string {
-    return 'TODO';
+    const args: string = this.formatPrototypeArguments(func);
+    const returnType: string = this.formatType(func.returnType);
+    const annotation: string = func.isNative ? `#[redscript(native)]\n` : '';
+    return `#[redscript_import]
+impl ${memberOf.name} {
+  ${annotation}pub fn ${this.camelToSnakeCase(
+      func.name
+    )}(${args}) -> ${returnType};
+}`;
   }
 
   protected override formatMemberCall(
