@@ -13,3 +13,9 @@ export function cyrb53(str: string, seed: number = 0): number {
   h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
   return 4294967296 * (2097151 & h2) + (h1 >>> 0);
 }
+
+export function camelToSnakeCase(str: string): string {
+  return str.replace(/[A-Z]/g, (letter, offset) =>
+    offset > 0 ? `_${letter.toLowerCase()}` : letter.toLowerCase()
+  );
+}

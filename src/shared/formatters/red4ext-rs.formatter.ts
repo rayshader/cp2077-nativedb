@@ -2,6 +2,7 @@ import { RedClassAst } from '../red-ast/red-class.ast';
 import { RedFunctionAst } from '../red-ast/red-function.ast';
 import { RedTypeAst } from '../red-ast/red-type.ast';
 import { CodeSyntax } from '../services/settings.service';
+import { camelToSnakeCase } from '../string';
 import { CodeFormatter, CodeVariableFormat } from './formatter';
 
 export class Red4extRsFormatter extends CodeFormatter {
@@ -15,7 +16,7 @@ export class Red4extRsFormatter extends CodeFormatter {
       ? '#[redscript_global(native)]'
       : '#[redscript_global]';
 
-    return `${annotation}\npub fn ${this.camelToSnakeCase(
+    return `${annotation}\npub fn ${camelToSnakeCase(
       func.name
     )}(${args}) -> ${returnType}`;
   }
@@ -57,9 +58,7 @@ export class Red4extRsFormatter extends CodeFormatter {
     const annotation: string = func.isNative ? `#[redscript(native)]\n` : '';
     return `#[redscript_import]
 impl ${memberOf.name} {
-  ${annotation}pub fn ${this.camelToSnakeCase(
-      func.name
-    )}(${args}) -> ${returnType};
+  ${annotation}pub fn ${camelToSnakeCase(func.name)}(${args}) -> ${returnType};
 }`;
   }
 
@@ -77,8 +76,7 @@ impl ${memberOf.name} {
   private formatPrototypeArguments(func: RedFunctionAst): string {
     return func.arguments
       .map(
-        (arg) =>
-          `${this.camelToSnakeCase(arg.name)}: ${this.formatType(arg.type)}`
+        (arg) => `${camelToSnakeCase(arg.name)}: ${this.formatType(arg.type)}`
       )
       .join(', ');
   }
@@ -93,11 +91,5 @@ impl ${memberOf.name} {
 
   private formatFlags(func: RedFunctionAst): string {
     return 'TODO';
-  }
-
-  private camelToSnakeCase(str: string) {
-    return str.replace(/[A-Z]/g, (letter, offset) =>
-      offset > 0 ? `_${letter.toLowerCase()}` : letter.toLowerCase()
-    );
   }
 }
