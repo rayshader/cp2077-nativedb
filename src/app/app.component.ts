@@ -13,7 +13,6 @@ import {NavigationEnd, Router, RouterLink, RouterOutlet} from '@angular/router';
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {NDBTabsComponent} from "./components/ndb-tabs/ndb-tabs.component";
 import {IconsService} from "../shared/services/icons.service";
-import {HttpClientModule} from "@angular/common/http";
 import {MatChipsModule} from "@angular/material/chips";
 import {PageScrollBehavior, PageService} from "../shared/services/page.service";
 import {MatButtonModule} from "@angular/material/button";
@@ -44,7 +43,6 @@ export interface AppData {
     CommonModule,
     RouterOutlet,
     RouterLink,
-    HttpClientModule,
     MatIconModule,
     MatChipsModule,
     MatButtonModule,
