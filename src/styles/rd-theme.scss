@@ -4,19 +4,19 @@
 /**
  * Palette of colors for badges.
  */
-@function rd-badges($primary-palette) {
+@function rd-badges($primary) {
   @return (
-    primary: map.get($primary-palette, default),
+    primary: map.get($primary, default),
 
-    protected: map.get(mat.$amber-palette, 500),
-    private: map.get(mat.$red-palette, 500),
+    protected: map.get(mat.$m2-amber-palette, 500),
+    private: map.get(mat.$m2-red-palette, 500),
 
     script: #AB0613,
 
-    enum: map.get(mat.$light-blue-palette, 500),
-    bitfield: map.get(mat.$light-blue-palette, A200),
-    class: map.get(mat.$green-palette, 500),
-    struct: map.get(mat.$green-palette, A200),
-    function: map.get(mat.$amber-palette, A200),
+    enum: map.get(mat.$m2-light-blue-palette, 500),
+    bitfield: map.get(mat.$m2-light-blue-palette, A200),
+    class: map.get(mat.$m2-green-palette, 500),
+    struct: map.get(mat.$m2-green-palette, A200),
+    function: map.get(mat.$m2-amber-palette, A200),
   );
 }
