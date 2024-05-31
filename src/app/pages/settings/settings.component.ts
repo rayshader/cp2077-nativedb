@@ -1,9 +1,9 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, OnInit} from '@angular/core';
+import {Component, DestroyRef, OnInit} from '@angular/core';
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatSelectModule} from "@angular/material/select";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {take} from "rxjs";
+import {combineLatest, take} from "rxjs";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {CodeSyntax, Settings, SettingsService} from "../../../shared/services/settings.service";
@@ -18,7 +18,6 @@ interface AItem<T> {
 @Component({
   selector: 'ndb-page-settings',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatFormFieldModule,
     MatSelectModule,
@@ -59,6 +58,9 @@ export class SettingsComponent implements OnInit {
 
   ngOnInit(): void {
     this.settingsService.settings$.pipe(take(1), takeUntilDestroyed(this.dr)).subscribe(this.onSettingsLoaded.bind(this));
+    combineLatest([this.settingsService.clipboard$, this.settingsService.code$])
+      .pipe(takeUntilDestroyed(this.dr))
+      .subscribe(this.onSyntaxChanged.bind(this));
 
     this.ignoreDuplicate.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onIgnoreDuplicateChanged.bind(this));
     this.scriptOnly.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onScriptOnlyChanged.bind(this));
@@ -142,8 +144,11 @@ export class SettingsComponent implements OnInit {
     this.highlightEmptyObject.setValue(settings.highlightEmptyObject, {emitEvent: false});
     this.showEmptyAccordion.setValue(settings.showEmptyAccordion, {emitEvent: false});
     this.mergeObject.setValue(settings.mergeObject, {emitEvent: false});
-    this.clipboardSyntax.setValue(settings.clipboardSyntax, {emitEvent: false});
-    this.codeSyntax.setValue(settings.codeSyntax, {emitEvent: false});
+  }
+
+  private onSyntaxChanged([clipboard, code]: [CodeSyntax, CodeSyntax]): void {
+    this.clipboardSyntax.setValue(clipboard, {emitEvent: false});
+    this.codeSyntax.setValue(code, {emitEvent: false});
   }
 
 }

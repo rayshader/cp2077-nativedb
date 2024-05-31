@@ -1,0 +1,37 @@
+<button mat-icon-button
+        matTooltip="Change syntax of code"
+        [matMenuTriggerFor]="menu">
+  <mat-icon [svgIcon]="'code-syntax'"></mat-icon>
+</button>
+
+<mat-menu #menu="matMenu">
+  @if (data$ | async; as data) {
+    <button mat-menu-item>Code syntax</button>
+    @for (option of codeOptions; track option.value) {
+      <button mat-menu-item (click)="selectCodeSyntax(option)">
+        @if (option.value === data.codeSyntax - 1) {
+          <mat-icon color="primary">radio_button_checked</mat-icon>
+        } @else {
+          <mat-icon>radio_button_unchecked</mat-icon>
+        }
+        {{option.name}}
+      </button>
+    }
+
+    @if (!data.isMobile) {
+      <mat-divider></mat-divider>
+
+      <button mat-menu-item>Clipboard syntax</button>
+      @for (option of clipboardOptions; track option.value) {
+        <button mat-menu-item (click)="selectClipboardSyntax(option)">
+          @if (option.value === data.clipboardSyntax - 1) {
+            <mat-icon color="primary">radio_button_checked</mat-icon>
+          } @else {
+            <mat-icon>radio_button_unchecked</mat-icon>
+          }
+          {{option.name}}
+        </button>
+      }
+    }
+  }
+</mat-menu>
