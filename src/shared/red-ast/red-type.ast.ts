@@ -67,7 +67,6 @@ export class RedTypeAst {
         syntax === CodeSyntax.pseudocode) && type.aliasName) {
       name = type.aliasName;
     }
-    // TODO: ignore script_ref<T> when syntax is for Redscript / Lua ?
     if (type.innerType !== undefined) {
       if (syntax === CodeSyntax.pseudocode) {
         if (this.isPrimitive(type)) {
@@ -77,14 +76,18 @@ export class RedTypeAst {
         }
         str += `${name}:`;
       } else {
-        str += `${name}<`;
+        if (type.size === undefined) {
+          str += `${name}<`;
+        } else {
+          str += '[';
+        }
       }
       str += RedTypeAst.toString(type.innerType, syntax);
       if (type.size !== undefined && syntax !== CodeSyntax.pseudocode) {
         str += `; ${type.size}`;
       }
       if (syntax !== CodeSyntax.pseudocode) {
-        str += '>';
+        str += (type.size === undefined) ? '>' : ']';
       }
     } else {
       str = name;

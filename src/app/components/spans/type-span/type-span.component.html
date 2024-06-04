@@ -8,14 +8,18 @@
           <type-span [node]="node.innerType"></type-span>
         }
         @case (redscript) {
-          <span class="stx-lang">{{node | ndbFormatCode:syntax}}</span>
-          <span class="stx-type"><</span>
-          <type-span [node]="node.innerType"></type-span>
-          @if (node.size !== undefined) {
-            <span class="stx-type">;&nbsp;</span>
+          @if (node.size === undefined) {
+            <span class="stx-lang">{{node | ndbFormatCode:syntax}}</span>
+            <span class="stx-type"><</span>
+            <type-span [node]="node.innerType"></type-span>
+            <span class="stx-type">></span>
+          } @else {
+            <span class="stx-parenthesis">[</span>
+            <type-span [node]="node.innerType"></type-span>
+            <span class="stx-text">;&nbsp;</span>
             <span class="stx-number">{{node.size}}</span>
+            <span class="stx-parenthesis">]</span>
           }
-          <span class="stx-type">></span>
         }
         @case (cpp) {
           <span class="stx-lang">{{node | ndbFormatCode:syntax}}</span>
