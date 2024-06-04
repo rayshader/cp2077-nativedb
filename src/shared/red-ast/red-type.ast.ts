@@ -74,7 +74,11 @@ export class RedTypeAst {
         } else if (this.isTemplate(type)) {
           name = this.templateToString(type.flag as RedTemplateDef);
         }
-        str += `${name}:`;
+        if (type.size === undefined) {
+          str += `${name}:`;
+        } else {
+          str += `[${type.size}]`;
+        }
       } else {
         if (type.size === undefined) {
           str += `${name}<`;
