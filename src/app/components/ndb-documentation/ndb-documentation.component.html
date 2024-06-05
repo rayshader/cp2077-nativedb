@@ -1,52 +1,28 @@
-@if (mode == 'view') {
-  <p class="stx stx-doc"
-     matTooltip="Double-click to edit"
-     matTooltipShowDelay="3000"
-     (click)="onLinkClicked($event)"
-     (dblclick)="mode = 'edit'"
-     [innerHTML]="body | ndbFormatDocumentation"></p>
-} @else if (mode == 'edit') {
-  <form [formGroup]="form">
-    <mat-form-field>
-    <textarea matInput
-              [cdkTextareaAutosize]="true"
-              [cdkAutosizeMinRows]="4"
-              formControlName="input"></textarea>
-    </mat-form-field>
-  </form>
+<p class="stx stx-doc"
+   (click)="onLinkClicked($event)"
+   [innerHTML]="body | ndbFormatDocumentation"></p>
 
-  <div class="actions">
-    <button mat-icon-button
-            matTooltip="Guidelines"
-            (click)="openGuidelines()">
-      <mat-icon>help_outline</mat-icon>
-    </button>
+<button mat-icon-button
+        [matMenuTriggerFor]="menu">
+  <mat-icon>more_vert</mat-icon>
+</button>
 
-    @if (!isEmpty) {
-      <button mat-icon-button
-              color="warn"
-              [matTooltip]="deleteTitle"
-              (click)="delete()">
-        @if (deleteStatus) {
-          <mat-icon svgIcon="delete-empty"></mat-icon>
-        } @else {
-          <mat-icon>delete</mat-icon>
-        }
-      </button>
-    }
+<mat-menu #menu="matMenu">
+  <button mat-menu-item
+          (click)="editGitBook()">
+    <mat-icon>edit</mat-icon>
+    Edit in GitBook
+  </button>
 
-    <button mat-icon-button
-            matTooltip="Cancel"
-            (click)="cancel()">
-      <mat-icon>clear</mat-icon>
-    </button>
+  <button mat-menu-item
+          (click)="showGitBook()">
+    <mat-icon>visibility</mat-icon>
+    Show in GitBook
+  </button>
 
-    <button mat-icon-button
-            color="primary"
-            matTooltip="Save"
-            (click)="save()"
-            [disabled]="saveDisabled">
-      <mat-icon>check</mat-icon>
-    </button>
-  </div>
-}
+  <button mat-menu-item
+          (click)="openGuidelines()">
+    <mat-icon>help_outline</mat-icon>
+    Show guidelines
+  </button>
+</mat-menu>

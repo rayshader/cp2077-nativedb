@@ -2,8 +2,8 @@
   <ndb-title-bar [title]="data.name"
                  [altTitle]="data.altName"
                  [node]="data.object"
-                 [hideDocumentation]="data.hideDocumentation"
-                 [hasDocumentation]="data.hasBodyDocumentation"
+                 [hideDocumentation]="!data.canDocument"
+                 [hasDocumentation]="data.hasComment"
                  (toggleDocumentation)="toggleDocumentation()">
     <mat-icon class="badge" [attr.data-scope]="data.scope" svgIcon="scope" [matTooltip]="data.scope"></mat-icon>
     @if (data.isAbstract) {
@@ -26,10 +26,9 @@
     }
   </ndb-title-bar>
 
-  @if (showDocumentation) {
-    <ndb-documentation [data]="{documentation: data.documentation, main: true}"
-                       (documented)="changeDocumentation($event)"
-                       (closed)="toggleDocumentation()"></ndb-documentation>
+  @if (data.showComment && data.hasComment && data.canDocument) {
+    <ndb-documentation [body]="data.documentation!.comment"
+                       [object]="data.object"></ndb-documentation>
   }
 
   <cdk-accordion multi="true">
@@ -152,7 +151,7 @@
                          [memberOf]="data.object"
                          [documentation]="data.documentation"
                          [canCopy]="true"
-                         [canDocument]="!data.hideDocumentation"
+                         [canDocument]="data.canDocument"
                          [badges]="data.badges"></function-span>
           @if (data.isMobile && !$last) {
             <mat-divider></mat-divider>

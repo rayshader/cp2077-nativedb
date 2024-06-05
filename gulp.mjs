@@ -2,11 +2,6 @@ import gulp from 'gulp';
 import brotli from 'gulp-brotli';
 import htmlmin from 'gulp-htmlmin';
 
-gulp.task('install-wasm', () => {
-  return gulp.src('./node_modules/brotli-wasm/pkg.web/*.wasm')
-    .pipe(gulp.dest('./src'));
-});
-
 gulp.task('gh-pages', () => {
   return gulp.src('./src/404.html')
     .pipe(htmlmin({

@@ -1,7 +1,8 @@
 @if (node) {
   @if (canDocument && isVisible) {
-    <ndb-documentation [data]="{documentation: documentation, node: node}"
-                       (closed)="hideDocumentation()"></ndb-documentation>
+    <ndb-documentation [body]="documentation?.comment ?? ''"
+                       [object]="memberOf"
+                       [method]="node"></ndb-documentation>
   }
 
   <div class="content">

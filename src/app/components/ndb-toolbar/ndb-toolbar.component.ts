@@ -11,7 +11,6 @@ import {NavigationEnd, Router, RouterLink} from "@angular/router";
 import {ResponsiveService} from "../../../shared/services/responsive.service";
 import {filter} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {NDBSyncDocumentationComponent} from "../ndb-sync-documentation/ndb-sync-documentation.component";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {NDBSyntaxModeComponent} from "../ndb-syntax-mode/ndb-syntax-mode.component";
 
@@ -31,7 +30,6 @@ import {NDBSyntaxModeComponent} from "../ndb-syntax-mode/ndb-syntax-mode.compone
     NDBIdeThemeComponent,
     NDBThemeModeComponent,
     NDBSyntaxModeComponent,
-    NDBSyncDocumentationComponent
   ],
   templateUrl: './ndb-toolbar.component.html',
   styleUrl: './ndb-toolbar.component.scss'

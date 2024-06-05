@@ -18,7 +18,8 @@ import {
   OperatorFunction,
   pipe,
   shareReplay,
-  switchMap
+  switchMap,
+  take
 } from "rxjs";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {RedNodeKind} from "../../../shared/red-ast/red-node.ast";
@@ -36,13 +37,14 @@ import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar
 import {RecentVisitService} from "../../../shared/services/recent-visit.service";
 import {ResponsiveService} from "../../../shared/services/responsive.service";
 import {MatDividerModule} from "@angular/material/divider";
-import {ClassDocumentation, DocumentationService} from "../../../shared/services/documentation.service";
 import {cyrb53} from "../../../shared/string";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
 import {NDBDocumentationComponent} from "../../components/ndb-documentation/ndb-documentation.component";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {SearchRequest, SearchService} from "../../../shared/services/search.service";
+import {WikiService} from "../../../shared/services/wiki.service";
+import {WikiClassDto} from "../../../shared/dtos/wiki.dto";
 
 export interface InheritData extends RedTypeAst {
   readonly isEmpty: boolean;
@@ -63,9 +65,10 @@ interface ObjectData {
   readonly badges: number;
   readonly align: string;
 
-  readonly documentation: ClassDocumentation;
-  readonly hideDocumentation: boolean;
-  readonly hasBodyDocumentation: boolean;
+  readonly documentation?: WikiClassDto;
+  readonly showComment: boolean;
+  readonly canDocument: boolean;
+  readonly hasComment: boolean;
 
   readonly isMobile: boolean;
   readonly isPinned: boolean;
@@ -181,7 +184,6 @@ export class ObjectComponent {
   ];
 
   data$: Observable<ObjectData | undefined> = EMPTY;
-  showDocumentation: boolean = false;
 
   protected readonly isMobile$: Observable<boolean>;
 
@@ -200,13 +202,13 @@ export class ObjectComponent {
   protected propertySearchFilter: MemberFilter = 'empty';
   protected functionSearchFilter: MemberFilter = 'empty';
 
-  private readonly isDocumentedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  private readonly isDocumented$: Observable<boolean> = this.isDocumentedSubject.asObservable();
+  private readonly showDocumentationSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private readonly showDocumentation$: Observable<boolean> = this.showDocumentationSubject.asObservable();
   private readonly filtersSubject: BehaviorSubject<void> = new BehaviorSubject<void>(undefined);
   private readonly filters$: Observable<void> = this.filtersSubject.asObservable();
 
   constructor(private readonly dumpService: RedDumpService,
-              private readonly documentationService: DocumentationService,
+              private readonly wikiService: WikiService,
               private readonly pageService: PageService,
               private readonly recentVisitService: RecentVisitService,
               private readonly settingsService: SettingsService,
@@ -226,18 +228,16 @@ export class ObjectComponent {
     }
     this.recentVisitService.pushLastVisit(+id);
     this.resetFilters();
-    const object$ = this.loadObject(+id);
-    const documentation$ = object$.pipe(this.getDocumentation(), shareReplay(1));
+    const object$: Observable<RedClassAst> = this.loadObject(+id);
+    const documentation$: Observable<WikiClassDto | undefined> = object$.pipe(this.getDocumentation());
 
-    combineLatest([
-      this.settingsService.showDocumentation$,
-      documentation$,
-    ]).pipe(takeUntilDestroyed(this.dr)).subscribe(this.onShowDocumentation.bind(this));
+    this.settingsService.showDocumentation$.pipe(take(1), takeUntilDestroyed(this.dr))
+      .subscribe((show) => this.showDocumentationSubject.next(show));
 
     this.data$ = combineLatest([
       object$,
       documentation$,
-      this.isDocumented$,
+      this.showDocumentation$,
       this.dumpService.badges$,
       this.settingsService.settings$,
       this.isMobile$,
@@ -258,12 +258,8 @@ export class ObjectComponent {
     return 'Reset filter';
   }
 
-  changeDocumentation(isDocumented: boolean): void {
-    this.isDocumentedSubject.next(isDocumented);
-  }
-
   toggleDocumentation(): void {
-    this.showDocumentation = !this.showDocumentation;
+    this.showDocumentationSubject.next(!this.showDocumentationSubject.value);
   }
 
   computePropertyFilters(properties: RedPropertyAst[]): void {
@@ -442,12 +438,12 @@ export class ObjectComponent {
   private loadData([
                      object,
                      documentation,
-                     isDocumented,
+                     showDocumentation,
                      badges,
                      settings,
                      isMobile,
                      request
-                   ]: [RedClassAst, ClassDocumentation, boolean, number, Settings, boolean, SearchRequest, void]) {
+                   ]: [RedClassAst, WikiClassDto | undefined, boolean, number, Settings, boolean, SearchRequest, void]) {
     const properties: RedPropertyAst[] = this.filterProperties(object.properties, request);
     const functions: RedFunctionAst[] = this.filterFunctions(object.functions, request);
     const showEmptyAccordion: boolean = settings.showEmptyAccordion;
@@ -476,8 +472,9 @@ export class ObjectComponent {
       badges: badges,
       align: `${104 + badges * 24 + 12 - 30}px`,
       documentation: documentation,
-      hideDocumentation: isMobile,
-      hasBodyDocumentation: !isMobile && documentation.body !== undefined,
+      showComment: showDocumentation,
+      canDocument: !isMobile,
+      hasComment: documentation && documentation.comment.length > 0,
       isMobile: isMobile,
       isPinned: settings.isBarPinned,
       highlightEmpty: settings.highlightEmptyObject,
@@ -542,14 +539,6 @@ export class ObjectComponent {
     return match;
   }
 
-  private onShowDocumentation([state, documentation]: [boolean, ClassDocumentation]): void {
-    if (!documentation.body) {
-      this.showDocumentation = false;
-      return;
-    }
-    this.showDocumentation = state;
-  }
-
   private onScrollToFragment(): void {
     const fragment: string | null = this.route.snapshot.fragment;
 
@@ -564,20 +553,20 @@ export class ObjectComponent {
     $element.scrollIntoView({block: 'center'});
   }
 
-  private getDocumentation(): OperatorFunction<RedClassAst | undefined, ClassDocumentation> {
+  private getDocumentation(): OperatorFunction<RedClassAst | undefined, WikiClassDto | undefined> {
     return pipe(
-      switchMap((object) => {
+      switchMap((object?: RedClassAst) => {
         if (!object) {
           return EMPTY;
         }
-        return this.documentationService.getClassById(object.id);
+        return this.wikiService.getClass(object.name);
       })
     );
   }
 
   private loadObject(id: number): Observable<RedClassAst> {
     return of(this.kind).pipe(
-      switchMap((kind) => {
+      switchMap((kind: RedNodeKind) => {
         if (kind === RedNodeKind.class) {
           return this.dumpService.getClassById(+id);
         } else if (kind === RedNodeKind.struct) {
@@ -585,7 +574,7 @@ export class ObjectComponent {
         }
         return EMPTY;
       }),
-      map((object) => object as RedClassAst),
+      switchMap((object?: RedClassAst) => (object) ? of(object) : EMPTY),
       shareReplay(1)
     );
   }

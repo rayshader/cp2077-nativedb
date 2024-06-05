@@ -1,106 +1,46 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
-import {MatFormFieldModule} from "@angular/material/form-field";
-import {AbstractControl, FormControl, FormGroup, ReactiveFormsModule} from "@angular/forms";
-import {MatInputModule} from "@angular/material/input";
-import {MatButtonModule} from "@angular/material/button";
-import {MatIconModule} from "@angular/material/icon";
-import {
-  ClassDocumentation,
-  DocumentationService,
-  MemberDocumentation
-} from "../../../shared/services/documentation.service";
-import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {Component, Input} from '@angular/core';
 import {NDBFormatDocumentationPipe} from "../../pipes/ndb-format-documentation.pipe";
-import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
-import {firstValueFrom} from "rxjs";
 import {Router} from "@angular/router";
 import {MatDialog} from "@angular/material/dialog";
 import {NDBGuidelinesDialogComponent} from "../ndb-guidelines-dialog/ndb-guidelines-dialog.component";
 import {MatTooltipModule} from "@angular/material/tooltip";
-
-export interface DocumentationData {
-  readonly documentation?: ClassDocumentation;
-  readonly main?: boolean;
-  readonly node?: RedFunctionAst;
-}
-
-type Mode = 'view' | 'edit';
+import {RedClassAst} from "../../../shared/red-ast/red-class.ast";
+import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
+import {RedTypeAst} from "../../../shared/red-ast/red-type.ast";
+import {CodeSyntax} from "../../../shared/services/settings.service";
+import {MatIconButton} from "@angular/material/button";
+import {MatIcon} from "@angular/material/icon";
+import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 
 @Component({
   selector: 'ndb-documentation',
   standalone: true,
   imports: [
-    ReactiveFormsModule,
-    MatIconModule,
-    MatInputModule,
-    MatButtonModule,
+    MatIcon,
+    MatIconButton,
+    MatMenu,
+    MatMenuTrigger,
     MatTooltipModule,
-    MatFormFieldModule,
-    NDBFormatDocumentationPipe
+    NDBFormatDocumentationPipe,
+    MatMenuItem
   ],
   templateUrl: './ndb-documentation.component.html',
   styleUrl: './ndb-documentation.component.scss'
 })
 export class NDBDocumentationComponent {
 
-  @Output()
-  documented: EventEmitter<boolean> = new EventEmitter();
-
-  @Output()
-  closed: EventEmitter<void> = new EventEmitter();
-
-  mode: Mode = 'view';
+  @Input()
   body: string = '';
-  isChanged: boolean = false;
-  deleteStatus: boolean = false;
 
-  readonly form: FormGroup = new FormGroup({
-    input: new FormControl('')
-  });
+  @Input()
+  object?: RedClassAst;
 
-  private documentation?: ClassDocumentation;
-  private main: boolean = false;
-  private node?: RedFunctionAst;
+  @Input()
+  method?: RedFunctionAst;
 
-  constructor(private readonly documentationService: DocumentationService,
-              private readonly dialog: MatDialog,
+  constructor(private readonly dialog: MatDialog,
               private readonly router: Router) {
-    this.input.valueChanges.pipe(takeUntilDestroyed()).subscribe(this.onChanged.bind(this));
-  }
 
-  @Input('data')
-  set _data(value: DocumentationData | undefined) {
-    if (!value) {
-      return;
-    }
-    this.documentation = value.documentation;
-    this.main = value.main ?? false;
-    this.node = value.node;
-    if (this.documentation && this.main) {
-      this.loadMain();
-    } else {
-      this.loadMember();
-    }
-  }
-
-  get isEmpty(): boolean {
-    return this.body.length === 0;
-  }
-
-  protected get input(): AbstractControl<string> {
-    return this.form.get('input')!;
-  }
-
-  protected get deleteTitle(): string {
-    return this.deleteStatus ? 'Confirm' : 'Delete';
-  }
-
-  protected get saveDisabled(): boolean {
-    let body: string = this.input.value;
-
-    body ??= '';
-    body = body.trim();
-    return !this.isChanged || body.length === 0;
   }
 
   onLinkClicked(event: Event): void {
@@ -131,155 +71,63 @@ export class NDBDocumentationComponent {
     this.dialog.open(NDBGuidelinesDialogComponent, NDBGuidelinesDialogComponent.Config);
   }
 
-  async delete(): Promise<void> {
-    if (!this.documentation) {
-      return;
-    }
-    if (!this.deleteStatus) {
-      this.deleteStatus = true;
-      return;
-    }
-    if (this.main) {
-      await this.deleteMain();
-    } else if (this.node) {
-      await this.deleteMember();
-    }
-    this.deleteStatus = false;
+  showGitBook(): void {
+    const path: string = this.getGitBookPath();
+
+    window.open(`https://wiki.redmodding.org/nativedb-documentation/classes/${path}`, '_blank');
   }
 
-  cancel(): void {
-    this.input.setValue(this.body, {emitEvent: false});
-    this.isChanged = false;
-    this.deleteStatus = false;
-    this.mode = 'view';
-    if (this.body.length === 0) {
-      this.closed.emit();
-    }
+  editGitBook(): void {
+    const path: string = this.getGitBookPath();
+
+    window.open(`https://app.gitbook.com/o/-MP5ijqI11FeeX7c8-N8/s/iEOlL96xX95sTRIvzobZ/classes/${path}`, '_blank');
   }
 
-  async save(): Promise<void> {
-    if (!this.documentation) {
-      return;
+  private getGitBookPath(): string {
+    if (!this.object) {
+      return '';
     }
-    if (this.main) {
-      await this.saveMain();
-    } else if (this.node) {
-      await this.saveMember();
+    let path: string = this.object.name.toLowerCase();
+
+    if (!this.method) {
+      path = `${path}#description`;
+    } else {
+      path = `${path}#${this.formatFragment()}`;
     }
-    this.isChanged = false;
-    this.deleteStatus = false;
+    return path;
   }
 
-  private onChanged(value: string): void {
-    value = value.trim();
-    this.isChanged = value !== this.body;
-  }
-
-  private async deleteMain(): Promise<void> {
-    if (!this.documentation) {
-      return;
+  private formatFragment(): string {
+    if (!this.method) {
+      return '';
     }
-    this.documentation.body = undefined;
-    await firstValueFrom(this.documentationService.update(this.documentation));
-    this.body = '';
-    this.input.setValue('');
-    this.documented.emit(false);
-    this.closed.emit();
-  }
+    const tokens: string[] = [this.method.name];
 
-  private async deleteMember(): Promise<void> {
-    if (!this.documentation) {
-      return;
-    }
-    const member: MemberDocumentation | undefined = this.getFunction();
-
-    if (member) {
-      await firstValueFrom(this.documentationService.deleteFunction(this.documentation, member.id));
-      this.body = '';
-      this.input.setValue('');
-    }
-    this.documented.emit(false);
-    this.closed.emit();
-  }
-
-  private async saveMain(): Promise<void> {
-    if (!this.documentation) {
-      return;
-    }
-    try {
-      let body: string = this.input.value;
-
-      body = body.trim();
-      this.documentation.body = body;
-      await firstValueFrom(this.documentationService.update(this.documentation));
-      this.body = body;
-      this.documented.emit(true);
-      this.mode = 'view';
-    } catch (error) {
-      // TODO: show a toast!
-      console.error(error);
-    }
-  }
-
-  private async saveMember(): Promise<void> {
-    if (!this.documentation) {
-      return;
-    }
-    try {
-      let body: string = this.input.value;
-
-      body = body.trim();
-      let member: MemberDocumentation | undefined = this.getFunction();
-
-      if (!member) {
-        member = {
-          id: this.node!.id,
-          body: body
-        };
-        await firstValueFrom(this.documentationService.addFunction(this.documentation, member));
-      } else {
-        member.body = body;
-        await firstValueFrom(this.documentationService.update(this.documentation));
+    for (const argument of this.method.arguments) {
+      if (argument.isOptional) {
+        tokens.push('opt');
       }
-      this.body = body;
-      this.documented.emit(true);
-      this.mode = 'view';
-    } catch (error) {
-      // TODO: show a toast!
-      console.error(error);
+      if (argument.isOut) {
+        tokens.push('out');
+      }
+      tokens.push(argument.name);
+      tokens.push(this.formatFragmentType(argument.type));
     }
+    tokens.push('greater-than');
+    tokens.push(this.formatFragmentType(this.method.returnType));
+    return tokens.join('-').toLowerCase();
   }
 
-  private loadMain(): void {
-    if (!this.documentation) {
-      return;
+  private formatFragmentType(type?: RedTypeAst): string {
+    if (!type) {
+      return 'Void';
     }
-    if (!this.documentation.body) {
-      this.mode = 'edit';
-      return;
-    }
-    this.body = this.documentation.body ?? '';
-    this.input.setValue(this.body, {emitEvent: false});
-    this.documented.emit(true);
-  }
+    let fragment: string = RedTypeAst.toString(type, CodeSyntax.pseudocode);
 
-  private loadMember(): void {
-    const member: MemberDocumentation | undefined = this.getFunction();
-
-    if (!member) {
-      this.mode = 'edit';
-      return;
-    }
-    this.body = member.body;
-    this.input.setValue(this.body, {emitEvent: false});
-    this.documented.emit(true);
-  }
-
-  private getFunction(): MemberDocumentation | undefined {
-    if (!this.documentation || !this.node) {
-      return undefined;
-    }
-    return this.documentation.functions?.find((item) => item.id === this.node!.id);
+    fragment = fragment.replaceAll(':', '-');
+    fragment = fragment.replaceAll('[', '');
+    fragment = fragment.replaceAll(']', '-');
+    return fragment;
   }
 
 }

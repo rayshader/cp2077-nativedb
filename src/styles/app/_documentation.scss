@@ -2,9 +2,6 @@
 @use 'sass:color';
 
 @mixin documentation-theme($theme) {
-  $primary: map.get($theme, primary);
-  $warn: map.get($theme, warn);
-
   ndb-documentation,
   .ndb-documentation {
     & p {
@@ -16,16 +13,6 @@
         border-left-color: #7F7F7F!important;
       }
 
-      &.update {
-        background-color: color.change(map.get($primary, 500), $alpha: 0.1)!important;
-        border-left-color: map.get($primary, 500)!important;
-      }
-
-      &.delete {
-        background-color: color.change(map.get($warn, 500), $alpha: 0.1)!important;
-        border-left-color: map.get($warn, 500)!important;
-      }
-
       & a {
         text-decoration: none;
 
@@ -34,13 +21,17 @@
           text-decoration: underline;
         }
       }
-    }
 
-    & mat-form-field {
-      width: 100%;
+      & pre {
+        display: inline-flex;
+        margin: 0;
+        padding: 0 4px;
 
-      & .mat-mdc-text-field-wrapper {
-        background-color: rgba(0, 0, 0, 0.2);
+        font-family: inherit;
+        color: var(--ndb-ide-text);
+        border: 1px solid #6f6f6f;
+        border-radius: 4px;
+        background-color: var(--ndb-ide-background);
       }
     }
   }

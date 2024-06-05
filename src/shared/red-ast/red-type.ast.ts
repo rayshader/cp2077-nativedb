@@ -62,9 +62,7 @@ export class RedTypeAst {
     let name: string = type.name;
     let str: string = '';
 
-    if ((syntax === CodeSyntax.lua ||
-        syntax === CodeSyntax.redscript ||
-        syntax === CodeSyntax.pseudocode) && type.aliasName) {
+    if ((syntax === CodeSyntax.lua || syntax === CodeSyntax.redscript) && type.aliasName) {
       name = type.aliasName;
     }
     if (type.innerType !== undefined) {
@@ -127,4 +125,69 @@ export class RedTypeAst {
     }
     type.aliasName = alias.aliasName;
   }
+
+  static fromPseudocode(code: string): RedTypeAst | undefined {
+    const tokens: string[] = code.split(':').reverse();
+    let currentType: RedTypeAst | undefined = undefined;
+    let innerType: RedTypeAst | undefined = undefined;
+
+    for (const token of tokens) {
+      const innerDef: any = {};
+      const primitiveDef: RedPrimitiveDef | undefined = this.pseudocodeToPrimitive(token);
+      const templateDef: RedTemplateDef | undefined = this.pseudocodeToTemplate(token, innerDef);
+      let name: string;
+
+      if (primitiveDef !== undefined) {
+        name = RedPrimitiveDef[primitiveDef];
+      } else if (templateDef !== undefined) {
+        name = RedTemplateDef[templateDef];
+      } else {
+        name = token;
+      }
+      currentType = {
+        id: cyrb53(name),
+        kind: RedNodeKind.type,
+        name: name,
+        flag: primitiveDef || templateDef,
+        innerType: innerType,
+        size: innerDef?.size
+      };
+      innerType = currentType;
+    }
+    return currentType;
+  }
+
+  static pseudocodeToPrimitive(code: string): RedPrimitiveDef | undefined {
+    try {
+      return RedPrimitiveDef[code as keyof typeof RedPrimitiveDef];
+    } catch (error) {
+      return undefined;
+    }
+  }
+
+  static pseudocodeToTemplate(code: string, innerDef: any): RedTemplateDef | undefined {
+    const staticArrayMatch: RegExpMatchArray | null = code.match(/\\\\\[(?<size>[0-9]+)].*/);
+
+    if (staticArrayMatch) {
+      innerDef.size = +staticArrayMatch.groups!['size'];
+      return RedTemplateDef.array;
+    }
+    switch (code) {
+      case 'handle':
+        return RedTemplateDef.ref;
+      case 'whandle':
+        return RedTemplateDef.wref;
+      case 'rRef':
+        return RedTemplateDef.ResRef;
+      case 'raRef':
+        return RedTemplateDef.ResAsyncRef;
+      default:
+        try {
+          return RedTemplateDef[code as keyof typeof RedTemplateDef];
+        } catch (error) {
+          return undefined;
+        }
+    }
+  }
+
 }

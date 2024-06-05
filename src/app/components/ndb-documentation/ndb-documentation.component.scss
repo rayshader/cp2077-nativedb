@@ -1,11 +1,9 @@
-p {
-  user-select: none;
-
-  margin: 0 0 16px;
-  padding: 16px;
+:host {
+  display: flex;
 }
 
-.actions {
-  display: flex;
-  justify-content: end;
+p {
+  flex: 1;
+  margin: 0 16px 16px 0;
+  padding: 16px;
 }

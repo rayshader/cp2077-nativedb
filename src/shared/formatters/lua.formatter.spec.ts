@@ -410,7 +410,7 @@ end)
       // THEN
       expect(code).toBe(`listener = NewProxy("GodModeStatListener", {
     OnGodModeChanged = {
-        args = {"EntityID", "gameGodModeType"},
+        args = {"entEntityID", "gameGodModeType"},
         callback = function(ownerID, newType)
             -- Do stuff
         end

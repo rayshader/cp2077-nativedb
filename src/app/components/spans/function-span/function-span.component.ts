@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {AfterViewInit, Component, DestroyRef, Input} from '@angular/core';
 import {ArgumentSpanComponent} from "../argument-span/argument-span.component";
 import {TypeSpanComponent} from "../type-span/type-span.component";
 
@@ -8,7 +8,6 @@ import {RedFunctionAst} from "../../../../shared/red-ast/red-function.ast";
 import {RedClassAst} from "../../../../shared/red-ast/red-class.ast";
 import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
 import {NDBDocumentationComponent} from "../../ndb-documentation/ndb-documentation.component";
-import {ClassDocumentation} from "../../../../shared/services/documentation.service";
 import {CodeSyntax, SettingsService} from "../../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {BehaviorSubject, combineLatest, Observable} from "rxjs";
@@ -17,11 +16,11 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 import {RouterLink} from "@angular/router";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatDivider} from "@angular/material/divider";
+import {WikiClassDto, WikiFunctionDto} from "../../../../shared/dtos/wiki.dto";
 
 @Component({
   selector: 'function-span',
   standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink,
     MatMenu,
@@ -38,7 +37,7 @@ import {MatDivider} from "@angular/material/divider";
   templateUrl: './function-span.component.html',
   styleUrl: './function-span.component.scss'
 })
-export class FunctionSpanComponent {
+export class FunctionSpanComponent implements AfterViewInit {
 
   /**
    * Offset in pixels to add between badges and function's name, with at least 12px.
@@ -79,19 +78,16 @@ export class FunctionSpanComponent {
   @Input()
   canShare: boolean = true;
 
-  documentation?: ClassDocumentation;
+  documentation?: WikiFunctionDto;
 
   protected readonly CodeSyntax = CodeSyntax;
 
-  private readonly documentationSubject: BehaviorSubject<ClassDocumentation | undefined> = new BehaviorSubject<ClassDocumentation | undefined>(undefined);
-  private readonly documentation$: Observable<ClassDocumentation | undefined> = this.documentationSubject.asObservable();
+  private readonly documentationSubject: BehaviorSubject<WikiClassDto | undefined> = new BehaviorSubject<WikiClassDto | undefined>(undefined);
+  private readonly documentation$: Observable<WikiClassDto | undefined> = this.documentationSubject.asObservable();
 
   constructor(protected readonly fmtService: CodeFormatterService,
-              private readonly settingsService: SettingsService) {
-    combineLatest([
-      this.settingsService.showDocumentation$,
-      this.documentation$
-    ]).pipe(takeUntilDestroyed()).subscribe(this.onShowDocumentation.bind(this));
+              private readonly settingsService: SettingsService,
+              private readonly dr: DestroyRef) {
   }
 
   @Input('node')
@@ -108,9 +104,12 @@ export class FunctionSpanComponent {
   }
 
   @Input('documentation')
-  set _documentation(value: ClassDocumentation | undefined) {
-    this.documentation = value;
-    this.documentationSubject.next(value);
+  set _documentation(value: WikiClassDto | undefined) {
+    if (!value) {
+      this.documentation = undefined;
+      return;
+    }
+    this.documentation = value.functions.find((method) => method.id === this.node!.id);
   }
 
   /**
@@ -136,20 +135,18 @@ export class FunctionSpanComponent {
    * Whether this function is documented?
    */
   get hasDocumentation(): boolean {
-    if (!this.documentation || !this.node) {
-      return false;
-    }
-    const functions = this.documentation.functions ?? [];
+    return this.documentation !== undefined && this.documentation.comment.length > 0;
+  }
 
-    return functions.some((item) => item.id === this.node!.id);
+  ngAfterViewInit(): void {
+    combineLatest([
+      this.settingsService.showDocumentation$,
+      this.documentation$
+    ]).pipe(takeUntilDestroyed(this.dr)).subscribe(this.onShowDocumentation.bind(this));
   }
 
   toggleDocumentation(): void {
     this.isVisible = !this.isVisible;
-  }
-
-  hideDocumentation(): void {
-    this.isVisible = false;
   }
 
   async copyFullName(): Promise<void> {
@@ -202,7 +199,7 @@ export class FunctionSpanComponent {
     await navigator.clipboard.writeText(data);
   }
 
-  private onShowDocumentation([state,]: [boolean, ClassDocumentation | undefined]): void {
+  private onShowDocumentation([state,]: [boolean, WikiClassDto | undefined]): void {
     if (!this.hasDocumentation) {
       return;
     }

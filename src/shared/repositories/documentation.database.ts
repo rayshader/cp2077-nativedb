@@ -1,6 +1,5 @@
 import {Injectable} from "@angular/core";
 import {Observable} from "rxjs";
-import {ClassRepository} from "./class.repository";
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +22,7 @@ export class DocumentationDatabase {
         // @ts-ignore
         const db: IDBDatabase = event.target.result;
 
-        ClassRepository.upgrade(db, event.oldVersion, event.newVersion);
+        //[Entity]Repository.upgrade(db, event.oldVersion, event.newVersion);
       };
       request.onsuccess = (event) => {
         // @ts-ignore

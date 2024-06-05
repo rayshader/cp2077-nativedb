@@ -107,4 +107,16 @@ describe('NDBFormatDocumentationPipe', () => {
       '.');
   });
 
+  it('should format `content` with <pre> tag', () => {
+    // GIVEN
+    const documentation: string = 'This test should format my `magic content` and ```code content```.';
+
+    // WHEN
+    const html: string = getSafeHtml(pipe.transform(documentation));
+
+    // THEN
+    expect(html).toBe('This test should format my ' +
+      `<pre>magic content</pre> and <pre>code content</pre>.`);
+  });
+
 });

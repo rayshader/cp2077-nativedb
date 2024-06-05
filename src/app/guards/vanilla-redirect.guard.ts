@@ -17,7 +17,7 @@ export function vanillaRedirectGuard(next: ActivatedRouteSnapshot) {
   const id: number = cyrb53(name);
   let fragment: string | undefined = next.fragment ?? undefined;
 
-  if (fragment) {
+  if (fragment && !fragment.match(/[0-9]+/g)) {
     fragment = `${cyrb53(fragment)}`;
   }
   return dumpService.isReady$.pipe(
