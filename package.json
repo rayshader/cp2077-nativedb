@@ -32,7 +32,7 @@
     "@angular/platform-browser": "^18.0.1",
     "@angular/platform-browser-dynamic": "^18.0.1",
     "@angular/router": "^18.0.1",
-    "@angular/service-worker": "^18.0.1",
+    "@angular/service-worker": "^18.0.2",
     "brotli-wasm": "^2.0.1",
     "rxjs": "~7.8.1",
     "tslib": "^2.3.1",
