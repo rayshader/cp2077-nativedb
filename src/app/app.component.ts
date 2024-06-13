@@ -27,7 +27,6 @@ import {NDBToolbarComponent} from "./components/ndb-toolbar/ndb-toolbar.componen
 import {NDBBottomBarComponent} from "./components/ndb-bottom-bar/ndb-bottom-bar.component";
 import {combineLatestWith, filter, first, map, OperatorFunction, pipe} from "rxjs";
 import {ResponsiveService} from "../shared/services/responsive.service";
-import {DocumentationDatabase} from "../shared/repositories/documentation.database";
 import {ShortcutService} from "../shared/services/shortcut.service";
 
 export interface AppData {
@@ -70,7 +69,6 @@ export class AppComponent implements OnInit {
 
   constructor(private readonly iconsService: IconsService,
               private readonly pageService: PageService,
-              private readonly documentationDB: DocumentationDatabase,
               private readonly responsiveService: ResponsiveService,
               private readonly shortcutService: ShortcutService,
               private readonly app: ApplicationRef,
@@ -108,7 +106,6 @@ export class AppComponent implements OnInit {
     if (this.swService.isEnabled) {
       this.swService.versionUpdates.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onUpdate.bind(this));
     }
-    this.documentationDB.init().pipe(takeUntilDestroyed(this.dr)).subscribe();
   }
 
   @HostListener('document:keydown', ['$event'])

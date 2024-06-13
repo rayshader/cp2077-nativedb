@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {marked, Token, Tokens, TokensList} from "marked";
-import {WikiClassDto, WikiFunctionDto} from "../dtos/wiki.dto";
+import {WikiClassDto, WikiFileDto, WikiFunctionDto} from "../dtos/wiki.dto";
 import {cyrb53} from "../string";
 import {RedTypeAst} from "../red-ast/red-type.ast";
 import ListItem = Tokens.ListItem;
@@ -15,8 +15,8 @@ export class WikiParser {
 
   private readonly hintRule: RegExp = new RegExp(/\{% hint style="(info|success|warning|danger)" %}\n.*\n\{% endhint %}/gm);
 
-  public parseClass(markdown: string): WikiClassDto {
-    const tokens: TokensList = marked.lexer(markdown, {gfm: true});
+  public parseClass(file: WikiFileDto, name: string): WikiClassDto {
+    const tokens: TokensList = marked.lexer(file.markdown, {gfm: true});
     const stream: WikiTokenStream = new WikiTokenStream(tokens);
     const headerTitle: Tokens.Heading | undefined = stream.nextHeading(1);
 
@@ -29,8 +29,9 @@ export class WikiParser {
     const functions: WikiFunctionDto[] = this.parseFunctions(stream, headerFunctions);
 
     return {
-      id: cyrb53(headerTitle.text),
-      name: headerTitle.text,
+      id: cyrb53(name),
+      sha: file.sha,
+      name: name,
       comment: comment,
       functions: functions
     };
@@ -97,8 +98,7 @@ export class WikiParser {
     return {
       id: this.computeHashFromPrototype(rule),
       name: name,
-      comment: comment,
-      prototype: prototype
+      comment: comment
     };
   }
 

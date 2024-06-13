@@ -2,9 +2,22 @@ import {Injectable} from "@angular/core";
 import {WikiClient} from "../clients/wiki.client";
 import {WikiParser} from "../parsers/wiki.parser";
 import {WikiClassDto, WikiFileDto, WikiFileEntryDto} from "../dtos/wiki.dto";
-import {catchError, expand, map, Observable, of, OperatorFunction, pipe, shareReplay, switchMap, timer} from "rxjs";
+import {
+  catchError,
+  combineLatestWith,
+  expand,
+  map,
+  Observable,
+  of,
+  OperatorFunction,
+  pipe,
+  shareReplay,
+  switchMap,
+  timer
+} from "rxjs";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {GitHubRateLimitError} from "../clients/github.client";
+import {WikiRepository} from "../repositories/wiki.repository";
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +29,8 @@ export class WikiService {
   private readonly invalidationDelay: number = 10 * 60 * 1000;
   private readonly nextErrorAt: Date;
 
-  constructor(private readonly wikiClient: WikiClient,
+  constructor(private readonly wikiRepository: WikiRepository,
+              private readonly wikiClient: WikiClient,
               private readonly wikiParser: WikiParser,
               private readonly toast: MatSnackBar) {
     this.classes$ = this.wikiClient.getClasses().pipe(this.invalidateClasses());
@@ -25,19 +39,36 @@ export class WikiService {
 
   public getClass(name: string): Observable<WikiClassDto | undefined> {
     return this.findClass(name).pipe(
-      switchMap((file?: WikiFileEntryDto) => {
+      combineLatestWith(this.wikiRepository.findByName(name)),
+      switchMap(([file, cache]: [WikiFileEntryDto | undefined, WikiClassDto | undefined]) => {
+        if (!file && cache) {
+          return this.wikiRepository.delete(cache.id).pipe(map(() => undefined));
+        }
         if (!file) {
           return of(undefined);
         }
-        return this.wikiClient.getClass(name);
-      }),
-      catchError(this.showError.bind(this)),
-      map((file?: WikiFileDto) => {
-        if (!file) {
-          return undefined;
+        if (file.sha === cache?.sha) {
+          return of(cache);
         }
-        return this.wikiParser.parseClass(file.markdown);
+        return this.requestClass(name, cache);
       })
+    );
+  }
+
+  private requestClass(name: string, cache?: WikiClassDto): Observable<WikiClassDto | undefined> {
+    return this.wikiClient.getClass(name).pipe(
+      map((file: WikiFileDto) => this.wikiParser.parseClass(file, name)),
+      switchMap((wikiClass: WikiClassDto) => {
+        let operation$: Observable<number> = of(NaN);
+
+        if (!cache) {
+          operation$ = this.wikiRepository.create(wikiClass);
+        } else if (wikiClass.sha !== cache.sha) {
+          operation$ = this.wikiRepository.update(wikiClass);
+        }
+        return operation$.pipe(map(() => wikiClass));
+      }),
+      catchError(this.showError.bind(this))
     );
   }
 

@@ -4,7 +4,7 @@ export interface GitHubFileEntryDto {
   //readonly html_url: string;
   readonly name: string;
   readonly path: string;
-  //readonly sha: string;
+  readonly sha: string;
   //readonly size: number;
   readonly type: 'file';
   //readonly url: string;

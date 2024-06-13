@@ -1,132 +1,36 @@
-import {DocumentationDatabase} from "./documentation.database";
-import {Observable} from "rxjs";
-
-export interface Entity {
-  readonly id: number;
-}
+import {Table} from "dexie";
+import {EMPTY, Observable} from "rxjs";
+import {fromPromise} from "rxjs/internal/observable/innerFrom";
+import {Entity, WikiDB} from "./wiki.database";
 
 export abstract class CrudRepository<T extends Entity> {
 
-  protected constructor(protected readonly db: DocumentationDatabase,
-                        private readonly store: string) {
+  protected constructor(protected readonly db: WikiDB) {
   }
 
-  findAll(): Observable<T[]> {
-    return new Observable((observer) => {
-      const store: IDBObjectStore = this.read();
-      const request: IDBRequest = store.getAll();
+  protected abstract get table(): Table<T, number>;
 
-      request.onerror = (event) => {
-        observer.error();
-        observer.complete();
-      };
-      request.onsuccess = (event) => {
-        // @ts-ignore
-        const entities: T[] = event.target.result;
-
-        observer.next(entities);
-        observer.complete();
-      };
-    });
+  public findAll(): Observable<T[]> {
+    return fromPromise(this.table.toArray());
   }
 
-  findById(id: number): Observable<T | undefined> {
-    return new Observable((observer) => {
-      const store: IDBObjectStore = this.read();
-      const request: IDBRequest = store.get(id);
-
-      request.onerror = (event) => {
-        observer.error();
-        observer.complete();
-      };
-      request.onsuccess = (event) => {
-        // @ts-ignore
-        const entity: T | undefined = event.target.result;
-
-        observer.next(entity);
-        observer.complete();
-      };
-    });
+  public findById(id: number): Observable<T | undefined> {
+    return fromPromise(this.table.get(id));
   }
 
-  create(entity: T): Observable<void> {
-    return new Observable((observer) => {
-      const store: IDBObjectStore = this.write();
-      const request: IDBRequest = store.add(entity);
-
-      request.onerror = (event) => {
-        observer.error();
-        observer.complete();
-      };
-      request.onsuccess = (event) => {
-        observer.next();
-        observer.complete();
-      };
-    });
+  public create(entity: T): Observable<number> {
+    return fromPromise(this.table.add(entity));
   }
 
-  update(entity: T): Observable<void> {
-    return new Observable((observer) => {
-      const store: IDBObjectStore = this.write();
-      const request: IDBRequest = store.put(entity);
-
-      request.onerror = (event) => {
-        observer.error();
-        observer.complete();
-      };
-      request.onsuccess = (event) => {
-        observer.next();
-        observer.complete();
-      };
-    });
+  public update(entity: T): Observable<number> {
+    if (entity.id === undefined) {
+      return EMPTY;
+    }
+    return fromPromise(this.table.put(entity));
   }
 
-  delete(id: number): Observable<void> {
-    return new Observable((observer) => {
-      const store: IDBObjectStore = this.write();
-      const request: IDBRequest = store.delete(id);
-
-      request.onerror = (event) => {
-        observer.error();
-        observer.complete();
-      };
-      request.onsuccess = (event) => {
-        observer.next();
-        observer.complete();
-      };
-    });
-  }
-
-  deleteAll(): Observable<void> {
-    return new Observable<void>((observer) => {
-      const store: IDBObjectStore = this.write();
-      const request: IDBRequest = store.openCursor();
-
-      request.onerror = (event) => {
-        observer.error();
-        observer.complete();
-      }
-      request.onsuccess = (event) => {
-        // @ts-ignore
-        const cursor: IDBCursorWithValue | null = event.target.result;
-
-        if (cursor) {
-          cursor.delete();
-          cursor.continue();
-          return;
-        }
-        observer.next();
-        observer.complete();
-      }
-    });
-  }
-
-  protected read(): IDBObjectStore {
-    return this.db.read(this.store);
-  }
-
-  protected write(): IDBObjectStore {
-    return this.db.write(this.store);
+  public delete(id: number): Observable<void> {
+    return fromPromise(this.table.delete(id));
   }
 
 }
