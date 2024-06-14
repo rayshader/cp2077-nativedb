@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {WikiClient} from "../clients/wiki.client";
-import {WikiParser} from "../parsers/wiki.parser";
+import {WikiParser, WikiParserError, WikiParserErrorCode} from "../parsers/wiki.parser";
 import {WikiClassDto, WikiFileDto, WikiFileEntryDto} from "../dtos/wiki.dto";
 import {
   catchError,
@@ -88,10 +88,19 @@ export class WikiService {
   }
 
   private showError(error: any, _caught: Observable<any>): Observable<any> {
-    if (!(error instanceof GitHubRateLimitError)) {
+    if (error instanceof GitHubRateLimitError) {
+      return this.showRateLimitError(error);
+    } else if (error instanceof WikiParserError && error.code === WikiParserErrorCode.noTitle) {
+      return this.showNoTitleError(error);
+    } else if (error instanceof WikiParserError && error.code === WikiParserErrorCode.noContent) {
+      return this.showNoContentError(error);
+    } else {
       this.toast.open('Failed to get documentation from GitBook. Reason: unknown.');
       return of(undefined);
     }
+  }
+
+  private showRateLimitError(error: GitHubRateLimitError): Observable<any> {
     const now: Date = new Date();
 
     if (now <= this.nextErrorAt) {
@@ -99,6 +108,18 @@ export class WikiService {
     }
     this.toast.open('Failed to get documentation from GitBook. Reason: api rate limit reached.');
     this.nextErrorAt.setTime(error.rateLimit.reset.getTime());
+    return of(undefined);
+  }
+
+  private showNoTitleError(error: WikiParserError): Observable<any> {
+    this.toast.open(`Failed to parse documentation. Reason: no title found for \`${error.className}\`.`);
+    return of(undefined);
+  }
+
+  private showNoContentError(error: WikiParserError): Observable<any> {
+    this.toast.open(
+      `Failed to parse documentation. Reason: no description nor functions found for \`${error.className}\`.`
+    );
     return of(undefined);
   }
 

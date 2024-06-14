@@ -21,13 +21,16 @@ export class WikiParser {
     const headerTitle: Tokens.Heading | undefined = stream.nextHeading(1);
 
     if (!headerTitle) {
-      throw new WikiParserError();
+      throw new WikiParserError(name, WikiParserErrorCode.noTitle);
     }
     const headerDescription: Tokens.Heading | undefined = stream.nextHeading(2);
     const comment: string = this.parseDescription(stream, headerDescription);
     const headerFunctions: Tokens.Heading | undefined = stream.nextHeading(2);
     const functions: WikiFunctionDto[] = this.parseFunctions(stream, headerFunctions);
 
+    if (!headerDescription && !headerFunctions) {
+      throw new WikiParserError(name, WikiParserErrorCode.noContent);
+    }
     return {
       id: cyrb53(name),
       sha: file.sha,
@@ -201,5 +204,16 @@ export class WikiTokenStream {
 
 }
 
+export enum WikiParserErrorCode {
+  noTitle,
+  noContent
+}
+
 export class WikiParserError extends Error {
+
+  constructor(public readonly className: string,
+              public readonly code: WikiParserErrorCode) {
+    super();
+  }
+
 }
