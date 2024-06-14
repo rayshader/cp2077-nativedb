@@ -242,35 +242,23 @@
   </div>
 
   <p>
-    You can write documentation for classes and structs. You can add documentation on a class or a struct to describe
-    its purpose. You can add documentation on any functions of a class or a struct.
+    You can see documentation for classes, structs and their functions. It is read-only when browsing from NativeDB.
   </p>
 
   <p>
-    This button <mat-icon>info_outline</mat-icon> allows you to show / hide the documentation. By default, it will show
-    you a form to start writing right-away. You can save, cancel or delete your documentation. When there is already
-    some content, the button will look like this <mat-icon class="stx-doc">info_outline</mat-icon>.
+    By default, when the body of a class / struct is documented (same with functions), it will be visible. If you want
+    to only show documentation when you need it, you can change the option "Show / hide documented classes, structs and
+    functions by default." in the page Settings. You can then toggle documentation with this icon
+    <mat-icon class="stx-doc">info_outline</mat-icon>.
   </p>
 
   <p>
-    Your documentation is saved in your browser only. However, you can export it to a file on your device. You can
-    import it back from elsewhere.
-  </p>
-
-  <p>
-    The documentation's format is made in such a way that you can merge your documentation with files from others. A
-    tool will popup to let you select what you want to merge.
-  </p>
-
-  <p>
-    It is generally better to follow some guidelines when writing documentation. This will allow you to write clear and
-    concise information. Which will be good for you and others to keep consistent descriptions. Here are some tips you
-    can follow by clicking on this button <button mat-icon-button
-                                                  class="inline"
-                                                  title="Guidelines"
-                                                  (click)="openGuidelines()"><mat-icon>help_outline</mat-icon></button>.
-    This button is always present in the form used to write documentation. It also contains some explanation on the
-    custom syntax you can use.
+    Documentation is stored using <a href="https://wiki.redmodding.org/nativedb-documentation" target="_blank">
+    GitBook</a>. A custom format and syntax is implemented to reference other definitions in NativeDB. GitBook also
+    provides everything to contribute and write documentation, for free. You can contribute (like fix a mistake, a
+    typo, add a behavior you discovered while digging) using GitBook's editor. You can start by
+    <a href="https://wiki.redmodding.org/nativedb-documentation/contributing" target="_blank">reading these guides</a>.
+    It provides enough information about the process to help the community too.
   </p>
 </article>
 

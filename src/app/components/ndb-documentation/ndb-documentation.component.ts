@@ -1,8 +1,6 @@
 import {Component, Input} from '@angular/core';
 import {NDBFormatDocumentationPipe} from "../../pipes/ndb-format-documentation.pipe";
 import {Router} from "@angular/router";
-import {MatDialog} from "@angular/material/dialog";
-import {NDBGuidelinesDialogComponent} from "../ndb-guidelines-dialog/ndb-guidelines-dialog.component";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {RedClassAst} from "../../../shared/red-ast/red-class.ast";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
@@ -19,10 +17,10 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
     MatIcon,
     MatIconButton,
     MatMenu,
+    MatMenuItem,
     MatMenuTrigger,
     MatTooltipModule,
-    NDBFormatDocumentationPipe,
-    MatMenuItem
+    NDBFormatDocumentationPipe
   ],
   templateUrl: './ndb-documentation.component.html',
   styleUrl: './ndb-documentation.component.scss'
@@ -38,8 +36,7 @@ export class NDBDocumentationComponent {
   @Input()
   method?: RedFunctionAst;
 
-  constructor(private readonly dialog: MatDialog,
-              private readonly router: Router) {
+  constructor(private readonly router: Router) {
 
   }
 
@@ -68,7 +65,7 @@ export class NDBDocumentationComponent {
   }
 
   openGuidelines(): void {
-    this.dialog.open(NDBGuidelinesDialogComponent, NDBGuidelinesDialogComponent.Config);
+    window.open('https://wiki.redmodding.org/nativedb-documentation/contributing/guidelines', '_blank');
   }
 
   showGitBook(): void {
