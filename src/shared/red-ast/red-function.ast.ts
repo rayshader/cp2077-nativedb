@@ -93,7 +93,7 @@ export class RedFunctionAst {
   }
 
   static toGitBook(func: RedFunctionAst): string {
-    let prototype: string = `### ${func.name}(`;
+    let prototype: string = `${func.name}(`;
 
     prototype += func.arguments.map((argument: RedArgumentAst) => {
       let argPrototype: string = '';
