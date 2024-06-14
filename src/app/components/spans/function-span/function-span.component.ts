@@ -146,6 +146,15 @@ export class FunctionSpanComponent implements AfterViewInit {
   }
 
   toggleDocumentation(): void {
+    if (!this.node) {
+      return;
+    }
+    if (this.documentation === undefined) {
+      const prototype: string = RedFunctionAst.toGitBook(this.node);
+
+      navigator.clipboard.writeText(prototype);
+      return;
+    }
     this.isVisible = !this.isVisible;
   }
 

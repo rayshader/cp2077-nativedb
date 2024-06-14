@@ -4,6 +4,7 @@ import {RedNodeAst, RedNodeKind} from "./red-node.ast";
 import {RedPropertyJson} from "./red-property.ast";
 import {RedTypeAst, RedTypeJson} from "./red-type.ast";
 import {RedArgumentAst} from "./red-argument.ast";
+import {CodeSyntax} from "../services/settings.service";
 
 export interface RedFunctionJson {
   readonly a: string; // full name
@@ -89,6 +90,30 @@ export class RedFunctionAst {
       arguments: args,
       returnType: returnType
     };
+  }
+
+  static toGitBook(func: RedFunctionAst): string {
+    let prototype: string = `### ${func.name}(`;
+
+    prototype += func.arguments.map((argument: RedArgumentAst) => {
+      let argPrototype: string = '';
+
+      if (argument.isOut) {
+        argPrototype += 'out ';
+      } else if (argument.isOptional) {
+        argPrototype += 'opt ';
+      }
+      argPrototype += `${argument.name}: `;
+      argPrototype += RedTypeAst.toString(argument.type, CodeSyntax.pseudocode);
+      return argPrototype;
+    }).join(', ');
+    prototype += ') -&gt; ';
+    if (func.returnType) {
+      prototype += RedTypeAst.toString(func.returnType, CodeSyntax.pseudocode);
+    } else {
+      prototype += 'Void';
+    }
+    return prototype;
   }
 
   static loadAlias(nodes: RedNodeAst[], func: RedFunctionAst): void {

@@ -52,11 +52,10 @@
       @if (canDocument) {
         <button mat-icon-button
                 class="badge"
-                matTooltip="Documentation"
+                [matTooltip]="documentation === undefined ? 'Copy GitBook signature' : 'Documentation'"
                 matTooltipShowDelay="1500"
                 [class.stx-doc]="hasDocumentation"
-                (click)="toggleDocumentation()"
-                [disabled]="documentation === undefined">
+                (click)="toggleDocumentation()">
           <mat-icon>info_outline</mat-icon>
         </button>
       }
