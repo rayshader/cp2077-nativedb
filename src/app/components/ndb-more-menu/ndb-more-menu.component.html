@@ -1,0 +1,39 @@
+<button mat-icon-button
+        matTooltip="More"
+        [matMenuTriggerFor]="menu">
+  <mat-icon>more_vert</mat-icon>
+</button>
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item routerLink="settings">
+    <mat-icon>settings</mat-icon>
+    Settings
+  </button>
+
+  <button mat-menu-item routerLink="readme">
+    <mat-icon>help_outline</mat-icon>
+    Readme
+  </button>
+
+  <mat-divider></mat-divider>
+
+  <button mat-menu-item (click)="openGitHub()">
+    <mat-icon [svgIcon]="'github'"></mat-icon>
+    Repository
+  </button>
+
+  <button mat-menu-item (click)="openGitBook()">
+    <mat-icon [svgIcon]="'gitbook'"></mat-icon>
+    Documentation
+  </button>
+
+  <button mat-menu-item (click)="openWiki()">
+    <mat-icon [svgIcon]="'bookshelf'"></mat-icon>
+    REDModding Wiki
+  </button>
+
+  <button mat-menu-item (click)="openDiscord()">
+    <mat-icon [svgIcon]="'discord'"></mat-icon>
+    Discord
+  </button>
+</mat-menu>

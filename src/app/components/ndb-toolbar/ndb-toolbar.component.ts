@@ -13,6 +13,7 @@ import {filter} from "rxjs";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {NDBSyntaxModeComponent} from "../ndb-syntax-mode/ndb-syntax-mode.component";
+import {NDBMoreMenuComponent} from "../ndb-more-menu/ndb-more-menu.component";
 
 @Component({
   selector: 'ndb-toolbar',
@@ -30,6 +31,7 @@ import {NDBSyntaxModeComponent} from "../ndb-syntax-mode/ndb-syntax-mode.compone
     NDBIdeThemeComponent,
     NDBThemeModeComponent,
     NDBSyntaxModeComponent,
+    NDBMoreMenuComponent,
   ],
   templateUrl: './ndb-toolbar.component.html',
   styleUrl: './ndb-toolbar.component.scss'

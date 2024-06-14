@@ -8,7 +8,7 @@ import {DomSanitizer} from "@angular/platform-browser";
 export class IconsService {
   private readonly icons: string[] = [
     // UI
-    'delete-empty', 'pin', 'pin-off', 'code-syntax',
+    'delete-empty', 'pin', 'pin-off', 'code-syntax', 'github', 'gitbook', 'bookshelf', 'discord',
 
     // Nodes
     'enum', 'bitfield', 'class', 'struct', 'function',

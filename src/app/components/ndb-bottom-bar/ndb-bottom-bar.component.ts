@@ -7,6 +7,7 @@ import {NDBThemeModeComponent} from "../ndb-theme-mode/ndb-theme-mode.component"
 import {RouterLink} from "@angular/router";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {NDBSyntaxModeComponent} from "../ndb-syntax-mode/ndb-syntax-mode.component";
+import {NDBMoreMenuComponent} from "../ndb-more-menu/ndb-more-menu.component";
 
 @Component({
   selector: 'ndb-bottom-bar',
@@ -20,7 +21,8 @@ import {NDBSyntaxModeComponent} from "../ndb-syntax-mode/ndb-syntax-mode.compone
     MatTooltipModule,
     NDBThemeModeComponent,
     NDBIdeThemeComponent,
-    NDBSyntaxModeComponent
+    NDBSyntaxModeComponent,
+    NDBMoreMenuComponent
   ],
   templateUrl: './ndb-bottom-bar.component.html',
   styleUrl: './ndb-bottom-bar.component.scss'
