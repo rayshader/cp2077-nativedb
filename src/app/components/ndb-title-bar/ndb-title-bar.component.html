@@ -29,7 +29,7 @@
   @if (_node !== undefined) {
     @if (!hideDocumentation) {
       <button mat-icon-button
-              matTooltip="Documentation"
+              [matTooltip]="hasDocumentation ? 'Documentation' : 'Start documenting with GitBook'"
               [class.stx-doc]="hasDocumentation"
               (click)="toggleDocumentation.emit()">
         <mat-icon>info_outline</mat-icon>

@@ -258,7 +258,12 @@ export class ObjectComponent {
     return 'Reset filter';
   }
 
-  toggleDocumentation(): void {
+  toggleDocumentation(name: string, hasComment: boolean): void {
+    if (!hasComment) {
+      navigator.clipboard.writeText(`# ${name}`);
+      window.open('https://app.gitbook.com/o/-MP5ijqI11FeeX7c8-N8/s/iEOlL96xX95sTRIvzobZ/classes', '_blank');
+      return;
+    }
     this.showDocumentationSubject.next(!this.showDocumentationSubject.value);
   }
 

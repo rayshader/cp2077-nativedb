@@ -4,7 +4,7 @@
                  [node]="data.object"
                  [hideDocumentation]="!data.canDocument"
                  [hasDocumentation]="data.hasComment"
-                 (toggleDocumentation)="toggleDocumentation()">
+                 (toggleDocumentation)="toggleDocumentation(data.object.name, data.hasComment)">
     <mat-icon class="badge" [attr.data-scope]="data.scope" svgIcon="scope" [matTooltip]="data.scope"></mat-icon>
     @if (data.isAbstract) {
       <mat-icon class="badge" svgIcon="abstract" matTooltip="abstract"></mat-icon>
