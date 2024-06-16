@@ -12,8 +12,10 @@ export class GitHubClient {
                         private readonly owner: string,
                         private readonly repo: string,
                         private readonly userAgent: string) {
-    this.headers = {'X-GitHub-Api-Version': '2022-11-28'};
-    this.headers['User-Agent'] = this.userAgent;
+    this.headers = {
+      'X-GitHub-Api-Version': '2022-11-28',
+      'User-Agent': this.userAgent
+    };
   }
 
   protected getFileFrom(path: string): Observable<GitHubFileDto> {
