@@ -23,9 +23,9 @@ export class WikiParser {
     if (!headerTitle) {
       throw new WikiParserError(name, WikiParserErrorCode.noTitle);
     }
-    const headerDescription: Tokens.Heading | undefined = stream.nextHeading(2);
+    const headerDescription: Tokens.Heading | undefined = stream.nextHeading(2, true);
     const comment: string = this.parseDescription(stream, headerDescription);
-    const headerFunctions: Tokens.Heading | undefined = stream.nextHeading(2);
+    const headerFunctions: Tokens.Heading | undefined = stream.nextHeading(2, true);
     const functions: WikiFunctionDto[] = this.parseFunctions(stream, headerFunctions);
 
     if (!headerDescription && !headerFunctions) {
@@ -44,6 +44,7 @@ export class WikiParser {
     if (!this.isDescription(header)) {
       return '';
     }
+    stream.nextHeading(2);
     let description: string = '';
 
     while (stream.hasNext()) {
@@ -52,7 +53,11 @@ export class WikiParser {
       if (this.isFunctions(token)) {
         break;
       }
-      description += this.parseAsText(stream.next());
+      const text: string = this.parseAsText(stream.next());
+
+      if (!(text === '\n\n' && description.endsWith('\n\n'))) {
+        description += text;
+      }
     }
     return description.trim();
   }
@@ -61,6 +66,7 @@ export class WikiParser {
     if (!this.isFunctions(header)) {
       return [];
     }
+    stream.nextHeading(2);
     const functions: WikiFunctionDto[] = [];
 
     while (stream.hasNext()) {
@@ -95,7 +101,11 @@ export class WikiParser {
       if (this.isFunction(token)) {
         break;
       }
-      comment += this.parseAsText(stream.next());
+      const text: string = this.parseAsText(stream.next());
+
+      if (!(text === '\n\n' && comment.endsWith('\n\n'))) {
+        comment += text;
+      }
     }
     comment = comment.trim();
     return {

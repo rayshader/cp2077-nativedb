@@ -22,7 +22,7 @@ export class WikiClient extends GitHubClient {
         }
         let markdown: string = atob(file.content);
 
-        markdown = markdown.replaceAll(/---(.*\n)*---\n\n/gm, '');
+        markdown = markdown.replaceAll(/^---(.*\n)*---\n\n/gm, '');
         return {
           sha: file.sha,
           fileName: file.name,
