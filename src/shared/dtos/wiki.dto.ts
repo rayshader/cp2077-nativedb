@@ -1,6 +1,6 @@
 export interface WikiFileEntryDto {
   readonly sha: string;
-  readonly name: string;
+  readonly fileName: string;
   readonly className: string;
   readonly path: string;
 }

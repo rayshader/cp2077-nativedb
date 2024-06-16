@@ -25,7 +25,7 @@ export class WikiClient extends GitHubClient {
         markdown = markdown.replaceAll(/---(.*\n)*---\n\n/gm, '');
         return {
           sha: file.sha,
-          name: file.name,
+          fileName: file.name,
           className: WikiClient.getClassName(file.name),
           path: file.path,
           markdown: markdown
@@ -40,7 +40,7 @@ export class WikiClient extends GitHubClient {
         return files.map((file) => {
           return {
             sha: file.sha,
-            name: file.name,
+            fileName: file.name,
             className: WikiClient.getClassName(file.name),
             path: file.path
           };
