@@ -47,7 +47,7 @@
     "gulp-brotli": "^3.0.0",
     "gulp-htmlmin": "^5.0.1",
     "jest": "^29.7.0",
-    "jest-preset-angular": "^14.1.0",
+    "jest-preset-angular": "^14.1.1",
     "typescript": "~5.4.5"
   }
 }
