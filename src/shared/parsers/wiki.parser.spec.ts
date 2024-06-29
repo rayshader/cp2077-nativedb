@@ -64,6 +64,9 @@ A hint, block is ignored.
 -- Code w/ lua, block is ignored.
 \`\`\`
 
+Support escape sequences like:
+\\!\\"\\#\\$\\%\\&\\'\\(\\)\\*\\+\\,\\-\\.\\/\\:\\;\\<\\=\\>\\?\\@\\[\\\\\\]\\^\\_\\{\\|\\}\\~\\\`
+
 A new paragraph. An URL [link](https://cyberpunk.net). A list:
 
 * Item A
@@ -85,6 +88,9 @@ A new paragraph. An URL [link](https://cyberpunk.net). A list:
         sha: '',
         name: 'ScriptGameInstance',
         comment: `A simple phrase. A reference to struct [Vector4]. Some block \`style\`.
+
+Support escape sequences like:
+!"#$%&'()*+,-./:;<=>?@[\\]^_{|}~\`
 
 A new paragraph. An URL [link](https://cyberpunk.net). A list:
 

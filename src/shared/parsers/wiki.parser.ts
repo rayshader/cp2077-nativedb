@@ -155,7 +155,8 @@ export class WikiParser {
   }
 
   private sanitizeText(text: string): string {
-    return text.replaceAll(/\\\[/gm, '[');
+    text = text.replaceAll(/\\(?<symbol>[!"#$%&'()*+,\-./:;<=>?@\[\\\]^_{|}~`])/gm, '$<symbol>');
+    return text;
   }
 
   private computeHashFromPrototype(prototypeMatch: RegExpMatchArray): number {
