@@ -14,6 +14,7 @@ export interface RedClassJson {
   readonly e?: RedPropertyJson[]; // properties
   readonly f?: RedFunctionJson[]; // functions
   readonly g?: true; // is struct
+  readonly h?: string; // script to native alias name
 }
 
 export interface RedClassAst extends RedNodeAst {
@@ -48,6 +49,7 @@ export class RedClassAst {
       origin: getOriginFromClassFlags(flags),
       name: name,
       aliasName: json.c,
+      nativeAliasName: json.h,
       isStruct: json.g === true,
       parent: json.a,
       properties: json.e?.map(RedPropertyAst.fromJson) ?? [],

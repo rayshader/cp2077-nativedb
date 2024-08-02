@@ -17,6 +17,9 @@ export interface RedNodeAst {
 
   // Define alias, when it exists, while loading data.
   aliasName?: string;
+
+  // ?
+  nativeAliasName?: string;
 }
 
 export function getRedNodeKindName(kind: RedNodeKind): string {
