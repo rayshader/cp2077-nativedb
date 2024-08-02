@@ -32,6 +32,9 @@ export class NDBTitleBarComponent {
   altTitle?: string;
 
   @Input()
+  nativeAliasTitle?: string;
+
+  @Input()
   hideDocumentation: boolean = false;
 
   @Input()

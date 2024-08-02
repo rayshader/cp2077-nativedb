@@ -5,7 +5,7 @@
       [matTooltip]="altTitle ?? ''"
       matTooltipPosition="right"
       matTooltipShowDelay="500"
-      (click)="copyAltTitle()">{{title}}</h1>
+      (click)="copyAltTitle()">{{title}} {{(nativeAliasTitle) ? '&middot; ' + nativeAliasTitle : ''}}</h1>
   <div class="prototype">
     <ng-content></ng-content>
   </div>

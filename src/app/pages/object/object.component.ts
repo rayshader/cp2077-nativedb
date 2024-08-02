@@ -54,6 +54,7 @@ interface ObjectData {
   readonly object: RedClassAst;
   readonly name: string;
   readonly altName?: string;
+  readonly nativeAliasName?: string;
 
   readonly scope: string;
   readonly isAbstract: boolean;
@@ -468,6 +469,7 @@ export class ObjectComponent {
       object: object,
       name: name,
       altName: altName,
+      nativeAliasName: object.nativeAliasName,
       scope: RedVisibilityDef[object.visibility],
       isAbstract: object.isAbstract,
       parents: object.parents,
