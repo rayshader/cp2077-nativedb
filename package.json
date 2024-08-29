@@ -41,7 +41,7 @@
   "devDependencies": {
     "@angular/build": "^18.1.4",
     "@angular/cli": "^18.1.4",
-    "@angular/compiler-cli": "^18.1.4",
+    "@angular/compiler-cli": "^18.2.2",
     "@types/jest": "^29.5.12",
     "gulp": "^5.0.0",
     "gulp-brotli": "^3.0.0",
