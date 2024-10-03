@@ -27,6 +27,12 @@ export function getRedNodeKindName(kind: RedNodeKind): string {
 
 export class RedNodeAst {
 
+  static testName(node: RedNodeAst, rule: RegExp): boolean {
+    const name: string = node.name.toLowerCase();
+
+    return rule.test(name);
+  }
+
   static hasName(node: RedNodeAst, words: string[]): boolean {
     const name: string = node.name.toLowerCase();
 

@@ -30,6 +30,10 @@ export class RedPropertyAst {
     return a.name.localeCompare(b.name);
   }
 
+  static testByUsage(prop: RedPropertyAst, rule: RegExp): boolean {
+    return RedTypeAst.testType(prop.type, rule);
+  }
+
   static filterByUsage(prop: RedPropertyAst, words: string[]): boolean {
     return RedTypeAst.hasType(prop.type, words);
   }

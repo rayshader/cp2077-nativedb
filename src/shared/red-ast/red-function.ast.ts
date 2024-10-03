@@ -41,6 +41,15 @@ export class RedFunctionAst {
     return a.name.localeCompare(b.name);
   }
 
+  static testByUsage(func: RedFunctionAst, rule: RegExp): boolean {
+    if (func.returnType && RedTypeAst.testType(func.returnType!, rule)) {
+      return true;
+    }
+    const args: RedArgumentAst[] = func.arguments.filter((arg) => RedTypeAst.testType(arg.type, rule));
+
+    return args.length > 0;
+  }
+
   static filterByUsage(func: RedFunctionAst, words: string[]): boolean {
     if (func.returnType && RedTypeAst.hasType(func.returnType!, words)) {
       return true;

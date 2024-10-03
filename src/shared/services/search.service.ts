@@ -72,21 +72,41 @@ export class SearchService {
   }
 
   public static filterProperties(properties: RedPropertyAst[], request: SearchRequest): RedPropertyAst[] {
-    const words: string[] = request.query.toLowerCase().split(' ');
+    const query: string = request.query.toLowerCase();
+    const words: string[] = query.split(' ');
+    const rule: RegExp | undefined = SearchService.createRule(query);
 
     if (request.filter === FilterBy.usage) {
-      return properties.filter((prop) => RedPropertyAst.filterByUsage(prop, words));
+      if (rule) {
+        return properties.filter((prop) => RedPropertyAst.testByUsage(prop, rule));
+      } else {
+        return properties.filter((prop) => RedPropertyAst.filterByUsage(prop, words));
+      }
     }
-    return properties.filter((prop) => RedNodeAst.hasName(prop, words));
+    if (rule) {
+      return properties.filter((prop) => RedNodeAst.testName(prop, rule));
+    } else {
+      return properties.filter((prop) => RedNodeAst.hasName(prop, words));
+    }
   }
 
   public static filterFunctions(functions: RedFunctionAst[], request: SearchRequest): RedFunctionAst[] {
-    const words: string[] = request.query.toLowerCase().split(' ');
+    const query: string = request.query.toLowerCase();
+    const words: string[] = query.split(' ');
+    const rule: RegExp | undefined = SearchService.createRule(query);
 
     if (request.filter === FilterBy.usage) {
-      return functions.filter((func) => RedFunctionAst.filterByUsage(func, words));
+      if (rule) {
+        return functions.filter((func) => RedFunctionAst.testByUsage(func, rule));
+      } else {
+        return functions.filter((func) => RedFunctionAst.filterByUsage(func, words));
+      }
     }
-    return functions.filter((func) => RedNodeAst.hasName(func, words));
+    if (rule) {
+      return functions.filter((func) => RedNodeAst.testName(func, rule));
+    } else {
+      return functions.filter((func) => RedNodeAst.hasName(func, words));
+    }
   }
 
   search(query: string, filter: FilterBy): void {
@@ -166,67 +186,101 @@ export class SearchService {
   }
 
   private filterByName<T extends RedNodeAst>(nodes: T[], query: string): T[] {
-    const words: string[] = query.toLowerCase().split(' ');
+    query = query.toLowerCase();
+    const words: string[] = query.split(' ');
+    const rule: RegExp | undefined = SearchService.createRule(query);
 
     return nodes.filter((node) => {
       const name: string = node.name.toLowerCase();
       const aliasName: string | undefined = node.aliasName?.toLowerCase();
 
-      return words.every((word) => name.includes(word)) ||
-        (!!aliasName && words.every((word) => aliasName.includes(word)));
+      if (rule) {
+        return rule.test(name) || (!!aliasName && rule.test(aliasName));
+      } else {
+        return words.every((word) => name.includes(word)) ||
+          (!!aliasName && words.every((word) => aliasName.includes(word)));
+      }
     });
   }
 
   private filterByProperty<T extends RedNodeAst>(nodes: T[], query: string): T[] {
-    const words: string[] = query.toLowerCase().split(' ');
+    query = query.toLowerCase();
+    const words: string[] = query.split(' ');
+    const rule: RegExp | undefined = SearchService.createRule(query);
 
     return nodes.filter((node) => {
       if (node.kind === RedNodeKind.enum || node.kind === RedNodeKind.bitfield || node.kind === RedNodeKind.function) {
         return false;
       }
       const object: RedClassAst = node as unknown as RedClassAst;
-      const properties: RedPropertyAst[] = object.properties
-        .filter((prop) => RedNodeAst.hasName(prop, words));
+      let properties: RedPropertyAst[] = object.properties;
 
+      if (rule) {
+        properties = properties.filter((prop) => RedNodeAst.testName(prop, rule));
+      } else {
+        properties = properties.filter((prop) => RedNodeAst.hasName(prop, words));
+      }
       return properties.length > 0;
     });
   }
 
   private filterByFunction<T extends RedNodeAst>(nodes: T[], query: string): T[] {
-    const words: string[] = query.toLowerCase().split(' ');
+    query = query.toLowerCase();
+    const words: string[] = query.split(' ');
+    const rule: RegExp | undefined = SearchService.createRule(query);
 
     return nodes.filter((node) => {
       if (node.kind === RedNodeKind.enum || node.kind === RedNodeKind.bitfield || node.kind === RedNodeKind.function) {
         return false;
       }
       const object: RedClassAst = node as unknown as RedClassAst;
-      const functions: RedFunctionAst[] = object.functions
-        .filter((func) => RedNodeAst.hasName(func, words));
+      let functions: RedFunctionAst[] = object.functions;
 
+      if (rule) {
+        functions = functions.filter((func) => RedNodeAst.testName(func, rule));
+      } else {
+        functions = functions.filter((func) => RedNodeAst.hasName(func, words));
+      }
       return functions.length > 0;
     });
   }
 
   private filterByUsage<T extends RedNodeAst>(nodes: T[], query: string): T[] {
-    const words: string[] = query.toLowerCase().split(' ');
+    query = query.toLowerCase();
+    const words: string[] = query.split(' ');
+    const rule: RegExp | undefined = SearchService.createRule(query);
 
     return nodes.filter((node) => {
       if (node.kind === RedNodeKind.enum || node.kind === RedNodeKind.bitfield) {
         return false;
       }
       if (node.kind === RedNodeKind.function) {
-        return RedFunctionAst.filterByUsage(node as unknown as RedFunctionAst, words);
+        if (rule) {
+          return RedFunctionAst.testByUsage(node as unknown as RedFunctionAst, rule);
+        } else {
+          return RedFunctionAst.filterByUsage(node as unknown as RedFunctionAst, words);
+        }
       }
       const object: RedClassAst = node as unknown as RedClassAst;
-      const properties: RedPropertyAst[] = object.properties.filter((prop) => {
-        return RedPropertyAst.filterByUsage(prop, words);
-      });
-      const functions: RedFunctionAst[] = object.functions.filter((func) => {
-        return RedFunctionAst.filterByUsage(func, words);
-      });
+      let properties: RedPropertyAst[] = object.properties;
+      let functions: RedFunctionAst[] = object.functions;
+
+      if (rule) {
+        properties = properties.filter((prop) => RedPropertyAst.testByUsage(prop, rule));
+        functions = functions.filter((func) => RedFunctionAst.testByUsage(func, rule));
+      } else {
+        properties = properties.filter((prop) => RedPropertyAst.filterByUsage(prop, words));
+        functions = functions.filter((func) => RedFunctionAst.filterByUsage(func, words));
+      }
 
       return properties.length > 0 || functions.length > 0;
     });
+  }
+
+  private static createRule(query: string): RegExp | undefined {
+    const rule: string = query.replaceAll('*', '.*');
+
+    return query.includes('*') ? RegExp(`^${rule}$`) : undefined;
   }
 
 }

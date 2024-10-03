@@ -25,6 +25,19 @@ export class RedTypeAst {
     return type.flag !== undefined && type.flag >= RedTemplateDef.ref && type.flag <= RedTemplateDef.multiChannelCurve;
   }
 
+  static testType(type: RedTypeAst, rule: RegExp): boolean {
+    if (RedTypeAst.isPrimitive(type)) {
+      return false;
+    }
+    if (type.innerType) {
+      return this.testType(type.innerType, rule);
+    }
+    const name: string = type.name.toLowerCase();
+    const aliasName: string | undefined = type.aliasName?.toLowerCase();
+
+    return rule.test(name) || (!!aliasName && rule.test(aliasName));
+  }
+
   static hasType(type: RedTypeAst, words: string[]): boolean {
     if (RedTypeAst.isPrimitive(type)) {
       return false;
