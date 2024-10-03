@@ -6,6 +6,15 @@
   a {
     color: map.get($primary, 500);
   }
+
+  code {
+    padding: 0 4px;
+
+    color: var(--ndb-ide-text);
+    border: 1px solid #6f6f6f;
+    border-radius: 4px;
+    background-color: var(--ndb-ide-toolbar);
+  }
 }
 
 @mixin core-color($theme) {

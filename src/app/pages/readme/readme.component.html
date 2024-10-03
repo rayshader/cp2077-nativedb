@@ -34,6 +34,17 @@
   </p>
 
   <p>
+    You can use <code class="stx">*</code> to create queries such as:
+  </p>
+
+  <ul>
+    <li><code class="stx">AI*task</code> : starts with <code class="stx">AI</code> and ends with <code class="stx">task</code>.</li>
+    <li><code class="stx">money*</code> : starts with <code class="stx">money</code>.</li>
+    <li><code class="stx">*ID</code> : ends with <code class="stx">ID</code>.</li>
+    <li><code class="stx">*task*</code> : this is useless and the same as <code class="stx">task</code> alone.</li>
+  </ul>
+
+  <p>
     You can choose what your query will search for. This icon <mat-icon>tune</mat-icon> provides a few options:
   </p>
 
@@ -58,7 +69,7 @@
   <p>
     You can see items, in the left panel, with a <span class="stx-type disabled">darker color</span> to tell you
     "there is nothing to see". Whether its a class or a struct, it means there is no properties nor functions. However,
-    it might still inherit from parents and/or be inherited by children. You can change this behavior in the settings.
+    it might still inherit from parents and / or be inherited by children. You can change this behavior in the settings.
   </p>
 </article>
 
@@ -104,8 +115,8 @@
     All definitions are using native names like <span class="stx-type">vehicleBaseObject</span>. But some also contains
     an alias name from scripts like <span class="stx-type">VehicleObject</span>. If you select <em>Redscript</em> as a
     code syntax in Settings, it will show aliases when possible. Independently of this option, the name will be
-    <span class="stx stx-type stx-highlight">highlighted</span> to indicate there is a native/alias name. You can hover
-    the name to show it in a tooltip, and click on it to copy the name in your clipboard.
+    <span class="stx stx-type stx-highlight">highlighted</span> to indicate there is a native / alias name. You can
+    hover the name to show it in a tooltip, and click on it to copy the name in your clipboard.
   </p>
 
   <p>
@@ -157,7 +168,7 @@
 
   <p>
     You can reference any part of this database using the URL in your browser. All links are unique and will always
-    point to the same content. You can also directly reference a function of a class/struct. You should use icon
+    point to the same content. You can also directly reference a function of a class / struct. You should use icon
     <mat-icon>share</mat-icon> when present to copy a more user-friendly link.
   </p>
 </article>
