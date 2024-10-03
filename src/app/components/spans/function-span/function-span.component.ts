@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, DestroyRef, Input} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, Input} from '@angular/core';
 import {ArgumentSpanComponent} from "../argument-span/argument-span.component";
 import {TypeSpanComponent} from "../type-span/type-span.component";
 
@@ -21,6 +21,7 @@ import {WikiClassDto, WikiFunctionDto} from "../../../../shared/dtos/wiki.dto";
 @Component({
   selector: 'function-span',
   standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink,
     MatMenu,
@@ -87,6 +88,7 @@ export class FunctionSpanComponent implements AfterViewInit {
 
   constructor(protected readonly fmtService: CodeFormatterService,
               private readonly settingsService: SettingsService,
+              private readonly cdr: ChangeDetectorRef,
               private readonly dr: DestroyRef) {
   }
 
@@ -213,6 +215,7 @@ export class FunctionSpanComponent implements AfterViewInit {
       return;
     }
     this.isVisible = state;
+    this.cdr.detectChanges();
   }
 
 }
