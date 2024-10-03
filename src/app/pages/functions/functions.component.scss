@@ -11,6 +11,18 @@
   }
 }
 
+.setting {
+  display: flex;
+
+  & mat-icon {
+    margin-right: 24px;
+  }
+
+  & mat-slide-toggle {
+    margin-top: 1px;
+  }
+}
+
 .skt-function-def {
   display: flex;
   align-items: start;

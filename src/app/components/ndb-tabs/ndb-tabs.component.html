@@ -18,10 +18,18 @@
           <mat-divider></mat-divider>
 
           @if (tab.icon === 'function') {
-            <a class="stx stx-type"
-               routerLink="/f">
-              Global functions
-            </a>
+            <div class="setting">
+              <a class="stx stx-type" routerLink="/f">
+                Global functions
+              </a>
+
+              <mat-slide-toggle class="align"
+                                color="primary"
+                                matTooltip="Show/hide operators and casts"
+                                [formControl]="ignoreDuplicate">
+                {{ignoreDuplicate.value ? "Hide" : "Show"}}
+              </mat-slide-toggle>
+            </div>
 
             <mat-divider></mat-divider>
           }

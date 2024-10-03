@@ -17,6 +17,21 @@ mat-tab-group {
   margin-top: 4px;
 }
 
+.setting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  a {
+    flex: 1;
+    margin-right: 24px;
+  }
+
+  mat-slide-toggle {
+    width: 96px;
+  }
+}
+
 .slider {
   cursor: col-resize;
   display: flex;

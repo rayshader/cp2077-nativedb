@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef} from '@angular/core';
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {combineLatest, map, Observable} from "rxjs";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
@@ -9,6 +9,11 @@ import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar
 import {MatDividerModule} from "@angular/material/divider";
 import {ResponsiveService} from "../../../shared/services/responsive.service";
 import {MatTooltip} from "@angular/material/tooltip";
+import {MatFormField, MatLabel} from "@angular/material/form-field";
+import {MatSlideToggle} from "@angular/material/slide-toggle";
+import {FormControl, ReactiveFormsModule} from "@angular/forms";
+import {SettingsService} from "../../../shared/services/settings.service";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 interface FunctionsData {
   readonly functions: RedFunctionAst[];
@@ -22,8 +27,12 @@ interface FunctionsData {
   imports: [
     AsyncPipe,
     MatTooltip,
+    MatLabel,
+    MatFormField,
+    MatSlideToggle,
     MatIconModule,
     MatDividerModule,
+    ReactiveFormsModule,
     FunctionSpanComponent,
     NDBTitleBarComponent
   ],
@@ -54,8 +63,12 @@ export class FunctionsComponent {
     'ArraySortInts() → Void'
   ];
 
+  readonly ignoreDuplicate: FormControl<boolean> = new FormControl<boolean>(false, {nonNullable: true});
+
   constructor(private readonly dumpService: RedDumpService,
-              private readonly responsiveService: ResponsiveService) {
+              private readonly settingsService: SettingsService,
+              private readonly responsiveService: ResponsiveService,
+              private readonly dr: DestroyRef) {
     this.data$ = combineLatest([
       this.dumpService.functions$,
       this.responsiveService.mobile$
@@ -67,6 +80,20 @@ export class FunctionsComponent {
         };
       })
     );
+    this.settingsService.ignoreDuplicate$.pipe(
+      takeUntilDestroyed(this.dr)
+    ).subscribe(this.onIgnoreDuplicate.bind(this));
+    this.ignoreDuplicate.valueChanges.pipe(
+      takeUntilDestroyed(this.dr)
+    ).subscribe(this.onIgnoreDuplicateUpdated.bind(this));
+  }
+
+  private onIgnoreDuplicate(ignore: boolean) {
+    this.ignoreDuplicate.setValue(ignore, {emitEvent: false});
+  }
+
+  private onIgnoreDuplicateUpdated(value: boolean) {
+    this.settingsService.updateIgnoreDuplicate(value);
   }
 
 }

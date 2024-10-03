@@ -1,6 +1,12 @@
 @if (data$ | async; as data) {
   <ndb-title-bar [title]="'Global functions'">
-    <mat-icon class="badge-function" svgIcon="function" matTooltip="function"></mat-icon>
+    <div class="setting">
+      <mat-icon class="badge-function" svgIcon="function" matTooltip="function"></mat-icon>
+
+      <mat-slide-toggle class="align" color="primary" [formControl]="ignoreDuplicate">
+        {{ignoreDuplicate.value ? "Hide" : "Show"}} operators and casts
+      </mat-slide-toggle>
+    </div>
   </ndb-title-bar>
 
   @for (func of data.functions; track func.fullName) {

@@ -3,7 +3,7 @@ import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatSelectModule} from "@angular/material/select";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {combineLatest, take} from "rxjs";
+import {combineLatest} from "rxjs";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {CodeSyntax, Settings, SettingsService} from "../../../shared/services/settings.service";
@@ -57,7 +57,7 @@ export class SettingsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.settingsService.settings$.pipe(take(1), takeUntilDestroyed(this.dr)).subscribe(this.onSettingsLoaded.bind(this));
+    this.settingsService.settings$.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onSettingsLoaded.bind(this));
     combineLatest([this.settingsService.clipboard$, this.settingsService.code$])
       .pipe(takeUntilDestroyed(this.dr))
       .subscribe(this.onSyntaxChanged.bind(this));

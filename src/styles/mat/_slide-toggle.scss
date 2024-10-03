@@ -4,6 +4,12 @@
       min-width: 92px;
       margin-left: 12px!important;
     }
+
+    &.align {
+      & label {
+        margin-top: 2px;
+      }
+    }
   }
 }
 

@@ -22,6 +22,8 @@ import {SettingsService} from "../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {ResponsiveService} from "../../../shared/services/responsive.service";
+import {MatSlideToggle} from "@angular/material/slide-toggle";
+import {FormControl, ReactiveFormsModule} from "@angular/forms";
 
 export interface TabItemNode {
   readonly id: number;
@@ -54,8 +56,10 @@ interface ViewData {
     CdkVirtualScrollViewport,
     MatIconModule,
     MatTabsModule,
+    MatSlideToggle,
     MatDividerModule,
-    MatTooltipModule
+    MatTooltipModule,
+    ReactiveFormsModule
   ],
   templateUrl: './ndb-tabs.component.html',
   styleUrl: './ndb-tabs.component.scss'
@@ -70,6 +74,8 @@ export class NDBTabsComponent implements AfterViewInit {
 
   readonly data$: Observable<ViewData>;
 
+  readonly ignoreDuplicate: FormControl<boolean> = new FormControl<boolean>(false, {nonNullable: true});
+
   width: string = '320px';
 
   private isResizing: boolean = false;
@@ -81,6 +87,12 @@ export class NDBTabsComponent implements AfterViewInit {
               private readonly responsiveService: ResponsiveService,
               private readonly dr: DestroyRef) {
     this.settingsService.tabsWidth$.pipe(first(), takeUntilDestroyed()).subscribe(this.onWidthLoaded.bind(this));
+    this.settingsService.ignoreDuplicate$.pipe(
+      takeUntilDestroyed()
+    ).subscribe(this.onIgnoreDuplicate.bind(this));
+    this.ignoreDuplicate.valueChanges.pipe(
+      takeUntilDestroyed(this.dr)
+    ).subscribe(this.onIgnoreDuplicateUpdated.bind(this));
     this.data$ = combineLatest([
       this.getTabs(),
       this.responsiveService.mobile$
@@ -149,6 +161,14 @@ export class NDBTabsComponent implements AfterViewInit {
 
   private onWidthLoaded(width: number): void {
     this.width = `${width}px`;
+  }
+
+  private onIgnoreDuplicate(ignore: boolean) {
+    this.ignoreDuplicate.setValue(ignore, {emitEvent: false});
+  }
+
+  private onIgnoreDuplicateUpdated(value: boolean) {
+    this.settingsService.updateIgnoreDuplicate(value);
   }
 
   private getTabs(): Observable<TabItem[]> {
