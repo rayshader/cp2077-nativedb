@@ -1,5 +1,6 @@
-import {Directive, ElementRef, HostBinding, HostListener, OnInit} from '@angular/core';
+import {DestroyRef, Directive, ElementRef, HostBinding, HostListener, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from "@angular/router";
+import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 @Directive({
   selector: '[ndbHighlight]',
@@ -12,6 +13,7 @@ export class NDBHighlightDirective implements OnInit {
 
   constructor(private readonly route: ActivatedRoute,
               private readonly router: Router,
+              private readonly dr: DestroyRef,
               private readonly el: ElementRef) {
   }
 
@@ -22,10 +24,13 @@ export class NDBHighlightDirective implements OnInit {
   }
 
   ngOnInit(): void {
-    let fragment: string | undefined = this.route.snapshot.fragment ?? undefined;
-    let id: number = parseInt(fragment ?? '-1');
+    this.route.fragment.pipe(
+      takeUntilDestroyed(this.dr)
+    ).subscribe((fragment) => {
+      const id: number = parseInt(fragment ?? '-1');
 
-    this.isHighlight = id === this.id;
+      this.isHighlight = id === this.id;
+    });
   }
 
   @HostListener('mouseenter')

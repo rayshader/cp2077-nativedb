@@ -1,4 +1,4 @@
-import {ApplicationRef, ChangeDetectionStrategy, Component, DestroyRef, Input} from '@angular/core';
+import {AfterViewInit, ApplicationRef, ChangeDetectionStrategy, Component, DestroyRef, Input} from '@angular/core';
 import {AsyncPipe} from "@angular/common";
 import {CdkAccordionModule} from "@angular/cdk/accordion";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
@@ -9,9 +9,8 @@ import {TypeSpanComponent} from "../../components/spans/type-span/type-span.comp
 import {
   BehaviorSubject,
   combineLatest,
+  delay,
   EMPTY,
-  filter,
-  first,
   map,
   Observable,
   of,
@@ -119,7 +118,7 @@ type MemberFilter = 'empty' | 'disable' | 'enable';
   templateUrl: './object.component.html',
   styleUrl: './object.component.scss'
 })
-export class ObjectComponent {
+export class ObjectComponent implements AfterViewInit {
 
   readonly badgesProperty: BadgeFilterItem<RedPropertyAst>[] = [
     {
@@ -231,7 +230,8 @@ export class ObjectComponent {
     const object$: Observable<RedClassAst> = this.loadObject(+id);
     const documentation$: Observable<WikiClassDto | undefined> = object$.pipe(this.getDocumentation());
 
-    this.settingsService.showDocumentation$.pipe(take(1), takeUntilDestroyed(this.dr))
+    this.settingsService.showDocumentation$
+      .pipe(take(1), takeUntilDestroyed(this.dr))
       .subscribe((show) => this.showDocumentationSubject.next(show));
 
     this.data$ = combineLatest([
@@ -246,6 +246,12 @@ export class ObjectComponent {
     ]).pipe(
       map(this.loadData.bind(this))
     );
+  }
+
+  ngAfterViewInit(): void {
+    this.route.fragment.pipe(
+      takeUntilDestroyed(this.dr)
+    ).subscribe(this.onScrollToFragment.bind(this));
   }
 
   getFilterTooltip(badge: BadgeFilterItem<any>, isFiltered: boolean): string {
@@ -459,9 +465,8 @@ export class ObjectComponent {
       name = object.aliasName;
       altName = object.name;
     }
-    this.app.isStable.pipe(
-      filter((stable: boolean) => stable),
-      first(),
+    of(true).pipe(
+      delay(1),
       takeUntilDestroyed(this.dr)
     ).subscribe(this.onScrollToFragment.bind(this));
     return <ObjectData>{
