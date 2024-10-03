@@ -3,7 +3,7 @@
     <mat-icon class="badge-function" svgIcon="function" matTooltip="function"></mat-icon>
   </ndb-title-bar>
 
-  @for (func of data.functions; track func.id) {
+  @for (func of data.functions; track func.fullName) {
     <function-span [node]="func" [canCopy]="true" [canShare]="false"></function-span>
     @if (data.isMobile && !$last) {
       <mat-divider></mat-divider>
