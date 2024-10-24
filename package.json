@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@angular/build": "^18.2.7",
-    "@angular/cli": "^18.2.7",
+    "@angular/cli": "^18.2.10",
     "@angular/compiler-cli": "^18.2.7",
     "@types/jest": "^29.5.13",
     "gulp": "^5.0.0",
