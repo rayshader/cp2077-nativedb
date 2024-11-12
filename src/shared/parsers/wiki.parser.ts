@@ -26,8 +26,12 @@ export class WikiParser {
     const headerDescription: Tokens.Heading | undefined = stream.nextHeading(2, true);
     const comment: string = this.parseDescription(stream, headerDescription);
     const headerFunctions: Tokens.Heading | undefined = stream.nextHeading(2, true);
-    const functions: WikiFunctionDto[] = this.parseFunctions(stream, headerFunctions);
+    let functions: WikiFunctionDto[] = [];
 
+    if (this.isFunctions(headerFunctions)) {
+      stream.nextHeading(2);
+      functions = this.parseFunctions(stream);
+    }
     if (!headerDescription && !headerFunctions) {
       throw new WikiParserError(name, WikiParserErrorCode.noContent);
     }
@@ -62,11 +66,7 @@ export class WikiParser {
     return description.trim();
   }
 
-  private parseFunctions(stream: WikiTokenStream, header?: Tokens.Heading): WikiFunctionDto[] {
-    if (!this.isFunctions(header)) {
-      return [];
-    }
-    stream.nextHeading(2);
+  private parseFunctions(stream: WikiTokenStream): WikiFunctionDto[] {
     const functions: WikiFunctionDto[] = [];
 
     while (stream.hasNext()) {
