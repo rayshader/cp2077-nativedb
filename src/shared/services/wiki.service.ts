@@ -33,22 +33,22 @@ export class WikiService {
   private readonly invalidationDelay: number = 10 * 60 * 1000;
   private readonly nextErrorAt: Date;
 
-  constructor(private readonly wikiClassesRepository: WikiClassesRepository,
-              private readonly wikiGlobalsRepository: WikiGlobalsRepository,
-              private readonly wikiClient: WikiClient,
-              private readonly wikiParser: WikiParser,
+  constructor(private readonly classesRepository: WikiClassesRepository,
+              private readonly globalsRepository: WikiGlobalsRepository,
+              private readonly client: WikiClient,
+              private readonly parser: WikiParser,
               private readonly toast: MatSnackBar) {
-    this.classes$ = this.wikiClient.getClasses().pipe(this.invalidateClasses());
-    this.globals$ = this.wikiClient.getGlobals().pipe(this.invalidateGlobals());
+    this.classes$ = this.client.getClasses().pipe(this.invalidateClasses());
+    this.globals$ = this.client.getGlobals().pipe(this.invalidateGlobals());
     this.nextErrorAt = new Date();
   }
 
   public getClass(name: string): Observable<WikiClassDto | undefined> {
     return this.findClass(name).pipe(
-      combineLatestWith(this.wikiClassesRepository.findByName(name)),
+      combineLatestWith(this.classesRepository.findByName(name)),
       switchMap(([file, cache]: [WikiFileEntryDto | undefined, WikiClassDto | undefined]) => {
         if (!file && cache) {
-          return this.wikiClassesRepository.delete(cache.id).pipe(map(() => undefined));
+          return this.classesRepository.delete(cache.id).pipe(map(() => undefined));
         }
         if (!file) {
           return of(undefined);
@@ -71,8 +71,8 @@ export class WikiService {
 
   public getGlobals(): Observable<WikiGlobalDto[]> {
     return this.globals$.pipe(
-      map((file: WikiFileDto) => this.wikiParser.parseGlobals(file)),
-      combineLatestWith(this.wikiGlobalsRepository.findAll()),
+      map((file: WikiFileDto) => this.parser.parseGlobals(file)),
+      combineLatestWith(this.globalsRepository.findAll()),
       switchMap(([globals, caches]: [WikiGlobalDto[], WikiGlobalDto[]]) => {
         const operations$: Observable<WikiGlobalDto | undefined>[] = [];
 
@@ -80,7 +80,7 @@ export class WikiService {
           const global: WikiGlobalDto | undefined = globals.find((item) => item.name === cache.name);
 
           if (!global) {
-            operations$.push(this.wikiGlobalsRepository.delete(cache.id).pipe(map(() => undefined)));
+            operations$.push(this.globalsRepository.delete(cache.id).pipe(map(() => undefined)));
           }
         }
         for (const global of globals) {
@@ -97,15 +97,15 @@ export class WikiService {
   }
 
   private requestClass(name: string, cache?: WikiClassDto): Observable<WikiClassDto | undefined> {
-    return this.wikiClient.getClass(name).pipe(
-      map((file: WikiFileDto) => this.wikiParser.parseClass(file, name)),
+    return this.client.getClass(name).pipe(
+      map((file: WikiFileDto) => this.parser.parseClass(file, name)),
       switchMap((wikiClass: WikiClassDto) => {
         let operation$: Observable<number> = of(NaN);
 
         if (!cache) {
-          operation$ = this.wikiClassesRepository.create(wikiClass);
+          operation$ = this.classesRepository.create(wikiClass);
         } else if (wikiClass.sha !== cache.sha) {
-          operation$ = this.wikiClassesRepository.update(wikiClass);
+          operation$ = this.classesRepository.update(wikiClass);
         }
         return operation$.pipe(map(() => wikiClass));
       }),
@@ -119,9 +119,9 @@ export class WikiService {
     if (global.sha === cache?.sha) {
       operation$ = of(cache);
     } else if (!cache) {
-      operation$ = this.wikiGlobalsRepository.create(global).pipe(map(() => global));
+      operation$ = this.globalsRepository.create(global).pipe(map(() => global));
     } else if (global.sha !== cache.sha) {
-      operation$ = this.wikiGlobalsRepository.update(global).pipe(map(() => global));
+      operation$ = this.globalsRepository.update(global).pipe(map(() => global));
     }
     return operation$;
   }
@@ -136,14 +136,14 @@ export class WikiService {
 
   private invalidateClasses(): OperatorFunction<WikiFileEntryDto[], WikiFileEntryDto[]> {
     return pipe(
-      expand(() => timer(this.invalidationDelay).pipe(switchMap(() => this.wikiClient.getClasses()))),
+      expand(() => timer(this.invalidationDelay).pipe(switchMap(() => this.client.getClasses()))),
       shareReplay(1)
     );
   }
 
   private invalidateGlobals(): OperatorFunction<WikiFileDto, WikiFileDto> {
     return pipe(
-      expand(() => timer(this.invalidationDelay).pipe(switchMap(() => this.wikiClient.getGlobals()))),
+      expand(() => timer(this.invalidationDelay).pipe(switchMap(() => this.client.getGlobals()))),
       shareReplay(1)
     );
   }
