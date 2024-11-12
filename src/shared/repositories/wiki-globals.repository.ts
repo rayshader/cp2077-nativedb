@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {CrudRepository} from "./crud.repository";
-import {WikiClassDto} from "../dtos/wiki.dto";
+import {WikiGlobalDto} from "../dtos/wiki.dto";
 import {Table} from "dexie";
 import {Observable} from "rxjs";
 import {fromPromise} from "rxjs/internal/observable/innerFrom";
@@ -9,17 +9,17 @@ import {WikiDB} from "./wiki.database";
 @Injectable({
   providedIn: 'root'
 })
-export class WikiRepository extends CrudRepository<WikiClassDto> {
+export class WikiGlobalsRepository extends CrudRepository<WikiGlobalDto> {
 
   constructor(db: WikiDB) {
     super(db);
   }
 
-  protected override get table(): Table<WikiClassDto, number, WikiClassDto> {
-    return this.db.classes;
+  protected override get table(): Table<WikiGlobalDto, number, WikiGlobalDto> {
+    return this.db.globals;
   }
 
-  public findByName(name: string): Observable<WikiClassDto | undefined> {
+  public findByName(name: string): Observable<WikiGlobalDto | undefined> {
     return fromPromise(this.table.where('name').equalsIgnoreCase(name).first());
   }
 

@@ -14,9 +14,16 @@ import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {SettingsService} from "../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {WikiService} from "../../../shared/services/wiki.service";
+import {WikiGlobalDto} from "../../../shared/dtos/wiki.dto";
+
+interface FunctionData {
+  readonly func: RedFunctionAst;
+  readonly documentation: WikiGlobalDto;
+}
 
 interface FunctionsData {
-  readonly functions: RedFunctionAst[];
+  readonly functions: FunctionData[];
   readonly isMobile: boolean;
 }
 
@@ -66,17 +73,24 @@ export class FunctionsComponent {
   readonly ignoreDuplicate: FormControl<boolean> = new FormControl<boolean>(false, {nonNullable: true});
 
   constructor(private readonly dumpService: RedDumpService,
+              private readonly wikiService: WikiService,
               private readonly settingsService: SettingsService,
               private readonly responsiveService: ResponsiveService,
               private readonly dr: DestroyRef) {
     this.data$ = combineLatest([
       this.dumpService.functions$,
+      this.wikiService.getGlobals(),
       this.responsiveService.mobile$
     ]).pipe(
-      map(([functions, isMobile]) => {
+      map(([functions, wikiGlobals, isMobile]) => {
         return {
-          functions,
-          isMobile
+          functions: functions.map((func) => {
+            return <FunctionData>{
+              func: func,
+              documentation: wikiGlobals.find((wikiGlobal) => wikiGlobal.id === func.id),
+            };
+          }),
+          isMobile: isMobile
         };
       })
     );

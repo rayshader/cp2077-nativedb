@@ -1,7 +1,7 @@
 export interface WikiFileEntryDto {
   readonly sha: string;
   readonly fileName: string;
-  readonly className: string;
+  readonly className: string | 'GLOBALS';
   readonly path: string;
 }
 
@@ -21,4 +21,8 @@ export interface WikiFunctionDto {
   readonly id: number;
   readonly name: string;
   readonly comment: string;
+}
+
+export interface WikiGlobalDto extends WikiFunctionDto {
+  readonly sha: string;
 }

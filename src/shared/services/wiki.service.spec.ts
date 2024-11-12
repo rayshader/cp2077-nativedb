@@ -1,5 +1,5 @@
 import {WikiService} from "./wiki.service";
-import {WikiRepository} from "../repositories/wiki.repository";
+import {WikiClassesRepository} from "../repositories/wiki-classes.repository";
 import {WikiClient} from "../clients/wiki.client";
 import {WikiParser, WikiParserError, WikiParserErrorCode} from "../parsers/wiki.parser";
 import {MatSnackBar} from "@angular/material/snack-bar";
@@ -8,6 +8,7 @@ import {WikiClassDto, WikiFileDto, WikiFileEntryDto} from "../dtos/wiki.dto";
 import {cyrb53} from "../string";
 import {GitHubRateLimit, GitHubRateLimitError} from "../clients/github.client";
 import {HttpHeaders} from "@angular/common/http";
+import {WikiGlobalsRepository} from "../repositories/wiki-globals.repository";
 import SpyInstance = jest.SpyInstance;
 
 /**
@@ -18,7 +19,8 @@ type PartialMock<T> = {
 };
 
 describe('WikiService', () => {
-  let mockRepository: PartialMock<WikiRepository>;
+  let mockClassesRepository: PartialMock<WikiClassesRepository>;
+  let mockGlobalsRepository: PartialMock<WikiGlobalsRepository>;
   let mockClient: PartialMock<WikiClient>;
   let mockToast: PartialMock<MatSnackBar>;
 
@@ -27,7 +29,13 @@ describe('WikiService', () => {
   let service: WikiService;
 
   beforeAll(() => {
-    mockRepository = {
+    mockClassesRepository = {
+      findByName: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    };
+    mockGlobalsRepository = {
       findByName: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
@@ -35,6 +43,7 @@ describe('WikiService', () => {
     };
     mockClient = {
       getClasses: jest.fn(),
+      getGlobals: jest.fn(),
       getClass: jest.fn(),
     };
     mockToast = {
@@ -48,10 +57,15 @@ describe('WikiService', () => {
   });
 
   afterEach(() => {
-    mockRepository.findByName.mockReset();
-    mockRepository.create.mockReset();
-    mockRepository.update.mockReset();
-    mockRepository.delete.mockReset();
+    mockClassesRepository.findByName.mockReset();
+    mockClassesRepository.create.mockReset();
+    mockClassesRepository.update.mockReset();
+    mockClassesRepository.delete.mockReset();
+
+    mockGlobalsRepository.findByName.mockReset();
+    mockGlobalsRepository.create.mockReset();
+    mockGlobalsRepository.update.mockReset();
+    mockGlobalsRepository.delete.mockReset();
 
     mockClient.getClasses.mockReset();
     mockClient.getClass.mockReset();
@@ -61,7 +75,8 @@ describe('WikiService', () => {
 
   const setup = () => {
     service = new WikiService(
-      mockRepository as unknown as WikiRepository,
+      mockClassesRepository as unknown as WikiClassesRepository,
+      mockGlobalsRepository as unknown as WikiGlobalsRepository,
       mockClient as unknown as WikiClient,
       parser,
       mockToast as unknown as MatSnackBar
@@ -86,6 +101,10 @@ describe('WikiService', () => {
       spyParseClass = jest.spyOn(parser, 'parseClass');
     });
 
+    beforeEach(() => {
+      mockClient.getGlobals.mockReturnValueOnce(of());
+    });
+
     afterEach(() => {
       spyParseClass.mockClear();
     });
@@ -98,7 +117,7 @@ describe('WikiService', () => {
         {sha: '', path: '', fileName: 'scriptgameinstance.md', className: 'scriptgameinstance'}
       ]));
       mockClient.getClass.mockReturnValueOnce(throwError(() => error));
-      mockRepository.findByName.mockReturnValueOnce(of(undefined));
+      mockClassesRepository.findByName.mockReturnValueOnce(of(undefined));
       setup();
 
       // WHEN
@@ -110,9 +129,9 @@ describe('WikiService', () => {
         'Failed to get documentation from GitBook. Reason: api rate limit reached.'
       );
       expect(spyParseClass).not.toHaveBeenCalled();
-      expect(mockRepository.create).not.toHaveBeenCalled();
-      expect(mockRepository.update).not.toHaveBeenCalled();
-      expect(mockRepository.delete).not.toHaveBeenCalled();
+      expect(mockClassesRepository.create).not.toHaveBeenCalled();
+      expect(mockClassesRepository.update).not.toHaveBeenCalled();
+      expect(mockClassesRepository.delete).not.toHaveBeenCalled();
     });
 
     it('should show a toast when WikiParserError is thrown without title', async () => {
@@ -123,7 +142,7 @@ describe('WikiService', () => {
         {sha: '', path: '', fileName: 'scriptgameinstance.md', className: 'scriptgameinstance'}
       ]));
       mockClient.getClass.mockReturnValueOnce(throwError(() => error));
-      mockRepository.findByName.mockReturnValueOnce(of(undefined));
+      mockClassesRepository.findByName.mockReturnValueOnce(of(undefined));
       setup();
 
       // WHEN
@@ -135,9 +154,9 @@ describe('WikiService', () => {
         'Failed to parse documentation. Reason: no title found for \`ScriptGameInstance\`.'
       );
       expect(spyParseClass).not.toHaveBeenCalled();
-      expect(mockRepository.create).not.toHaveBeenCalled();
-      expect(mockRepository.update).not.toHaveBeenCalled();
-      expect(mockRepository.delete).not.toHaveBeenCalled();
+      expect(mockClassesRepository.create).not.toHaveBeenCalled();
+      expect(mockClassesRepository.update).not.toHaveBeenCalled();
+      expect(mockClassesRepository.delete).not.toHaveBeenCalled();
     });
 
     it('should show a toast when WikiParserError is thrown without content', async () => {
@@ -148,7 +167,7 @@ describe('WikiService', () => {
         {sha: '', path: '', fileName: 'scriptgameinstance.md', className: 'scriptgameinstance'}
       ]));
       mockClient.getClass.mockReturnValueOnce(throwError(() => error));
-      mockRepository.findByName.mockReturnValueOnce(of(undefined));
+      mockClassesRepository.findByName.mockReturnValueOnce(of(undefined));
       setup();
 
       // WHEN
@@ -160,9 +179,9 @@ describe('WikiService', () => {
         'Failed to parse documentation. Reason: no description nor functions found for \`ScriptGameInstance\`.'
       );
       expect(spyParseClass).not.toHaveBeenCalled();
-      expect(mockRepository.create).not.toHaveBeenCalled();
-      expect(mockRepository.update).not.toHaveBeenCalled();
-      expect(mockRepository.delete).not.toHaveBeenCalled();
+      expect(mockClassesRepository.create).not.toHaveBeenCalled();
+      expect(mockClassesRepository.update).not.toHaveBeenCalled();
+      expect(mockClassesRepository.delete).not.toHaveBeenCalled();
     });
 
     it('should show a toast when an unknown Error is thrown', async () => {
@@ -173,7 +192,7 @@ describe('WikiService', () => {
         {sha: '', path: '', fileName: 'scriptgameinstance.md', className: 'scriptgameinstance'}
       ]));
       mockClient.getClass.mockReturnValueOnce(throwError(() => error));
-      mockRepository.findByName.mockReturnValueOnce(of(undefined));
+      mockClassesRepository.findByName.mockReturnValueOnce(of(undefined));
       setup();
 
       // WHEN
@@ -183,16 +202,16 @@ describe('WikiService', () => {
       await expect(promise).resolves.toEqual(undefined);
       expect(mockToast.open).toHaveBeenCalledWith('Failed to get documentation from GitBook. Reason: unknown.');
       expect(spyParseClass).not.toHaveBeenCalled();
-      expect(mockRepository.create).not.toHaveBeenCalled();
-      expect(mockRepository.update).not.toHaveBeenCalled();
-      expect(mockRepository.delete).not.toHaveBeenCalled();
+      expect(mockClassesRepository.create).not.toHaveBeenCalled();
+      expect(mockClassesRepository.update).not.toHaveBeenCalled();
+      expect(mockClassesRepository.delete).not.toHaveBeenCalled();
     });
 
 
     it('should emit undefined when page is not found in cache and request is empty', async () => {
       // GIVEN
       mockClient.getClasses.mockReturnValueOnce(of([]));
-      mockRepository.findByName.mockReturnValueOnce(of(undefined));
+      mockClassesRepository.findByName.mockReturnValueOnce(of(undefined));
       setup();
 
       // WHEN
@@ -218,8 +237,8 @@ describe('WikiService', () => {
 Parsing Markdown is already tested in WikiParser...`,
         path: ''
       }));
-      mockRepository.findByName.mockReturnValueOnce(of(undefined));
-      mockRepository.create.mockReturnValueOnce(of(42));
+      mockClassesRepository.findByName.mockReturnValueOnce(of(undefined));
+      mockClassesRepository.create.mockReturnValueOnce(of(42));
       setup();
 
       // WHEN
@@ -234,9 +253,9 @@ Parsing Markdown is already tested in WikiParser...`,
         functions: []
       }));
       expect(spyParseClass).toHaveBeenCalled();
-      expect(mockRepository.create).toHaveBeenCalled();
-      expect(mockRepository.update).not.toHaveBeenCalled();
-      expect(mockRepository.delete).not.toHaveBeenCalled();
+      expect(mockClassesRepository.create).toHaveBeenCalled();
+      expect(mockClassesRepository.update).not.toHaveBeenCalled();
+      expect(mockClassesRepository.delete).not.toHaveBeenCalled();
     });
 
     it('should emit and update class in cache when page is found but request is newer', async () => {
@@ -255,14 +274,14 @@ Parsing Markdown is already tested in WikiParser...`,
 Data is different between GitHub and cache...`,
         path: ''
       }));
-      mockRepository.findByName.mockReturnValueOnce(of({
+      mockClassesRepository.findByName.mockReturnValueOnce(of({
         id: cyrb53('ScriptGameInstance'),
         name: 'ScriptGameInstance',
         sha: '1',
         comment: 'Parsing Markdown is already tested in WikiParser...',
         functions: []
       }));
-      mockRepository.update.mockReturnValueOnce(of(42));
+      mockClassesRepository.update.mockReturnValueOnce(of(42));
       setup();
 
       // WHEN
@@ -277,9 +296,9 @@ Data is different between GitHub and cache...`,
         functions: []
       }));
       expect(spyParseClass).toHaveBeenCalled();
-      expect(mockRepository.update).toHaveBeenCalled();
-      expect(mockRepository.create).not.toHaveBeenCalled();
-      expect(mockRepository.delete).not.toHaveBeenCalled();
+      expect(mockClassesRepository.update).toHaveBeenCalled();
+      expect(mockClassesRepository.create).not.toHaveBeenCalled();
+      expect(mockClassesRepository.delete).not.toHaveBeenCalled();
     });
 
     it('should emit class from cache when page is found and is not changed', async () => {
@@ -298,7 +317,7 @@ Data is different between GitHub and cache...`,
 Data was not changed between GitHub and cache...`,
         path: ''
       }));
-      mockRepository.findByName.mockReturnValueOnce(of({
+      mockClassesRepository.findByName.mockReturnValueOnce(of({
         id: cyrb53('ScriptGameInstance'),
         name: 'ScriptGameInstance',
         sha: '3',
@@ -319,23 +338,23 @@ Data was not changed between GitHub and cache...`,
         functions: []
       }));
       expect(spyParseClass).not.toHaveBeenCalled();
-      expect(mockRepository.create).not.toHaveBeenCalled();
-      expect(mockRepository.update).not.toHaveBeenCalled();
-      expect(mockRepository.delete).not.toHaveBeenCalled();
+      expect(mockClassesRepository.create).not.toHaveBeenCalled();
+      expect(mockClassesRepository.update).not.toHaveBeenCalled();
+      expect(mockClassesRepository.delete).not.toHaveBeenCalled();
     });
 
     it('should emit undefined and remove class from cache when page is cached but request is empty', async () => {
       // GIVEN
       mockClient.getClasses.mockReturnValueOnce(of([]));
       mockClient.getClass.mockReturnValueOnce(of(undefined));
-      mockRepository.findByName.mockReturnValueOnce(of({
+      mockClassesRepository.findByName.mockReturnValueOnce(of({
         id: cyrb53('ScriptGameInstance'),
         name: 'ScriptGameInstance',
         sha: '3',
         comment: 'Data is present in cache but was removed from GitHub...',
         functions: []
       }));
-      mockRepository.delete.mockReturnValueOnce(of(undefined));
+      mockClassesRepository.delete.mockReturnValueOnce(of(undefined));
       setup();
 
       // WHEN
@@ -344,9 +363,9 @@ Data was not changed between GitHub and cache...`,
       // THEN
       await expect(promise).resolves.toEqual(undefined);
       expect(spyParseClass).not.toHaveBeenCalled();
-      expect(mockRepository.delete).toHaveBeenCalled();
-      expect(mockRepository.create).not.toHaveBeenCalled();
-      expect(mockRepository.update).not.toHaveBeenCalled();
+      expect(mockClassesRepository.delete).toHaveBeenCalled();
+      expect(mockClassesRepository.create).not.toHaveBeenCalled();
+      expect(mockClassesRepository.update).not.toHaveBeenCalled();
     });
   });
 });

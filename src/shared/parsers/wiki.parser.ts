@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {marked, Token, Tokens, TokensList} from "marked";
-import {WikiClassDto, WikiFileDto, WikiFunctionDto} from "../dtos/wiki.dto";
+import {WikiClassDto, WikiFileDto, WikiFunctionDto, WikiGlobalDto} from "../dtos/wiki.dto";
 import {cyrb53} from "../string";
 import {RedTypeAst} from "../red-ast/red-type.ast";
 import ListItem = Tokens.ListItem;
@@ -42,6 +42,24 @@ export class WikiParser {
       comment: comment,
       functions: functions
     };
+  }
+
+  public parseGlobals(file: WikiFileDto): WikiGlobalDto[] {
+    const tokens: TokensList = marked.lexer(file.markdown, {gfm: true});
+    const stream: WikiTokenStream = new WikiTokenStream(tokens);
+    const headerTitle: Tokens.Heading | undefined = stream.nextHeading(1);
+
+    if (!headerTitle) {
+      throw new WikiParserError('GLOBALS', WikiParserErrorCode.noTitle);
+    }
+    const functions: WikiFunctionDto[] = this.parseFunctions(stream);
+
+    return functions.map((func) => {
+      return {
+        ...func,
+        sha: file.sha
+      };
+    });
   }
 
   private parseDescription(stream: WikiTokenStream, header?: Tokens.Heading): string {

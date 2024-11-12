@@ -49,6 +49,26 @@ export class WikiClient extends GitHubClient {
     );
   }
 
+  public getGlobals(): Observable<WikiFileDto> {
+    return this.getFileFrom('globals.md').pipe(
+      map((file: GitHubFileDto) => {
+        if (file.encoding !== 'base64') {
+          throw new WikiEncodingError(file.encoding);
+        }
+        let markdown: string = atob(file.content);
+
+        markdown = markdown.replaceAll(/^---(.*\n)*---\n\n/gm, '');
+        return {
+          sha: file.sha,
+          fileName: file.name,
+          className: 'GLOBALS',
+          path: file.path,
+          markdown: markdown
+        };
+      })
+    );
+  }
+
   private static getClassName(fileName: string): string {
     return fileName.substring(0, fileName.indexOf('.md'));
   }
