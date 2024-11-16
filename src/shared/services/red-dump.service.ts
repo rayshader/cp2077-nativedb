@@ -2,7 +2,7 @@ import {Injectable, NgZone} from "@angular/core";
 import {
   BehaviorSubject,
   combineLatest,
-  combineLatestWith,
+  combineLatestWith, filter,
   firstValueFrom,
   map,
   Observable,
@@ -23,6 +23,7 @@ import {SettingsService} from "./settings.service";
 import {cyrb53} from "../string";
 import {NDBCommand, NDBCommandHandler, NDBMessage, NDBWorker} from "../worker.common";
 import {InheritData} from "../../app/pages/object/object.component";
+import {v4 as uuid} from "uuid";
 
 export interface RedDumpWorkerLoad {
   readonly enums: RedEnumAst[];
@@ -37,6 +38,11 @@ export interface RedDumpWorkerLoadAliases {
   readonly functions?: RedFunctionAst[];
   readonly classes: RedClassAst[];
   readonly structs: RedClassAst[];
+}
+
+interface Token<T> {
+  readonly token: string;
+  readonly data: T;
 }
 
 @Injectable({
@@ -58,11 +64,11 @@ export class RedDumpService {
   private readonly classes: BehaviorSubject<RedClassAst[]> = new BehaviorSubject<RedClassAst[]>([]);
   private readonly structs: BehaviorSubject<RedClassAst[]> = new BehaviorSubject<RedClassAst[]>([]);
   private readonly badges: BehaviorSubject<number> = new BehaviorSubject<number>(1);
-  private readonly inheritance: Subject<RedClassAst> = new Subject<RedClassAst>();
+  private readonly inheritance: Subject<Token<RedClassAst>> = new Subject<Token<RedClassAst>>();
   private readonly isReady: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
 
   private readonly nodes$: Observable<RedNodeAst[]>;
-  private readonly inheritance$: Observable<RedClassAst> = this.inheritance.asObservable();
+  private readonly inheritance$: Observable<Token<RedClassAst>> = this.inheritance.asObservable();
 
   private worker?: NDBWorker;
   private readonly commands: NDBCommandHandler[] = [
@@ -169,6 +175,8 @@ export class RedDumpService {
   }
 
   private loadInheritance(): OperatorFunction<RedClassAst | undefined, RedClassAst | undefined> {
+    const token: string = uuid();
+
     return pipe(
       switchMap((object) => {
         if (!object) {
@@ -179,9 +187,15 @@ export class RedDumpService {
         }
         this.worker?.postMessage(<NDBMessage>{
           command: NDBCommand.rd_load_inheritance,
-          data: object.id
+          data: {
+            token: token,
+            id: object.id,
+          }
         });
-        return this.inheritance$.pipe(take(1));
+        return this.inheritance$.pipe(
+          filter((request: Token<RedClassAst>) => request.token === token),
+          map((request: Token<RedClassAst>) => request.data)
+        );
       })
     );
   }
@@ -230,7 +244,7 @@ export class RedDumpService {
     this.structs.next(data.structs);
   }
 
-  private async onWorkerLoadInheritance([id, parents, children]: [number, InheritData[], InheritData[]]): Promise<void> {
+  private async onWorkerLoadInheritance([token, id, parents, children]: [string, number, InheritData[], InheritData[]]): Promise<void> {
     const object: RedClassAst | undefined = await firstValueFrom(this.getById(id)) as RedClassAst;
 
     if (!object || object.isInheritanceLoaded) {
@@ -239,7 +253,10 @@ export class RedDumpService {
     object.parents.push(...parents);
     object.children.push(...children);
     object.isInheritanceLoaded = true;
-    this.inheritance.next(object);
+    this.inheritance.next({
+      token: token,
+      data: object
+    });
   }
 
   private onWorkerDispose(): void {

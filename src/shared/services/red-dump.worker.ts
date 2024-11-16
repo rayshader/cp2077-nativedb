@@ -105,20 +105,20 @@ async function load(port?: MessagePort): Promise<void> {
   isReady = true;
 }
 
-function onLoadInheritance(id: number, port?: MessagePort): void {
-  const object: RedClassAst | undefined = data.objects.find((object) => object.id === id);
+function onLoadInheritance(request: {token: string, id: number}, port?: MessagePort): void {
+  const object: RedClassAst | undefined = data.objects.find((object) => object.id === request.id);
 
   if (!object) {
     return;
   }
   if (object.isInheritanceLoaded) {
-    send(NDBCommand.rd_load_inheritance, port, [object.id, object.parents, object.children]);
+    send(NDBCommand.rd_load_inheritance, port, [request.token, object.id, object.parents, object.children]);
     return;
   }
   loadParents(data.objects, object);
   loadChildren(data.objects, object);
   object.isInheritanceLoaded = true;
-  send(NDBCommand.rd_load_inheritance, port, [object.id, object.parents, object.children]);
+  send(NDBCommand.rd_load_inheritance, port, [request.token, object.id, object.parents, object.children]);
 }
 
 function send(command: NDBCommand, port?: MessagePort, data?: any): void {
