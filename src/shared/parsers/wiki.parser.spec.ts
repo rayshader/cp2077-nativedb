@@ -1,5 +1,5 @@
 import {WikiParser, WikiParserError, WikiParserErrorCode} from "./wiki.parser";
-import {WikiClassDto} from "../dtos/wiki.dto";
+import {WikiClassDto, WikiGlobalDto} from "../dtos/wiki.dto";
 import {cyrb53} from "../string";
 
 describe('WikiParser', () => {
@@ -172,6 +172,87 @@ A new paragraph. An URL [link](https://cyberpunk.net). A list:
             comment: '- Item A\n- Item B\n\n- Item C\n- Item D\n\n- Task E\n- Task F'
           },
         ])
+      }));
+    });
+  });
+
+  describe('parseGlobals(<file>)', () => {
+    it('should throw a WikiParserError when there is no title', () => {
+      // GIVEN
+      const wikiFile: any = {
+        className: 'GLOBALS',
+        fileName: 'GLOBALS.md',
+        markdown: `#### FakeGlobal(should: Bool)`
+      };
+
+      // WHEN
+      const parse = () => parser.parseGlobals(wikiFile);
+
+      // THEN
+      expect(parse).toThrow(new WikiParserError('GLOBALS', WikiParserErrorCode.noTitle));
+    });
+
+    it('should parse functions', () => {
+      // GIVEN
+      const wikiFile: any = {
+        sha: '',
+        className: 'GLOBALS',
+        fileName: 'GLOBALS.md',
+        markdown: `# Globals
+
+#### GetGameInstance() -> ScriptGameInstance
+
+A simple phrase. A reference to struct \\[Vector4]. Some block \`style\`.
+
+{% hint style="info" %}
+A hint, block is ignored.
+{% endhint %}
+
+#### CalcSeed(object: handle:IScriptable) -> Int32
+
+> A quote, block is ignored.
+
+\`\`\`lua
+-- Code w/ lua, block is ignored.
+\`\`\`
+
+A new paragraph. An URL [link](https://cyberpunk.net). A list:
+
+#### FTLog(value: script_ref:String) -> Void
+
+* Item A
+* Item B
+
+1. Item C
+2. Item D
+
+* [ ] Task E
+* [ ] Task F`
+      };
+
+      // WHEN
+      const wikiGlobals: WikiGlobalDto[] = parser.parseGlobals(wikiFile);
+
+      // THEN
+      expect(wikiGlobals).toHaveLength(3);
+      const getGameInstance: WikiGlobalDto = wikiGlobals[0];
+      const calcSeed: WikiGlobalDto = wikiGlobals[1];
+      const ftLog: WikiGlobalDto = wikiGlobals[2];
+
+      expect(getGameInstance).toEqual(expect.objectContaining({
+        id: cyrb53('GetGameInstanceScriptGameInstance'),
+        name: 'GetGameInstance',
+        comment: 'A simple phrase. A reference to struct [Vector4]. Some block \`style\`.'
+      }));
+      expect(calcSeed).toEqual(expect.objectContaining({
+        id: cyrb53('CalcSeedobjectInt32'),
+        name: 'CalcSeed',
+        comment: 'A new paragraph. An URL [link](https://cyberpunk.net). A list:'
+      }));
+      expect(ftLog).toEqual(expect.objectContaining({
+        id: cyrb53('FTLogvalueVoid'),
+        name: 'FTLog',
+        comment: '- Item A\n- Item B\n\n- Item C\n- Item D\n\n- Task E\n- Task F'
       }));
     });
   });

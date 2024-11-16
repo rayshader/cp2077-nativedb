@@ -9,8 +9,13 @@
     </div>
   </ndb-title-bar>
 
-  @for (func of data.functions; track func.fullName) {
-    <function-span [node]="func" [canCopy]="true" [canShare]="false"></function-span>
+  @for (func of data.functions; track func.func.fullName) {
+    <function-span [node]="func.func"
+                   [documentation]="func.documentation"
+                   [canCopy]="true"
+                   [canDocument]="true"
+                   [canShare]="false" />
+
     @if (data.isMobile && !$last) {
       <mat-divider></mat-divider>
     }

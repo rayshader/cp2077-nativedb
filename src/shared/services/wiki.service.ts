@@ -1,10 +1,11 @@
 import {Injectable} from "@angular/core";
 import {WikiClient} from "../clients/wiki.client";
 import {WikiParser, WikiParserError, WikiParserErrorCode} from "../parsers/wiki.parser";
-import {WikiClassDto, WikiFileDto, WikiFileEntryDto} from "../dtos/wiki.dto";
+import {WikiClassDto, WikiFileDto, WikiFileEntryDto, WikiGlobalDto} from "../dtos/wiki.dto";
 import {
   catchError,
   combineLatestWith,
+  EMPTY,
   expand,
   map,
   Observable,
@@ -13,11 +14,13 @@ import {
   pipe,
   shareReplay,
   switchMap,
-  timer
+  timer,
+  zip
 } from "rxjs";
 import {MatSnackBar} from "@angular/material/snack-bar";
 import {GitHubRateLimitError} from "../clients/github.client";
-import {WikiRepository} from "../repositories/wiki.repository";
+import {WikiClassesRepository} from "../repositories/wiki-classes.repository";
+import {WikiGlobalsRepository} from "../repositories/wiki-globals.repository";
 
 @Injectable({
   providedIn: 'root'
@@ -25,24 +28,27 @@ import {WikiRepository} from "../repositories/wiki.repository";
 export class WikiService {
 
   private readonly classes$: Observable<WikiFileEntryDto[]>;
+  private readonly globals$: Observable<WikiFileDto>;
 
   private readonly invalidationDelay: number = 10 * 60 * 1000;
   private readonly nextErrorAt: Date;
 
-  constructor(private readonly wikiRepository: WikiRepository,
-              private readonly wikiClient: WikiClient,
-              private readonly wikiParser: WikiParser,
+  constructor(private readonly classesRepository: WikiClassesRepository,
+              private readonly globalsRepository: WikiGlobalsRepository,
+              private readonly client: WikiClient,
+              private readonly parser: WikiParser,
               private readonly toast: MatSnackBar) {
-    this.classes$ = this.wikiClient.getClasses().pipe(this.invalidateClasses());
+    this.classes$ = this.client.getClasses().pipe(this.invalidateClasses());
+    this.globals$ = this.client.getGlobals().pipe(this.invalidateGlobals());
     this.nextErrorAt = new Date();
   }
 
   public getClass(name: string): Observable<WikiClassDto | undefined> {
     return this.findClass(name).pipe(
-      combineLatestWith(this.wikiRepository.findByName(name)),
+      combineLatestWith(this.classesRepository.findByName(name)),
       switchMap(([file, cache]: [WikiFileEntryDto | undefined, WikiClassDto | undefined]) => {
         if (!file && cache) {
-          return this.wikiRepository.delete(cache.id).pipe(map(() => undefined));
+          return this.classesRepository.delete(cache.id).pipe(map(() => undefined));
         }
         if (!file) {
           return of(undefined);
@@ -55,21 +61,71 @@ export class WikiService {
     );
   }
 
+  public getGlobal(id: number): Observable<WikiGlobalDto | undefined> {
+    return this.getGlobals().pipe(
+      map((globals) => {
+        return globals.find((global) => global.id === id);
+      })
+    );
+  }
+
+  public getGlobals(): Observable<WikiGlobalDto[]> {
+    return this.globals$.pipe(
+      map((file: WikiFileDto) => this.parser.parseGlobals(file)),
+      combineLatestWith(this.globalsRepository.findAll()),
+      switchMap(([globals, caches]: [WikiGlobalDto[], WikiGlobalDto[]]) => {
+        const operations$: Observable<WikiGlobalDto | undefined>[] = [];
+
+        for (const cache of caches) {
+          const global: WikiGlobalDto | undefined = globals.find((item) => item.name === cache.name);
+
+          if (!global) {
+            operations$.push(this.globalsRepository.delete(cache.id).pipe(map(() => undefined)));
+          }
+        }
+        for (const global of globals) {
+          const cache: WikiGlobalDto | undefined = caches.find((item) => item.name === global.name);
+
+          operations$.push(this.requestGlobal(global, cache));
+        }
+        return zip(operations$);
+      }),
+      map((globals: (WikiGlobalDto | undefined)[]) => {
+        return globals.filter((wikiGlobal) => !!wikiGlobal) as WikiGlobalDto[];
+      }),
+      catchError(this.showError.bind(this)),
+      map((globals?: WikiGlobalDto[]) => globals ?? [])
+    );
+  }
+
   private requestClass(name: string, cache?: WikiClassDto): Observable<WikiClassDto | undefined> {
-    return this.wikiClient.getClass(name).pipe(
-      map((file: WikiFileDto) => this.wikiParser.parseClass(file, name)),
+    return this.client.getClass(name).pipe(
+      map((file: WikiFileDto) => this.parser.parseClass(file, name)),
       switchMap((wikiClass: WikiClassDto) => {
         let operation$: Observable<number> = of(NaN);
 
         if (!cache) {
-          operation$ = this.wikiRepository.create(wikiClass);
+          operation$ = this.classesRepository.create(wikiClass);
         } else if (wikiClass.sha !== cache.sha) {
-          operation$ = this.wikiRepository.update(wikiClass);
+          operation$ = this.classesRepository.update(wikiClass);
         }
         return operation$.pipe(map(() => wikiClass));
       }),
       catchError(this.showError.bind(this))
     );
+  }
+
+  private requestGlobal(global: WikiGlobalDto, cache?: WikiGlobalDto): Observable<WikiGlobalDto | undefined> {
+    let operation$: Observable<WikiGlobalDto> = EMPTY;
+
+    if (global.sha === cache?.sha) {
+      operation$ = of(cache);
+    } else if (!cache) {
+      operation$ = this.globalsRepository.create(global).pipe(map(() => global));
+    } else if (global.sha !== cache.sha) {
+      operation$ = this.globalsRepository.update(global).pipe(map(() => global));
+    }
+    return operation$;
   }
 
   private findClass(name: string): Observable<WikiFileEntryDto | undefined> {
@@ -82,7 +138,14 @@ export class WikiService {
 
   private invalidateClasses(): OperatorFunction<WikiFileEntryDto[], WikiFileEntryDto[]> {
     return pipe(
-      expand(() => timer(this.invalidationDelay).pipe(switchMap(() => this.wikiClient.getClasses()))),
+      expand(() => timer(this.invalidationDelay).pipe(switchMap(() => this.client.getClasses()))),
+      shareReplay(1)
+    );
+  }
+
+  private invalidateGlobals(): OperatorFunction<WikiFileDto, WikiFileDto> {
+    return pipe(
+      expand(() => timer(this.invalidationDelay).pipe(switchMap(() => this.client.getGlobals()))),
       shareReplay(1)
     );
   }

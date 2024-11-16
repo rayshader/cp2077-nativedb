@@ -1,6 +1,6 @@
 import {Injectable} from "@angular/core";
 import {marked, Token, Tokens, TokensList} from "marked";
-import {WikiClassDto, WikiFileDto, WikiFunctionDto} from "../dtos/wiki.dto";
+import {WikiClassDto, WikiFileDto, WikiFunctionDto, WikiGlobalDto} from "../dtos/wiki.dto";
 import {cyrb53} from "../string";
 import {RedTypeAst} from "../red-ast/red-type.ast";
 import ListItem = Tokens.ListItem;
@@ -26,8 +26,12 @@ export class WikiParser {
     const headerDescription: Tokens.Heading | undefined = stream.nextHeading(2, true);
     const comment: string = this.parseDescription(stream, headerDescription);
     const headerFunctions: Tokens.Heading | undefined = stream.nextHeading(2, true);
-    const functions: WikiFunctionDto[] = this.parseFunctions(stream, headerFunctions);
+    let functions: WikiFunctionDto[] = [];
 
+    if (this.isFunctions(headerFunctions)) {
+      stream.nextHeading(2);
+      functions = this.parseFunctions(stream);
+    }
     if (!headerDescription && !headerFunctions) {
       throw new WikiParserError(name, WikiParserErrorCode.noContent);
     }
@@ -38,6 +42,24 @@ export class WikiParser {
       comment: comment,
       functions: functions
     };
+  }
+
+  public parseGlobals(file: WikiFileDto): WikiGlobalDto[] {
+    const tokens: TokensList = marked.lexer(file.markdown, {gfm: true});
+    const stream: WikiTokenStream = new WikiTokenStream(tokens);
+    const headerTitle: Tokens.Heading | undefined = stream.nextHeading(1);
+
+    if (!headerTitle) {
+      throw new WikiParserError('GLOBALS', WikiParserErrorCode.noTitle);
+    }
+    const functions: WikiFunctionDto[] = this.parseFunctions(stream);
+
+    return functions.map((func) => {
+      return {
+        ...func,
+        sha: file.sha
+      };
+    });
   }
 
   private parseDescription(stream: WikiTokenStream, header?: Tokens.Heading): string {
@@ -62,11 +84,7 @@ export class WikiParser {
     return description.trim();
   }
 
-  private parseFunctions(stream: WikiTokenStream, header?: Tokens.Heading): WikiFunctionDto[] {
-    if (!this.isFunctions(header)) {
-      return [];
-    }
-    stream.nextHeading(2);
+  private parseFunctions(stream: WikiTokenStream): WikiFunctionDto[] {
     const functions: WikiFunctionDto[] = [];
 
     while (stream.hasNext()) {

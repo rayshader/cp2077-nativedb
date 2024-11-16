@@ -71,20 +71,20 @@ export class NDBDocumentationComponent {
   showGitBook(): void {
     const path: string = this.getGitBookPath();
 
-    window.open(`https://wiki.redmodding.org/nativedb-documentation/classes/${path}`, '_blank');
+    window.open(`https://wiki.redmodding.org/nativedb-documentation/${path}`, '_blank');
   }
 
   editGitBook(): void {
     const path: string = this.getGitBookPath();
 
-    window.open(`https://app.gitbook.com/o/-MP5ijqI11FeeX7c8-N8/s/iEOlL96xX95sTRIvzobZ/classes/${path}`, '_blank');
+    window.open(`https://app.gitbook.com/o/-MP5ijqI11FeeX7c8-N8/s/iEOlL96xX95sTRIvzobZ/${path}`, '_blank');
   }
 
   private getGitBookPath(): string {
     if (!this.object) {
-      return '';
+      return `globals#${this.formatFragment()}`;
     }
-    let path: string = this.object.name.toLowerCase();
+    let path: string = `classes/${this.object.name.toLowerCase()}`;
 
     if (!this.method) {
       path = `${path}#description`;

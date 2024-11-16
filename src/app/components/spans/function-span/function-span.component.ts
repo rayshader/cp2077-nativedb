@@ -16,7 +16,7 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 import {RouterLink} from "@angular/router";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatDivider} from "@angular/material/divider";
-import {WikiClassDto, WikiFunctionDto} from "../../../../shared/dtos/wiki.dto";
+import {WikiClassDto, WikiFunctionDto, WikiGlobalDto} from "../../../../shared/dtos/wiki.dto";
 
 @Component({
   selector: 'function-span',
@@ -106,12 +106,18 @@ export class FunctionSpanComponent implements AfterViewInit {
   }
 
   @Input('documentation')
-  set _documentation(value: WikiClassDto | undefined) {
+  set _documentation(value: WikiClassDto | WikiFunctionDto | undefined) {
     if (!value) {
       this.documentation = undefined;
       return;
     }
-    this.documentation = value.functions.find((method) => method.id === this.node!.id);
+    if ('functions' in value) {
+      const wikiClass = value as WikiClassDto;
+
+      this.documentation = wikiClass.functions.find((method) => method.id === this.node!.id);
+    } else {
+      this.documentation = value as WikiGlobalDto;
+    }
   }
 
   /**

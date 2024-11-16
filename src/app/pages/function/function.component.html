@@ -1,12 +1,16 @@
-@if (function$ | async; as func) {
-  <ndb-title-bar [title]="func.name"
-                 [node]="func"
+@if (data$ | async; as data) {
+  <ndb-title-bar [title]="data.function.name"
+                 [node]="data.function"
                  [hideDocumentation]="true"
                  [hidden]="true">
     <mat-icon class="badge-function" svgIcon="function" matTooltip="function"></mat-icon>
   </ndb-title-bar>
 
-  <function-span [node]="func" [canCopy]="true" [canShare]="false"></function-span>
+  <function-span [node]="data.function"
+                 [documentation]="data.documentation"
+                 [canCopy]="true"
+                 [canDocument]="true"
+                 [canShare]="false" />
 } @else {
   <h1 class="stx stx-type">Loading...</h1>
   <div class="prototype">
