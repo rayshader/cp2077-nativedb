@@ -92,7 +92,9 @@ export class WikiService {
       }),
       map((globals: (WikiGlobalDto | undefined)[]) => {
         return globals.filter((wikiGlobal) => !!wikiGlobal) as WikiGlobalDto[];
-      })
+      }),
+      catchError(this.showError.bind(this)),
+      map((globals?: WikiGlobalDto[]) => globals ?? [])
     );
   }
 
