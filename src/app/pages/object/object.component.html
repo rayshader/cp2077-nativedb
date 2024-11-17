@@ -42,11 +42,28 @@
                     [disableRipple]="true">{{data.parents.length}}</mat-chip>
         </div>
 
+        <div actions>
+          <mat-slide-toggle
+            color="primary"
+            (change)="onShowMembersToggled($event, data.parents)"
+            [formControl]="showMembers">
+            {{showMembers.value ? 'Show' : 'Hide'}} members of all parents
+          </mat-slide-toggle>
+        </div>
+
         @for (parent of data.parents; track parent.id) {
           <div class="inheritance stx">
             <div class="align" [style.width]="data.align"></div>
+
+            <mat-icon class="btn"
+                      [class.disabled]="parent.isEmpty"
+                      (click)="toggleMembers(parent, data.parents)">
+              {{areMembersVisible(parent) ? 'check_box' : 'check_box_outline_blank'}}
+            </mat-icon>
+
             <mat-icon>subdirectory_arrow_right</mat-icon>
-            <type-span [node]="parent" [isEmpty]="data.highlightEmpty && parent.isEmpty"></type-span>
+
+            <type-span [node]="parent" [isEmpty]="data.highlightEmpty && parent.isEmpty" />
           </div>
         }
       </ndb-accordion-item>
@@ -64,7 +81,10 @@
         @for (child of data.children; track child.id) {
           <div class="inheritance stx">
             <div class="align" [style.width]="data.align"></div>
+            <mat-icon></mat-icon>
+
             <mat-icon>subdirectory_arrow_left</mat-icon>
+
             <type-span [node]="child" [isEmpty]="data.highlightEmpty && child.isEmpty"></type-span>
           </div>
         }
@@ -144,12 +164,12 @@
         </div>
 
         <!-- NOTE: tracking with id will crash webapp when filtering per badge several times. -->
-        @for (func of data.functions; track func.fullName) {
+        @for (func of data.functions; track func.function.fullName) {
           <function-span ndbHighlight
-                         [id]="cyrb53(func.name)"
-                         [node]="func"
-                         [memberOf]="data.object"
-                         [documentation]="data.documentation"
+                         [id]="cyrb53(func.function.name)"
+                         [node]="func.function"
+                         [memberOf]="func.memberOf"
+                         [documentation]="func.documentation"
                          [canCopy]="true"
                          [canDocument]="data.canDocument"
                          [badges]="data.badges"></function-span>

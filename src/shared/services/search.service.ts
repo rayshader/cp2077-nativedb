@@ -90,22 +90,25 @@ export class SearchService {
     }
   }
 
-  public static filterFunctions(functions: RedFunctionAst[], request: SearchRequest): RedFunctionAst[] {
+  public static filterFunctions<T>(functions: T[],
+                                   request: SearchRequest,
+                                   key?: (data: T) => RedFunctionAst): T[] {
     const query: string = request.query.toLowerCase();
     const words: string[] = query.split(' ');
     const rule: RegExp | undefined = SearchService.createRule(query);
 
+    key ??= (data) => data as RedFunctionAst;
     if (request.filter === FilterBy.usage) {
       if (rule) {
-        return functions.filter((func) => RedFunctionAst.testByUsage(func, rule));
+        return functions.filter((func) => RedFunctionAst.testByUsage(key(func), rule));
       } else {
-        return functions.filter((func) => RedFunctionAst.filterByUsage(func, words));
+        return functions.filter((func) => RedFunctionAst.filterByUsage(key(func), words));
       }
     }
     if (rule) {
-      return functions.filter((func) => RedNodeAst.testName(func, rule));
+      return functions.filter((func) => RedNodeAst.testName(key(func), rule));
     } else {
-      return functions.filter((func) => RedNodeAst.hasName(func, words));
+      return functions.filter((func) => RedNodeAst.hasName(key(func), words));
     }
   }
 

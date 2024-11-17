@@ -56,6 +56,12 @@
       height: 18px;
       font-size: 18px;
       margin-right: 12px;
+
+      &.btn {
+        &:not(.disabled) {
+          cursor: pointer;
+        }
+      }
     }
 
     @media (max-width: 1025px) {

@@ -1,4 +1,4 @@
-import {AfterViewInit, ApplicationRef, ChangeDetectionStrategy, Component, DestroyRef, Input} from '@angular/core';
+import {AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, Input} from '@angular/core';
 import {AsyncPipe} from "@angular/common";
 import {CdkAccordionModule} from "@angular/cdk/accordion";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
@@ -44,6 +44,8 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 import {SearchRequest, SearchService} from "../../../shared/services/search.service";
 import {WikiService} from "../../../shared/services/wiki.service";
 import {WikiClassDto} from "../../../shared/dtos/wiki.dto";
+import {MatSlideToggle, MatSlideToggleChange} from "@angular/material/slide-toggle";
+import {FormControl, ReactiveFormsModule} from "@angular/forms";
 
 export interface InheritData extends RedTypeAst {
   readonly isEmpty: boolean;
@@ -60,7 +62,7 @@ interface ObjectData {
   readonly parents: InheritData[];
   readonly children: InheritData[];
   readonly properties: RedPropertyAst[];
-  readonly functions: RedFunctionAst[];
+  readonly functions: FunctionDocumentation[];
   readonly badges: number;
   readonly align: string;
 
@@ -78,6 +80,12 @@ interface ObjectData {
   readonly showChildren: boolean;
   readonly showProperties: boolean;
   readonly showFunctions: boolean;
+}
+
+interface FunctionDocumentation {
+  readonly memberOf: RedClassAst;
+  readonly function: RedFunctionAst;
+  readonly documentation?: WikiClassDto;
 }
 
 interface BadgeFilterItem<T> {
@@ -113,7 +121,9 @@ type MemberFilter = 'empty' | 'disable' | 'enable';
     NDBAccordionItemComponent,
     NDBTitleBarComponent,
     NDBHighlightDirective,
-    NDBDocumentationComponent
+    NDBDocumentationComponent,
+    MatSlideToggle,
+    ReactiveFormsModule
   ],
   templateUrl: './object.component.html',
   styleUrl: './object.component.scss'
@@ -184,6 +194,8 @@ export class ObjectComponent implements AfterViewInit {
 
   data$: Observable<ObjectData | undefined> = EMPTY;
 
+  showMembers: FormControl<boolean> = new FormControl(false, {nonNullable: true});
+
   protected readonly isMobile$: Observable<boolean>;
 
   protected readonly kind: RedNodeKind;
@@ -205,6 +217,8 @@ export class ObjectComponent implements AfterViewInit {
   private readonly showDocumentation$: Observable<boolean> = this.showDocumentationSubject.asObservable();
   private readonly filtersSubject: BehaviorSubject<void> = new BehaviorSubject<void>(undefined);
   private readonly filters$: Observable<void> = this.filtersSubject.asObservable();
+  private readonly inheritsSubject: BehaviorSubject<InheritData[]> = new BehaviorSubject<InheritData[]>([]);
+  private readonly inherits$: Observable<InheritData[]> = this.inheritsSubject.asObservable();
 
   constructor(private readonly dumpService: RedDumpService,
               private readonly wikiService: WikiService,
@@ -213,7 +227,6 @@ export class ObjectComponent implements AfterViewInit {
               private readonly settingsService: SettingsService,
               private readonly responsiveService: ResponsiveService,
               private readonly searchService: SearchService,
-              private readonly app: ApplicationRef,
               private readonly route: ActivatedRoute,
               private readonly dr: DestroyRef) {
     this.kind = (this.route.snapshot.data as any).kind;
@@ -227,8 +240,11 @@ export class ObjectComponent implements AfterViewInit {
     }
     this.recentVisitService.pushLastVisit(+id);
     this.resetFilters();
+    this.resetInherits();
     const object$: Observable<RedClassAst> = this.loadObject(+id);
     const documentation$: Observable<WikiClassDto | undefined> = object$.pipe(this.getDocumentation());
+    const inherits$: Observable<RedClassAst[]> = this.inherits$.pipe(this.getInherits());
+    const inheritsDocumentation$: Observable<WikiClassDto[]> = this.inherits$.pipe(this.getInheritsDocumentation());
 
     this.settingsService.showDocumentation$
       .pipe(take(1), takeUntilDestroyed(this.dr))
@@ -237,6 +253,8 @@ export class ObjectComponent implements AfterViewInit {
     this.data$ = combineLatest([
       object$,
       documentation$,
+      inherits$,
+      inheritsDocumentation$,
       this.showDocumentation$,
       this.dumpService.badges$,
       this.settingsService.settings$,
@@ -264,6 +282,10 @@ export class ObjectComponent implements AfterViewInit {
     return 'Reset filter';
   }
 
+  areMembersVisible(parent: InheritData): boolean {
+    return !!this.hasInherit(parent);
+  }
+
   toggleDocumentation(name: string, hasComment: boolean): void {
     if (!hasComment) {
       navigator.clipboard.writeText(`# ${name}`);
@@ -271,6 +293,28 @@ export class ObjectComponent implements AfterViewInit {
       return;
     }
     this.showDocumentationSubject.next(!this.showDocumentationSubject.value);
+  }
+
+  toggleMembers(parent: InheritData, parents: InheritData[]): void {
+    if (parent.isEmpty) {
+      return;
+    }
+    parents = parents.filter((parent) => !parent.isEmpty);
+    let inherits: InheritData[] = [...this.inheritsSubject.value];
+    let isVisible: boolean = this.areMembersVisible(parent);
+
+    isVisible = !isVisible;
+    if (isVisible) {
+      inherits.push(parent);
+    } else {
+      inherits = inherits.filter((inherit) => inherit.id !== parent.id);
+    }
+    this.inheritsSubject.next(inherits);
+    if (inherits.length === 0 && this.showMembers.value) {
+      this.showMembers.setValue(false);
+    } else if (inherits.length === parents.length && !this.showMembers.value) {
+      this.showMembers.setValue(true);
+    }
   }
 
   computePropertyFilters(properties: RedPropertyAst[]): void {
@@ -296,43 +340,43 @@ export class ObjectComponent implements AfterViewInit {
     });
   }
 
-  computeFunctionFilters(functions: RedFunctionAst[]): void {
+  computeFunctionFilters(functions: FunctionDocumentation[]): void {
     this.badgesFunction.forEach((badge) => {
       badge.isEmpty = true;
     });
     this.badgesFunction.forEach((badge) => {
-      for (const func of functions) {
-        if (func.visibility === RedVisibilityDef.public && badge.title === 'public') {
+      for (const data of functions) {
+        if (data.function.visibility === RedVisibilityDef.public && badge.title === 'public') {
           badge.isEmpty = false;
           return;
-        } else if (func.visibility === RedVisibilityDef.protected && badge.title === 'protected') {
+        } else if (data.function.visibility === RedVisibilityDef.protected && badge.title === 'protected') {
           badge.isEmpty = false;
           return;
-        } else if (func.visibility === RedVisibilityDef.private && badge.title === 'private') {
+        } else if (data.function.visibility === RedVisibilityDef.private && badge.title === 'private') {
           badge.isEmpty = false;
           return;
-        } else if (func.isNative && badge.title === 'native') {
+        } else if (data.function.isNative && badge.title === 'native') {
           badge.isEmpty = false;
           return;
-        } else if (func.isStatic && badge.title === 'static') {
+        } else if (data.function.isStatic && badge.title === 'static') {
           badge.isEmpty = false;
           return;
-        } else if (func.isFinal && badge.title === 'final') {
+        } else if (data.function.isFinal && badge.title === 'final') {
           badge.isEmpty = false;
           return;
-        } else if (func.isThreadSafe && badge.title === 'threadsafe') {
+        } else if (data.function.isThreadSafe && badge.title === 'threadsafe') {
           badge.isEmpty = false;
           return;
-        } else if (func.isCallback && badge.title === 'callback') {
+        } else if (data.function.isCallback && badge.title === 'callback') {
           badge.isEmpty = false;
           return;
-        } else if (func.isConst && badge.title === 'const') {
+        } else if (data.function.isConst && badge.title === 'const') {
           badge.isEmpty = false;
           return;
-        } else if (func.isQuest && badge.title === 'quest') {
+        } else if (data.function.isQuest && badge.title === 'quest') {
           badge.isEmpty = false;
           return;
-        } else if (func.isTimer && badge.title === 'timer') {
+        } else if (data.function.isTimer && badge.title === 'timer') {
           badge.isEmpty = false;
           return;
         }
@@ -426,6 +470,25 @@ export class ObjectComponent implements AfterViewInit {
     this.functionSearchFilter = 'empty';
   }
 
+  resetInherits(): void {
+    this.showMembers.setValue(false);
+    if (this.inheritsSubject.value.length === 0) {
+      return;
+    }
+    this.inheritsSubject.next([]);
+  }
+
+  onShowMembersToggled(event: MatSlideToggleChange, parents: InheritData[]): void {
+    const inherits: InheritData[] = [];
+
+    for (const parent of parents) {
+      if (!parent.isEmpty && event.checked) {
+        inherits.push(parent);
+      }
+    }
+    this.inheritsSubject.next(inherits);
+  }
+
   private enableBadges(member?: 'property' | 'function'): void {
     if (member === undefined || member === 'property') {
       this.badgesProperty.forEach((badge) => badge.isEnabled = true);
@@ -449,14 +512,33 @@ export class ObjectComponent implements AfterViewInit {
   private loadData([
                      object,
                      documentation,
+                     inherits,
+                     inheritsDocumentation,
                      showDocumentation,
                      badges,
                      settings,
                      isMobile,
                      request
-                   ]: [RedClassAst, WikiClassDto | undefined, boolean, number, Settings, boolean, SearchRequest, void]) {
-    const properties: RedPropertyAst[] = this.filterProperties(object.properties, request);
-    const functions: RedFunctionAst[] = this.filterFunctions(object.functions, request);
+                   ]: [RedClassAst, WikiClassDto | undefined, RedClassAst[], WikiClassDto[], boolean, number, Settings, boolean, SearchRequest, void]) {
+    let properties: RedPropertyAst[] = [...object.properties];
+    let functions: FunctionDocumentation[] = object.functions.map((func) => {
+      return {memberOf: object, function: func, documentation: documentation};
+    });
+
+    if (inherits.length > 0) {
+      properties.push(...inherits.flatMap((inherit) => inherit.properties));
+      functions.push(...inherits.flatMap((inherit) => {
+        const wiki: WikiClassDto | undefined = inheritsDocumentation.find((item) => item.id === inherit.id);
+
+        return inherit.functions.map((func) => {
+          return {memberOf: inherit, function: func, documentation: wiki};
+        });
+      }));
+      properties.sort(RedPropertyAst.sort);
+      functions.sort((a, b) => RedFunctionAst.sort(a.function, b.function));
+    }
+    properties = this.filterProperties(properties, request);
+    functions = this.filterFunctions(functions, request);
     const showEmptyAccordion: boolean = settings.showEmptyAccordion;
     let altName: string | undefined = object.aliasName;
     let name: string = object.name;
@@ -480,7 +562,7 @@ export class ObjectComponent implements AfterViewInit {
       properties: properties,
       functions: functions,
       badges: badges,
-      align: `${104 + badges * 24 + 12 - 30}px`,
+      align: `${104 + (badges - 2) * 24}px`,
       documentation: documentation,
       showComment: showDocumentation,
       canDocument: !isMobile,
@@ -512,7 +594,7 @@ export class ObjectComponent implements AfterViewInit {
     return properties;
   }
 
-  private filterFunctions(functions: RedFunctionAst[], request: SearchRequest): RedFunctionAst[] {
+  private filterFunctions(functions: FunctionDocumentation[], request: SearchRequest): FunctionDocumentation[] {
     this.computeFunctionFilters(functions);
     if (!SearchService.isFunctionOrUsage(request) && this.functionSearchFilter !== 'empty') {
       this.functionSearchFilter = 'empty';
@@ -521,7 +603,7 @@ export class ObjectComponent implements AfterViewInit {
     if (SearchService.isFunctionOrUsage(request) && this.functionSearchFilter !== 'disable') {
       this.isFunctionsFiltered = true;
       this.disableBadges('function');
-      functions = SearchService.filterFunctions(functions, request);
+      functions = SearchService.filterFunctions(functions, request, (data) => data.function);
       this.functionSearchFilter = 'enable';
     } else if (this.isFunctionsFiltered) {
       functions = functions.filter(this.hasFunctionFlag.bind(this));
@@ -539,14 +621,18 @@ export class ObjectComponent implements AfterViewInit {
     return match;
   }
 
-  private hasFunctionFlag(func: RedFunctionAst): boolean {
+  private hasFunctionFlag(data: FunctionDocumentation): boolean {
     const badges: BadgeFilterItem<RedFunctionAst>[] = this.badgesFunction.filter((badge) => badge.isEnabled);
     let match: boolean = false;
 
     for (const badge of badges) {
-      match ||= badge.filter(func);
+      match ||= badge.filter(data.function);
     }
     return match;
+  }
+
+  private hasInherit(parent: InheritData): InheritData | undefined {
+    return this.inheritsSubject.value.find((inherit) => inherit.id === parent.id);
   }
 
   private onScrollToFragment(): void {
@@ -563,6 +649,23 @@ export class ObjectComponent implements AfterViewInit {
     $element.scrollIntoView({block: 'center'});
   }
 
+  private getInherits(): OperatorFunction<InheritData[], RedClassAst[]> {
+    return pipe(
+      switchMap((parents: InheritData[]) => {
+        if (parents.length === 0) {
+          return of([]);
+        }
+        const operations$: Observable<RedClassAst | undefined>[] = [];
+
+        for (const parent of parents) {
+          operations$.push(this.dumpService.getClassById(parent.id));
+        }
+        return combineLatest(operations$);
+      }),
+      map((parents) => parents.filter((parent) => !!parent))
+    );
+  }
+
   private getDocumentation(): OperatorFunction<RedClassAst | undefined, WikiClassDto | undefined> {
     return pipe(
       switchMap((object?: RedClassAst) => {
@@ -571,6 +674,23 @@ export class ObjectComponent implements AfterViewInit {
         }
         return this.wikiService.getClass(object.name);
       })
+    );
+  }
+
+  private getInheritsDocumentation(): OperatorFunction<InheritData[], WikiClassDto[]> {
+    return pipe(
+      switchMap((inherits: InheritData[]) => {
+        if (inherits.length === 0) {
+          return of([]);
+        }
+        const operations$: Observable<WikiClassDto | undefined>[] = [];
+
+        for (const inherit of inherits) {
+          operations$.push(this.wikiService.getClass(inherit.name));
+        }
+        return combineLatest(operations$);
+      }),
+      map((wikis) => wikis.filter((wiki) => !!wiki))
     );
   }
 
