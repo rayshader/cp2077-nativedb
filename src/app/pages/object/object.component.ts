@@ -526,14 +526,18 @@ export class ObjectComponent implements AfterViewInit {
     });
 
     if (inherits.length > 0) {
-      properties.push(...inherits.flatMap((inherit) => inherit.properties));
-      functions.push(...inherits.flatMap((inherit) => {
-        const wiki: WikiClassDto | undefined = inheritsDocumentation.find((item) => item.id === inherit.id);
+      for (const inherit of inherits) {
+        properties.push(...inherit.properties);
+        for (const func of inherit.functions) {
+          const duplicate: boolean = functions.findIndex((item) => item.function.fullName === func.fullName) !== -1;
 
-        return inherit.functions.map((func) => {
-          return {memberOf: inherit, function: func, documentation: wiki};
-        });
-      }));
+          if (!duplicate) {
+            const wiki: WikiClassDto | undefined = inheritsDocumentation.find((item) => item.id === inherit.id);
+
+            functions.push({memberOf: inherit, function: func, documentation: wiki});
+          }
+        }
+      }
       properties.sort(RedPropertyAst.sort);
       functions.sort((a, b) => RedFunctionAst.sort(a.function, b.function));
     }
