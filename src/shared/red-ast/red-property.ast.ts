@@ -7,6 +7,7 @@ export interface RedPropertyJson {
   readonly a: RedTypeJson; // type
   readonly b?: string; // name
   readonly c: number; // flags
+  readonly d?: number; // offset
 }
 
 export interface RedPropertyAst extends RedNodeAst {
@@ -18,6 +19,7 @@ export interface RedPropertyAst extends RedNodeAst {
   //readonly isConst: boolean;
   //readonly name: string;
   readonly type: RedTypeAst;
+  readonly offset: number;
 }
 
 export class RedPropertyAst {
@@ -28,6 +30,10 @@ export class RedPropertyAst {
       return delta;
     }
     return a.name.localeCompare(b.name);
+  }
+
+  static sortByOffset(a: RedPropertyAst, b: RedPropertyAst): number {
+    return a.offset - b.offset;
   }
 
   static testByUsage(prop: RedPropertyAst, rule: RegExp): boolean {
@@ -61,7 +67,8 @@ export class RedPropertyAst {
       visibility: getVisibilityFromPropertyFlags(flags),
       isPersistent: ((flags >> RedPropertyFlags.isPersistent) & 1) !== 0,
       name: name,
-      type: RedTypeAst.fromJson(json.a)
+      type: RedTypeAst.fromJson(json.a),
+      offset: json.d === undefined ? 0 : json.d
     };
   }
 }

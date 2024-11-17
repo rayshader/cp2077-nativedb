@@ -16,7 +16,14 @@
     }
 
     & .align {
+      display: inline-flex;
+      justify-content: end;
       width: 72px;
+      margin-top: 1px;
+
+      & span {
+        margin-right: 16px;
+      }
 
       @media (max-width: 1025px) {
         display: none;

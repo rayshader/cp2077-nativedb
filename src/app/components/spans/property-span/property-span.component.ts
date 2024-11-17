@@ -1,9 +1,10 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {booleanAttribute, ChangeDetectionStrategy, Component, Input} from '@angular/core';
 import {MatIconModule} from "@angular/material/icon";
 import {TypeSpanComponent} from "../type-span/type-span.component";
 import {RedPropertyAst} from "../../../../shared/red-ast/red-property.ast";
 import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {NDBFormatOffsetPipe} from "../../../pipes/ndb-format-offset.pipe";
 
 @Component({
   selector: 'property-span',
@@ -12,7 +13,8 @@ import {MatTooltipModule} from "@angular/material/tooltip";
   imports: [
     MatIconModule,
     MatTooltipModule,
-    TypeSpanComponent
+    TypeSpanComponent,
+    NDBFormatOffsetPipe
   ],
   templateUrl: './property-span.component.html',
   styleUrl: './property-span.component.scss'
@@ -30,6 +32,9 @@ export class PropertySpanComponent {
 
   @Input()
   documentation?: string;
+
+  @Input({transform: booleanAttribute})
+  showOffset: boolean = false;
 
   @Input('node')
   set _node(value: RedPropertyAst | undefined) {
