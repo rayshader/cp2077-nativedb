@@ -113,6 +113,14 @@
                       [class.empty]="badge.isEmpty"
                       (click)="togglePropertyFilter(badge)"></mat-icon>
           }
+          @if (canShowOffset) {
+            <mat-icon class="badge sort"
+                      [matTooltip]="propertySort === 'name' ? 'Sort by offset' : 'Sort by name'"
+                      (click)="togglePropertySort()"
+                      [svgIcon]="propertySort === 'name' ? 'sort-numeric' : 'sort-alpha'">
+            </mat-icon>
+          }
+
           <mat-icon class="badge search"
                     [matTooltip]="propertySearchFilter === 'enable' ? 'Reset filter' : 'Filter by query'"
                     [matTooltipDisabled]="propertySearchFilter === 'empty'"
@@ -125,7 +133,8 @@
           <property-span ndbHighlight
                          [id]="prop.id"
                          [node]="prop"
-                         [badges]="data.badges"></property-span>
+                         [badges]="data.badges"
+                         [showOffset]="canShowOffset"></property-span>
           @if (data.isMobile && !$last) {
             <mat-divider></mat-divider>
           }

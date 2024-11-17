@@ -9,6 +9,7 @@ export class IconsService {
   private readonly icons: string[] = [
     // UI
     'delete-empty', 'pin', 'pin-off', 'code-syntax', 'github', 'gitbook', 'bookshelf', 'discord',
+    'sort-alpha', 'sort-numeric',
 
     // Nodes
     'enum', 'bitfield', 'class', 'struct', 'function',

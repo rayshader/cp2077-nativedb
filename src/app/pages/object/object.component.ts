@@ -103,6 +103,8 @@ interface BadgeFilterItem<T> {
 
 type MemberFilter = 'empty' | 'disable' | 'enable';
 
+type PropertySort = 'name' | 'offset';
+
 @Component({
   selector: 'ndb-page-object',
   standalone: true,
@@ -210,13 +212,17 @@ export class ObjectComponent implements AfterViewInit {
 
   protected isPropertiesFiltered: boolean = false;
   protected isFunctionsFiltered: boolean = false;
+  protected canShowOffset: boolean = false;
   protected propertySearchFilter: MemberFilter = 'empty';
   protected functionSearchFilter: MemberFilter = 'empty';
+  protected propertySort: PropertySort = 'name';
 
   private readonly showDocumentationSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private readonly showDocumentation$: Observable<boolean> = this.showDocumentationSubject.asObservable();
   private readonly filtersSubject: BehaviorSubject<void> = new BehaviorSubject<void>(undefined);
   private readonly filters$: Observable<void> = this.filtersSubject.asObservable();
+  private readonly sortSubject: BehaviorSubject<PropertySort> = new BehaviorSubject<PropertySort>('name');
+  private readonly sort$: Observable<PropertySort> = this.sortSubject.asObservable();
   private readonly inheritsSubject: BehaviorSubject<InheritData[]> = new BehaviorSubject<InheritData[]>([]);
   private readonly inherits$: Observable<InheritData[]> = this.inheritsSubject.asObservable();
 
@@ -260,7 +266,8 @@ export class ObjectComponent implements AfterViewInit {
       this.settingsService.settings$,
       this.isMobile$,
       this.searchService.query$,
-      this.filters$
+      this.filters$,
+      this.sort$
     ]).pipe(
       map(this.loadData.bind(this))
     );
@@ -464,6 +471,14 @@ export class ObjectComponent implements AfterViewInit {
     this.filtersSubject.next();
   }
 
+  togglePropertySort(): void {
+    if (!this.canShowOffset) {
+      return;
+    }
+    this.propertySort = (this.propertySort === 'name') ? 'offset' : 'name';
+    this.sortSubject.next(this.propertySort);
+  }
+
   resetFilters(): void {
     this.enableBadges();
     this.propertySearchFilter = 'empty';
@@ -518,13 +533,25 @@ export class ObjectComponent implements AfterViewInit {
                      badges,
                      settings,
                      isMobile,
-                     request
-                   ]: [RedClassAst, WikiClassDto | undefined, RedClassAst[], WikiClassDto[], boolean, number, Settings, boolean, SearchRequest, void]) {
+                     request,
+                     _filter,
+                     sort
+                   ]: [RedClassAst, WikiClassDto | undefined, RedClassAst[], WikiClassDto[], boolean, number, Settings, boolean, SearchRequest, void, PropertySort]) {
     let properties: RedPropertyAst[] = [...object.properties];
     let functions: FunctionDocumentation[] = object.functions.map((func) => {
       return {memberOf: object, function: func, documentation: documentation};
     });
+    let sortProperty: (a: RedPropertyAst, b: RedPropertyAst) => number;
 
+    this.canShowOffset = settings.codeSyntax === CodeSyntax.pseudocode;
+    if (!this.canShowOffset) {
+      sort = 'name';
+    }
+    if (sort === 'name') {
+      sortProperty = RedPropertyAst.sort;
+    } else {
+      sortProperty = RedPropertyAst.sortByOffset;
+    }
     if (inherits.length > 0) {
       for (const inherit of inherits) {
         properties.push(...inherit.properties);
@@ -538,11 +565,11 @@ export class ObjectComponent implements AfterViewInit {
           }
         }
       }
-      properties.sort(RedPropertyAst.sort);
       functions.sort((a, b) => RedFunctionAst.sort(a.function, b.function));
     }
     properties = this.filterProperties(properties, request);
     functions = this.filterFunctions(functions, request);
+    properties.sort(sortProperty);
     const showEmptyAccordion: boolean = settings.showEmptyAccordion;
     let altName: string | undefined = object.aliasName;
     let name: string = object.name;

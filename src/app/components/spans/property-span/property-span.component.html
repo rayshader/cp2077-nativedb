@@ -5,7 +5,8 @@
     <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" [matTooltip]="scope"></mat-icon>
     @if (node.isPersistent) {
       <mat-icon class="badge" svgIcon="scope" matTooltip="persistent"></mat-icon>
-    }<!--
+    }
+    <!--
     @if (node.isReplicated) {
       <mat-icon class="badge" svgIcon="replicated" matTooltip="replicated"></mat-icon>
     }
@@ -18,7 +19,11 @@
     @if (node.isConst) {
       <mat-icon class="badge" svgIcon="const" matTooltip="const"></mat-icon>
     }-->
-    <div class="align" [style.width]="align"></div>
+    <div class="align" [style.width]="align">
+      @if (showOffset) {
+        <span class="stx stx-number">{{node.offset | ndbFormatOffset}}</span>
+      }
+    </div>
   </div>
 
   <div class="prototype stx">
