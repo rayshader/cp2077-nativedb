@@ -1,6 +1,8 @@
 @use 'sass:map';
+@use 'sass:color';
 
 @mixin icon-theme($theme) {
+  $primary: map.get($theme, primary);
   $badges: map.get($theme, 'badges');
 
   mat-icon {
@@ -23,6 +25,15 @@
 
       &function {
         color: map.get($badges, 'function');
+      }
+    }
+
+    &.btn {
+      color: map.get($primary, 500);
+
+      &[disabled],
+      &.disabled {
+        color: color.scale(map.get($primary, 500), $saturation: -50%, $lightness: -50%);
       }
     }
   }

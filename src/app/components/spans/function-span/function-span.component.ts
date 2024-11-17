@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, DestroyRef, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, Input} from '@angular/core';
 import {ArgumentSpanComponent} from "../argument-span/argument-span.component";
 import {TypeSpanComponent} from "../type-span/type-span.component";
 
@@ -10,10 +10,8 @@ import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
 import {NDBDocumentationComponent} from "../../ndb-documentation/ndb-documentation.component";
 import {CodeSyntax, SettingsService} from "../../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {BehaviorSubject, combineLatest, Observable} from "rxjs";
 import {CodeFormatterService} from "../../../../shared/services/code-formatter.service";
 import {MatTooltipModule} from "@angular/material/tooltip";
-import {RouterLink} from "@angular/router";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatDivider} from "@angular/material/divider";
 import {WikiClassDto, WikiFunctionDto, WikiGlobalDto} from "../../../../shared/dtos/wiki.dto";
@@ -23,7 +21,6 @@ import {WikiClassDto, WikiFunctionDto, WikiGlobalDto} from "../../../../shared/d
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    RouterLink,
     MatMenu,
     MatMenuItem,
     MatMenuTrigger,
@@ -38,7 +35,7 @@ import {WikiClassDto, WikiFunctionDto, WikiGlobalDto} from "../../../../shared/d
   templateUrl: './function-span.component.html',
   styleUrl: './function-span.component.scss'
 })
-export class FunctionSpanComponent implements AfterViewInit {
+export class FunctionSpanComponent {
 
   /**
    * Offset in pixels to add between badges and function's name, with at least 12px.
@@ -83,12 +80,8 @@ export class FunctionSpanComponent implements AfterViewInit {
 
   protected readonly CodeSyntax = CodeSyntax;
 
-  private readonly documentationSubject: BehaviorSubject<WikiClassDto | undefined> = new BehaviorSubject<WikiClassDto | undefined>(undefined);
-  private readonly documentation$: Observable<WikiClassDto | undefined> = this.documentationSubject.asObservable();
-
   constructor(protected readonly fmtService: CodeFormatterService,
               private readonly settingsService: SettingsService,
-              private readonly cdr: ChangeDetectorRef,
               private readonly dr: DestroyRef) {
   }
 
@@ -118,6 +111,9 @@ export class FunctionSpanComponent implements AfterViewInit {
     } else {
       this.documentation = value as WikiGlobalDto;
     }
+    this.settingsService.showDocumentation$
+      .pipe(takeUntilDestroyed(this.dr))
+      .subscribe(this.onShowDocumentation.bind(this));
   }
 
   /**
@@ -144,13 +140,6 @@ export class FunctionSpanComponent implements AfterViewInit {
    */
   get hasDocumentation(): boolean {
     return this.documentation !== undefined && this.documentation.comment.length > 0;
-  }
-
-  ngAfterViewInit(): void {
-    combineLatest([
-      this.settingsService.showDocumentation$,
-      this.documentation$
-    ]).pipe(takeUntilDestroyed(this.dr)).subscribe(this.onShowDocumentation.bind(this));
   }
 
   toggleDocumentation(): void {
@@ -216,12 +205,11 @@ export class FunctionSpanComponent implements AfterViewInit {
     await navigator.clipboard.writeText(data);
   }
 
-  private onShowDocumentation([state,]: [boolean, WikiClassDto | undefined]): void {
+  private onShowDocumentation(state: boolean): void {
     if (!this.hasDocumentation) {
       return;
     }
     this.isVisible = state;
-    this.cdr.detectChanges();
   }
 
 }
