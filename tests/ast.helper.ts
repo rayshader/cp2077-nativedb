@@ -108,7 +108,8 @@ export class AstHelper {
   static buildArg(name: string,
                   type: RedTypeAst | string,
                   isOptional: boolean = false,
-                  isOut: boolean = false): RedArgumentAst {
+                  isOut: boolean = false,
+                  isConst: boolean = false): RedArgumentAst {
     let argType: RedTypeAst | undefined;
 
     if (typeof type === 'string') {
@@ -119,6 +120,7 @@ export class AstHelper {
     return {
       name: name,
       type: argType,
+      isConst: isConst,
       isOptional: isOptional,
       isOut: isOut
     };

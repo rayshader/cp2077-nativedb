@@ -6,7 +6,7 @@ import {cyrb53} from "../string";
 export interface RedPropertyJson {
   readonly a: RedTypeJson; // type
   readonly b?: string; // name
-  readonly c: number; // flags
+  readonly c?: number; // flags
   readonly d?: number; // offset
 }
 
@@ -58,7 +58,7 @@ export class RedPropertyAst {
   }
 
   static fromJson(json: RedPropertyJson): RedPropertyAst {
-    const flags: number = json.c;
+    const flags: number = json.c === undefined ? 0 : json.c;
     const name: string = json.b ?? '';
 
     return {

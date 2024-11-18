@@ -210,7 +210,7 @@ describe('RedscriptFormatter', () => {
         false,
         RedVisibilityDef.public,
         [
-          AstHelper.buildArg('a', AstHelper.Float),
+          AstHelper.buildArg('a', AstHelper.Float, false, false, true),
           AstHelper.buildArg('b', AstHelper.buildStruct('Vector4'), false, true),
           AstHelper.buildArg('c', AstHelper.buildRef('WeaponObject'), true),
         ]
@@ -220,7 +220,7 @@ describe('RedscriptFormatter', () => {
       const code: string = fmt.formatPrototype(func);
 
       // THEN
-      expect(code).toBe('Fake(a: Float, out b: Vector4, opt c: ref<WeaponObject>) -> array<wref<GameObject>>');
+      expect(code).toBe('Fake(const a: Float, out b: Vector4, opt c: ref<WeaponObject>) -> array<wref<GameObject>>');
     });
   });
 
