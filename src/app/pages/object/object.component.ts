@@ -543,7 +543,7 @@ export class ObjectComponent implements AfterViewInit {
     });
     let sortProperty: (a: RedPropertyAst, b: RedPropertyAst) => number;
 
-    this.canShowOffset = settings.codeSyntax === CodeSyntax.pseudocode;
+    this.canShowOffset = settings.codeSyntax === CodeSyntax.pseudocode && !isMobile;
     if (!this.canShowOffset) {
       sort = 'name';
     }
