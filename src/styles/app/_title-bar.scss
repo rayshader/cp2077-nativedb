@@ -15,6 +15,10 @@
 
       & h1 {
         width: fit-content;
+
+        @media (max-width: 1025px) {
+          width: auto;
+        }
       }
     }
 
