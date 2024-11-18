@@ -5,6 +5,38 @@ import {RedTypeAst} from "../red-ast/red-type.ast";
 import {RedArgumentAst} from "../red-ast/red-argument.ast";
 import {CodeSyntax} from "../services/settings.service";
 
+export enum LuaPrimitiveDef {
+  Void = 'void',
+  Bool = 'Bool',
+  Int8 = 'Int8',
+  Uint8 = 'Uint8',
+  Int16 = 'Int16',
+  Uint16 = 'Uint16',
+  Int32 = 'Int32',
+  Uint32 = 'Uint32',
+  Int64 = 'Int64',
+  Uint64 = 'Uint64',
+  Float = 'Float',
+  Double = 'Double',
+  String = 'String',
+  LocalizationString = 'LocalizationString',
+  CName = 'string | CName',
+  TweakDBID = 'TweakDBID',
+  NodeRef = 'NodeRef',
+  DataBuffer = 'DataBuffer',
+  serializationDeferredDataBuffer = 'serializationDeferredDataBuffer',
+  SharedDataBuffer = 'SharedDataBuffer',
+  CDateTime = 'CDateTime',
+  CGUID = 'CGUID',
+  CRUID = 'CRUID',
+  //CRUIDRef = 'any',
+  EditorObjectID = 'EditorObjectID',
+  //GamedataLocKeyWrapper = 'any',
+  MessageResourcePath = 'MessageResourcePath',
+  //RuntimeEntityRef = 'RuntimeEntityRef',
+  Variant = 'Variant'
+}
+
 export class LuaFormatter extends CodeFormatter {
 
   constructor() {
@@ -100,29 +132,33 @@ export class LuaFormatter extends CodeFormatter {
     if (nativePrefix !== -1) {
       funcName = funcName.substring(nativePrefix + 2);
     }
+    let luadoc: string = '';
     let callback: string = '';
 
     if (!func.isStatic) {
+      luadoc += `---@param this ${memberOf.aliasName ?? memberOf.name}`;
       callback += 'this';
       if (func.arguments.length > 0) {
+        luadoc += '\n';
         callback += ', ';
       }
     }
-    callback += func.arguments.map((arg) => arg.name).join(', ');
+    luadoc += func.arguments
+      .map((arg) => `---@param ${arg.name}${arg.isOptional ? '?' : ''} ${RedTypeAst.toLuadoc(arg.type)}`)
+      .join('\n');
+    callback += func.arguments
+      .map((arg) => arg.name)
+      .join(', ');
     let code: string = '';
     let after: string = isAfter ? 'After' : '';
 
-    code += `Observe${after}("${memberOf.aliasName ?? memberOf.name}", "${funcName}", function(${callback})\n`;
+    code += `Observe${after}("${memberOf.aliasName ?? memberOf.name}", "${funcName}",\n`;
+    code += `${luadoc}\n`;
+    code += `function(${callback})\n`;
     if (!isAfter) {
-      code += `    -- method has just been called with:\n`;
+      code += `    -- method has just been called\n`;
     } else {
-      code += `    -- method has been called and fully executed with:\n`;
-    }
-    if (!func.isStatic) {
-      code += `    -- this: ${memberOf.aliasName ?? memberOf.name}\n`;
-    }
-    for (const argument of func.arguments) {
-      code += `    -- ${argument.name}: ${RedTypeAst.toString(argument.type, CodeSyntax.redscript)}\n`;
+      code += `    -- method has been called and fully executed\n`;
     }
     code += 'end)\n';
     return code;
@@ -135,15 +171,29 @@ export class LuaFormatter extends CodeFormatter {
     if (nativePrefix !== -1) {
       funcName = funcName.substring(nativePrefix + 2);
     }
+    let luadoc: string = '';
     let callback: string = '';
 
     if (!func.isStatic) {
+      luadoc += `---@param this ${memberOf.aliasName ?? memberOf.name}`;
       callback += 'this';
       if (func.arguments.length > 0) {
+        luadoc += '\n';
         callback += ', ';
       }
     }
-    callback += func.arguments.map((arg) => arg.name).join(', ');
+    luadoc += func.arguments
+      .map((arg) => `---@param ${arg.name}${arg.isOptional ? '?' : ''} ${RedTypeAst.toLuadoc(arg.type)}`)
+      .join('\n');
+    callback += func.arguments
+      .map((arg) => arg.name)
+      .join(', ');
+    luadoc += '\n';
+    luadoc += `---@param wrappedMethod function`;
+    if (func.returnType) {
+      luadoc += '\n';
+      luadoc += `---@return ${RedTypeAst.toLuadoc(func.returnType)}`;
+    }
     if (callback.length !== 0) {
       callback += ', ';
     }
@@ -151,15 +201,10 @@ export class LuaFormatter extends CodeFormatter {
     const args: string = func.arguments.map((arg) => arg.name).join(', ');
     let code: string = '';
 
-    code += `Override("${memberOf.aliasName ?? memberOf.name}", "${funcName}", function(${callback})\n`;
-    code += '    -- rewrite method with:\n';
-    if (!func.isStatic) {
-      code += `    -- this: ${memberOf.aliasName ?? memberOf.name}\n`;
-    }
-    for (const argument of func.arguments) {
-      code += `    -- ${argument.name}: ${RedTypeAst.toString(argument.type, CodeSyntax.redscript)}\n`;
-    }
-    code += '    \n';
+    code += `Override("${memberOf.aliasName ?? memberOf.name}", "${funcName}",\n`;
+    code += `${luadoc}\n`;
+    code += `function(${callback})\n`;
+    code += '    -- rewrite method\n';
     if (func.returnType) {
       code += `    local result = wrappedMethod(${args})\n`;
       code += '    \n';
@@ -183,7 +228,7 @@ export class LuaFormatter extends CodeFormatter {
     code += `    ${func.name} = {\n`;
     code += `        args = {${pseudoArgs}},\n`;
     code += `        callback = function(${args})\n`;
-    code += '            -- Do stuff\n';
+    code += '            -- do stuff\n';
     code += '        end\n';
     code += '    }\n';
     code += '})\n';

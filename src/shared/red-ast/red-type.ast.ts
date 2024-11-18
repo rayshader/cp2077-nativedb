@@ -2,6 +2,7 @@ import {RedNodeAst, RedNodeKind} from "./red-node.ast";
 import {cyrb53} from "../string";
 import {RedPrimitiveDef, RedTemplateDef} from "./red-definitions.ast";
 import {CodeSyntax} from "../services/settings.service";
+import {LuaPrimitiveDef} from "../formatters/lua.formatter";
 
 export interface RedTypeJson {
   readonly a?: number; // flag
@@ -71,6 +72,11 @@ export class RedTypeAst {
     }
   }
 
+  static primitiveToLuadoc(flag: RedPrimitiveDef): string {
+    // @ts-ignore
+    return LuaPrimitiveDef[RedPrimitiveDef[flag]];
+  }
+
   static toString(type: RedTypeAst, syntax?: CodeSyntax): string {
     let name: string = type.name;
     let str: string = '';
@@ -103,6 +109,30 @@ export class RedTypeAst {
       }
       if (syntax !== CodeSyntax.pseudocode) {
         str += (type.size === undefined) ? '>' : ']';
+      }
+    } else {
+      str = name;
+    }
+    return str;
+  }
+
+  static toLuadoc(type: RedTypeAst): string {
+    let name: string = type.name;
+    let str: string = '';
+
+    if (type.aliasName) {
+      name = type.aliasName;
+    }
+    if (this.isPrimitive(type)) {
+      name = this.primitiveToLuadoc(type.flag as RedPrimitiveDef);
+    } else if (this.isTemplate(type)) {
+      name = '';
+    }
+    if (type.innerType !== undefined) {
+      str += name;
+      str += RedTypeAst.toLuadoc(type.innerType);
+      if (type.flag === RedTemplateDef.array) {
+        str += '[]';
       }
     } else {
       str = name;
