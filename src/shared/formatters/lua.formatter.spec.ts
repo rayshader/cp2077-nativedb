@@ -237,10 +237,11 @@ describe('LuaFormatter', () => {
       const code: string = fmt.formatSpecial('Observe', func, memberOf);
 
       // THEN
-      expect(code).toBe(`Observe("VehicleComponent", "PlayHonkForDuration", function(this, honkTime)
-    -- method has just been called with:
-    -- this: VehicleComponent
-    -- honkTime: Float
+      expect(code).toBe(`Observe("VehicleComponent", "PlayHonkForDuration",
+---@param this VehicleComponent
+---@param honkTime Float
+function(this, honkTime)
+    -- method has just been called
 end)
 `);
     });
@@ -256,7 +257,7 @@ end)
         [
           AstHelper.buildArg('vehicle', AstHelper.buildWeakRef('vehicleBaseObject', 'VehicleObject')),
           AstHelper.buildArg('vehicleSlotID', AstHelper.buildType('gamemountingMountingSlotId', 'MountingSlotId')),
-          AstHelper.buildArg('delay', AstHelper.Float),
+          AstHelper.buildArg('delay', AstHelper.Float, true),
         ],
         'OpenDoor;VehicleObjectMountingSlotIdFloat'
       );
@@ -265,11 +266,12 @@ end)
       const code: string = fmt.formatSpecial('Observe', func, memberOf);
 
       // THEN
-      expect(code).toBe(`Observe("VehicleComponent", "OpenDoor;VehicleObjectMountingSlotIdFloat", function(vehicle, vehicleSlotID, delay)
-    -- method has just been called with:
-    -- vehicle: wref<VehicleObject>
-    -- vehicleSlotID: MountingSlotId
-    -- delay: Float
+      expect(code).toBe(`Observe("VehicleComponent", "OpenDoor;VehicleObjectMountingSlotIdFloat",
+---@param vehicle VehicleObject
+---@param vehicleSlotID MountingSlotId
+---@param delay? Float
+function(vehicle, vehicleSlotID, delay)
+    -- method has just been called
 end)
 `);
     });
@@ -293,10 +295,11 @@ end)
       const code: string = fmt.formatSpecial('ObserveAfter', func, memberOf);
 
       // THEN
-      expect(code).toBe(`ObserveAfter("VehicleComponent", "PlayHonkForDuration", function(this, honkTime)
-    -- method has been called and fully executed with:
-    -- this: VehicleComponent
-    -- honkTime: Float
+      expect(code).toBe(`ObserveAfter("VehicleComponent", "PlayHonkForDuration",
+---@param this VehicleComponent
+---@param honkTime Float
+function(this, honkTime)
+    -- method has been called and fully executed
 end)
 `);
     });
@@ -312,7 +315,7 @@ end)
         [
           AstHelper.buildArg('vehicle', AstHelper.buildWeakRef('vehicleBaseObject', 'VehicleObject')),
           AstHelper.buildArg('vehicleSlotID', AstHelper.buildType('gamemountingMountingSlotId', 'MountingSlotId')),
-          AstHelper.buildArg('delay', AstHelper.Float),
+          AstHelper.buildArg('delay', AstHelper.Float, true),
         ],
         'OpenDoor;VehicleObjectMountingSlotIdFloat'
       );
@@ -321,11 +324,12 @@ end)
       const code: string = fmt.formatSpecial('ObserveAfter', func, memberOf);
 
       // THEN
-      expect(code).toBe(`ObserveAfter("VehicleComponent", "OpenDoor;VehicleObjectMountingSlotIdFloat", function(vehicle, vehicleSlotID, delay)
-    -- method has been called and fully executed with:
-    -- vehicle: wref<VehicleObject>
-    -- vehicleSlotID: MountingSlotId
-    -- delay: Float
+      expect(code).toBe(`ObserveAfter("VehicleComponent", "OpenDoor;VehicleObjectMountingSlotIdFloat",
+---@param vehicle VehicleObject
+---@param vehicleSlotID MountingSlotId
+---@param delay? Float
+function(vehicle, vehicleSlotID, delay)
+    -- method has been called and fully executed
 end)
 `);
     });
@@ -344,10 +348,12 @@ end)
       const code: string = fmt.formatSpecial('Override', func, memberOf);
 
       // THEN
-      expect(code).toBe(`Override("VehicleComponent", "GetVehicle", function(this, wrappedMethod)
-    -- rewrite method with:
-    -- this: VehicleComponent
-\u0020\u0020\u0020\u0020
+      expect(code).toBe(`Override("VehicleComponent", "GetVehicle",
+---@param this VehicleComponent
+---@param wrappedMethod function
+---@return VehicleObject
+function(this, wrappedMethod)
+    -- rewrite method
     local result = wrappedMethod()
 \u0020\u0020\u0020\u0020
     return result
@@ -374,11 +380,13 @@ end)
       const code: string = fmt.formatSpecial('Override', func, memberOf);
 
       // THEN
-      expect(code).toBe(`Override("VehicleComponent", "CloseDoor;VehicleObjectMountingSlotId", function(vehicle, vehicleSlotID, wrappedMethod)
-    -- rewrite method with:
-    -- vehicle: wref<VehicleObject>
-    -- vehicleSlotID: MountingSlotId
-\u0020\u0020\u0020\u0020
+      expect(code).toBe(`Override("VehicleComponent", "CloseDoor;VehicleObjectMountingSlotId",
+---@param vehicle VehicleObject
+---@param vehicleSlotID MountingSlotId
+---@param wrappedMethod function
+---@return Bool
+function(vehicle, vehicleSlotID, wrappedMethod)
+    -- rewrite method
     local result = wrappedMethod(vehicle, vehicleSlotID)
 \u0020\u0020\u0020\u0020
     return result
@@ -412,7 +420,7 @@ end)
     OnGodModeChanged = {
         args = {"entEntityID", "gameGodModeType"},
         callback = function(ownerID, newType)
-            -- Do stuff
+            -- do stuff
         end
     }
 })
