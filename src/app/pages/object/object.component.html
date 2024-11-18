@@ -53,7 +53,9 @@
 
         @for (parent of data.parents; track parent.id) {
           <div class="inheritance stx">
-            <div class="align" [style.width]="data.align"></div>
+            @if (!data.isMobile) {
+              <div class="align" [style.width]="data.align"></div>
+            }
 
             <mat-icon class="btn"
                       [class.disabled]="parent.isEmpty"
@@ -80,7 +82,10 @@
 
         @for (child of data.children; track child.id) {
           <div class="inheritance stx">
-            <div class="align" [style.width]="data.align"></div>
+            @if (!data.isMobile) {
+              <div class="align" [style.width]="data.align"></div>
+            }
+
             <mat-icon></mat-icon>
 
             <mat-icon>subdirectory_arrow_left</mat-icon>

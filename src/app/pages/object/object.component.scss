@@ -70,6 +70,14 @@
 
     @media (max-width: 1025px) {
       min-height: 48px;
+
+      & mat-icon {
+        min-width: 18px;
+      }
+
+      & type-span {
+        overflow-x: auto;
+      }
     }
   }
 }
