@@ -2,7 +2,6 @@
   <ndb-title-bar [title]="data.name"
                  [altTitle]="data.altName"
                  [node]="data.object"
-                 [hideDocumentation]="!data.canDocument"
                  [hasDocumentation]="data.hasComment"
                  (toggleDocumentation)="toggleDocumentation(data.object.name, data.hasComment)">
     <mat-icon class="badge" [attr.data-scope]="data.scope" svgIcon="scope" [matTooltip]="data.scope"></mat-icon>
@@ -26,7 +25,7 @@
     }
   </ndb-title-bar>
 
-  @if (data.showComment && data.hasComment && data.canDocument) {
+  @if (data.showComment && data.hasComment) {
     <ndb-documentation [body]="data.documentation!.comment"
                        [object]="data.object"></ndb-documentation>
   }
@@ -185,7 +184,7 @@
                          [memberOf]="func.memberOf"
                          [documentation]="func.documentation"
                          [canCopy]="true"
-                         [canDocument]="data.canDocument"
+                         [canDocument]="true"
                          [badges]="data.badges"></function-span>
           @if (data.isMobile && !$last) {
             <mat-divider></mat-divider>

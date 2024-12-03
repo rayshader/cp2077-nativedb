@@ -68,7 +68,6 @@ interface ObjectData {
 
   readonly documentation?: WikiClassDto;
   readonly showComment: boolean;
-  readonly canDocument: boolean;
   readonly hasComment: boolean;
 
   readonly isMobile: boolean;
@@ -595,7 +594,6 @@ export class ObjectComponent implements AfterViewInit {
       align: `${104 + (badges - 2) * 24}px`,
       documentation: documentation,
       showComment: showDocumentation,
-      canDocument: !isMobile,
       hasComment: documentation && documentation.comment.length > 0,
       isMobile: isMobile,
       isPinned: settings.isBarPinned,
