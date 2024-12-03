@@ -8,7 +8,7 @@ import {NDBAccordionItemComponent} from "../../components/ndb-accordion-item/ndb
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
 import {
   BehaviorSubject,
-  combineLatest,
+  combineLatest, combineLatestWith,
   delay,
   EMPTY,
   map,
@@ -253,6 +253,17 @@ export class ObjectComponent implements AfterViewInit {
     this.settingsService.showDocumentation$
       .pipe(take(1), takeUntilDestroyed(this.dr))
       .subscribe((show) => this.showDocumentationSubject.next(show));
+
+    this.settingsService.showMembers$
+      .pipe(
+        take(1),
+        takeUntilDestroyed(this.dr),
+        combineLatestWith(object$),
+      )
+      .subscribe(([show, object]) => {
+        this.showMembers.setValue(show, {emitEvent: false});
+        this.onShowMembersToggled(<any>{checked: show}, object.parents);
+      });
 
     this.data$ = combineLatest([
       object$,

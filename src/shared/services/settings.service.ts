@@ -7,6 +7,7 @@ export interface Settings {
   readonly scriptOnly: boolean;
   readonly scrollBehavior: PageScrollBehavior;
   readonly showDocumentation: boolean;
+  readonly showMembers: boolean;
   readonly highlightEmptyObject: boolean;
   readonly showEmptyAccordion: boolean;
   readonly mergeObject: boolean;
@@ -34,6 +35,7 @@ export class SettingsService {
   private readonly scriptOnlySubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private readonly scrollBehaviorSubject: BehaviorSubject<PageScrollBehavior> = new BehaviorSubject<PageScrollBehavior>('smooth');
   private readonly showDocumentationSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  private readonly showMembersSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private readonly highlightEmptyObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly showEmptyAccordionSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private readonly mergeObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
@@ -68,6 +70,11 @@ export class SettingsService {
    * Whether documented properties/functions should be visible?
    */
   readonly showDocumentation$: Observable<boolean> = this.showDocumentationSubject.asObservable();
+
+  /**
+   * Whether members of parents should be visible?
+   */
+  readonly showMembers$: Observable<boolean> = this.showMembersSubject.asObservable();
 
   /**
    * Whether empty class/struct should be highlighted?
@@ -110,6 +117,7 @@ export class SettingsService {
     const scriptOnly: boolean = (localStorage.getItem('script-only') ?? 'false') === 'true';
     const scrollBehavior: PageScrollBehavior = (localStorage.getItem('scroll-behavior') ?? 'smooth') as PageScrollBehavior;
     const showDocumentation: boolean = (localStorage.getItem('show-documentation') ?? 'true') === 'true';
+    const showMembers: boolean = (localStorage.getItem('show-members') ?? 'false') === 'true';
     const highlightEmptyObject: boolean = (localStorage.getItem('highlight-empty-object') ?? 'true') === 'true';
     const showEmptyAccordion: boolean = (localStorage.getItem('show-empty-accordion') ?? 'false') === 'true';
     const mergeObject: boolean = (localStorage.getItem('merge-object') ?? 'true') === 'true';
@@ -122,6 +130,7 @@ export class SettingsService {
     this.scriptOnlySubject.next(scriptOnly);
     this.scrollBehaviorSubject.next(scrollBehavior);
     this.showDocumentationSubject.next(showDocumentation);
+    this.showMembersSubject.next(showMembers);
     this.highlightEmptyObjectSubject.next(highlightEmptyObject);
     this.showEmptyAccordionSubject.next(showEmptyAccordion);
     this.mergeObjectSubject.next(mergeObject);
@@ -137,6 +146,7 @@ export class SettingsService {
       this.scriptOnly$,
       this.scrollBehavior$,
       this.showDocumentation$,
+      this.showMembers$,
       this.highlightEmptyObject$,
       this.showEmptyAccordion$,
       this.mergeObject$,
@@ -151,6 +161,7 @@ export class SettingsService {
                scriptOnly,
                scrollBehavior,
                showDocumentation,
+               showMembers,
                highlightEmptyObject,
                showEmptyAccordion,
                mergeObject,
@@ -164,6 +175,7 @@ export class SettingsService {
             scriptOnly: scriptOnly,
             scrollBehavior: scrollBehavior,
             showDocumentation: showDocumentation,
+            showMembers: showMembers,
             highlightEmptyObject: highlightEmptyObject,
             showEmptyAccordion: showEmptyAccordion,
             mergeObject: mergeObject,
@@ -202,6 +214,11 @@ export class SettingsService {
   updateShowDocumentation(state: boolean): void {
     localStorage.setItem('show-documentation', `${state}`);
     this.showDocumentationSubject.next(state);
+  }
+
+  updateShowMembers(state: boolean): void {
+    localStorage.setItem('show-members', `${state}`);
+    this.showMembersSubject.next(state);
   }
 
   updateHighlightEmptyObject(state: boolean): void {

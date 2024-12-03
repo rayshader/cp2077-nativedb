@@ -58,6 +58,18 @@
 
 <div class="setting">
   <p>
+    Show / hide members of parents by default.
+  </p>
+
+  <mat-slide-toggle color="primary" [formControl]="showMembers">
+    {{showMembers.value ? "Show" : "Hide"}}
+  </mat-slide-toggle>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="setting">
+  <p>
     Highlight empty classes and structs when they have no properties nor functions.
   </p>
 
