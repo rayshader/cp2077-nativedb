@@ -7,7 +7,6 @@ import {AsyncPipe} from "@angular/common";
 
 @Component({
   selector: 'argument-span',
-  standalone: true,
   imports: [
     AsyncPipe,
     TypeSpanComponent

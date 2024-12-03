@@ -107,7 +107,6 @@ type PropertySort = 'name' | 'offset';
 
 @Component({
   selector: 'ndb-page-object',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,

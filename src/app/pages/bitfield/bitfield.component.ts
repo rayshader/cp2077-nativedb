@@ -21,7 +21,6 @@ interface BitfieldData {
 
 @Component({
   selector: 'ndb-page-bitfield',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,

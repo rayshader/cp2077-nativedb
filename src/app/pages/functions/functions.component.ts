@@ -9,7 +9,6 @@ import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar
 import {MatDividerModule} from "@angular/material/divider";
 import {ResponsiveService} from "../../../shared/services/responsive.service";
 import {MatTooltip} from "@angular/material/tooltip";
-import {MatFormField, MatLabel} from "@angular/material/form-field";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {SettingsService} from "../../../shared/services/settings.service";
@@ -29,13 +28,10 @@ interface FunctionsData {
 
 @Component({
   selector: 'ndb-page-functions',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
     MatTooltip,
-    MatLabel,
-    MatFormField,
     MatSlideToggle,
     MatIconModule,
     MatDividerModule,

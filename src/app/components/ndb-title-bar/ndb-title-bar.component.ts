@@ -6,16 +6,13 @@ import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {take} from "rxjs";
 import {RedNodeAst, RedNodeKind} from "../../../shared/red-ast/red-node.ast";
 import {BookmarkService} from "../../../shared/services/bookmark.service";
-import {AsyncPipe} from "@angular/common";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {FilterBy, SearchService} from "../../../shared/services/search.service";
 
 @Component({
   selector: 'ndb-title-bar',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AsyncPipe,
     MatIconModule,
     MatButtonModule,
     MatTooltipModule

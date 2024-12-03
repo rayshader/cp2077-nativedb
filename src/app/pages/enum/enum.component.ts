@@ -21,7 +21,6 @@ interface EnumData {
 
 @Component({
   selector: 'ndb-page-enum',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,

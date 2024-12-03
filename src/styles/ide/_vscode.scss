@@ -19,7 +19,7 @@
       --ndb-ide-argument: #001080;
       --ndb-ide-number: #098658;
       --ndb-ide-type: #267F99;
-      --ndb-ide-type-disabled: #{darken(#267F99, 15%)};
+      --ndb-ide-type-disabled: #{color.adjust(#267F99, $lightness: -20%)};
       --ndb-ide-type-skeleton: #{color.change(#267F99, $alpha: 0.5)};
       --ndb-ide-primitive-type: var(--ndb-ide-type);
     }
@@ -38,7 +38,7 @@
         --ndb-ide-argument: #9CDCFE;
         --ndb-ide-number: #B5CEA8;
         --ndb-ide-type: #4EC9B0;
-        --ndb-ide-type-disabled: #{darken(#4EC9B0, 15%)};
+        --ndb-ide-type-disabled: #{color.adjust(#4EC9B0, $lightness: -20%)};
         --ndb-ide-type-skeleton: #{color.change(#4EC9B0, $alpha: 0.5)};
         //--ndb-ide-primitive-type: var(--ndb-ide-type);
       }

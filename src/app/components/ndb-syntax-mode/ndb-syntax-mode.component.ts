@@ -24,7 +24,6 @@ interface SyntaxData {
 
 @Component({
   selector: 'ndb-syntax-mode',
-  standalone: true,
   imports: [
     AsyncPipe,
     MatDivider,

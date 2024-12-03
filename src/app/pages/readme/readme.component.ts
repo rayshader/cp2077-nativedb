@@ -15,7 +15,6 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 
 @Component({
   selector: 'ndb-page-readme',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,

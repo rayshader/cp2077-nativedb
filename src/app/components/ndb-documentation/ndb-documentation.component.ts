@@ -12,7 +12,6 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 
 @Component({
   selector: 'ndb-documentation',
-  standalone: true,
   imports: [
     MatIcon,
     MatIconButton,

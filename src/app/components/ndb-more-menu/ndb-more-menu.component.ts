@@ -8,7 +8,6 @@ import {MatDivider} from "@angular/material/divider";
 
 @Component({
   selector: 'ndb-more-menu',
-  standalone: true,
   imports: [
     RouterLink,
     MatIcon,

@@ -13,7 +13,7 @@ import {
 import {MatTabGroup, MatTabsModule} from "@angular/material/tabs";
 import {combineLatest, filter, first, map, Observable} from "rxjs";
 import {MatIconModule} from "@angular/material/icon";
-import {AsyncPipe, NgTemplateOutlet} from "@angular/common";
+import {AsyncPipe} from "@angular/common";
 import {RouterLink} from "@angular/router";
 import {SearchService} from "../../../shared/services/search.service";
 import {CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport} from "@angular/cdk/scrolling";
@@ -45,12 +45,10 @@ interface ViewData {
 
 @Component({
   selector: 'ndb-tabs',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,
     RouterLink,
-    NgTemplateOutlet,
     CdkVirtualForOf,
     CdkFixedSizeVirtualScroll,
     CdkVirtualScrollViewport,

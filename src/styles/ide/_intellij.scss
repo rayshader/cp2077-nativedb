@@ -19,7 +19,7 @@
       --ndb-ide-argument: var(--ndb-ide-text);
       --ndb-ide-number: #1750EB;
       --ndb-ide-type: var(--ndb-ide-text);
-      --ndb-ide-type-disabled: #{darken(black, 15%)};
+      --ndb-ide-type-disabled: #{color.adjust(black, $lightness: +30%)};
       --ndb-ide-type-skeleton: #{color.change(black, $alpha: 0.5)};
       --ndb-ide-primitive-type: var(--ndb-ide-language);
     }
@@ -38,7 +38,7 @@
         //--ndb-ide-argument: var(--ndb-ide-text);
         --ndb-ide-number: #6897BB;
         //--ndb-ide-type: var(--ndb-ide-text);
-        --ndb-ide-type-disabled: #{darken(#A9B7C6, 15%)};
+        --ndb-ide-type-disabled: #{color.adjust(#A9B7C6, $lightness: -15%)};
         --ndb-ide-type-skeleton: #{color.change(#A9B7C6, $alpha: 0.5)};
         //--ndb-ide-primitive-type: var(--ndb-ide-language);
       }

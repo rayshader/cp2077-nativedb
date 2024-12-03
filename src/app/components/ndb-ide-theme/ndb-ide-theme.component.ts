@@ -14,7 +14,6 @@ interface ThemeItem {
 
 @Component({
   selector: 'ndb-ide-theme',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIconModule,

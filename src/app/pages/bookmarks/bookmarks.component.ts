@@ -17,7 +17,6 @@ interface BookmarkItem {
 
 @Component({
   selector: 'ndb-page-bookmarks',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,

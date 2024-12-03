@@ -9,7 +9,6 @@ import {ShortcutService} from "../../../../shared/services/shortcut.service";
 
 @Component({
   selector: 'type-span',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,

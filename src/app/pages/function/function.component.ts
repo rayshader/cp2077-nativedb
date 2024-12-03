@@ -19,7 +19,6 @@ interface FunctionData {
 
 @Component({
   selector: 'ndb-page-function',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,

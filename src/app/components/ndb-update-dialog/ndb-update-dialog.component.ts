@@ -10,7 +10,6 @@ interface Versioning {
 
 @Component({
   selector: 'ndb-update-dialog',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatButtonModule,

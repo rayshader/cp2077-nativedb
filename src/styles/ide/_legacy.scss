@@ -9,7 +9,7 @@
       --ndb-ide-typography-size: 1rem;
 
       --ndb-ide-background: #F3F4F6;
-      --ndb-ide-toolbar: #{darken(#F3F4F6, 10%)};
+      --ndb-ide-toolbar: #{color.adjust(#F3F4F6, $lightness: -10%)};
 
       --ndb-ide-documentation: #6D6D6D;
       --ndb-ide-text: black;
@@ -20,7 +20,7 @@
       --ndb-ide-argument: var(--ndb-ide-text);
       --ndb-ide-number: #005CC5;
       --ndb-ide-type: #BB4E03;
-      --ndb-ide-type-disabled: #{darken(#BB4E03, 15%)};
+      --ndb-ide-type-disabled: #{color.adjust(#BB4E03, $lightness: -15%)};
       --ndb-ide-type-skeleton: #{color.change(#BB4E03, $alpha: 0.5)};
       --ndb-ide-primitive-type: var(--ndb-ide-language);
     }
@@ -39,7 +39,7 @@
         //--ndb-ide-argument: var(--ndb-ide-text);
         --ndb-ide-number: #3F99FF;
         --ndb-ide-type: #FF822E;
-        --ndb-ide-type-disabled: #{darken(#FF822E, 15%)};
+        --ndb-ide-type-disabled: #{color.adjust(#FF822E, $lightness: -15%)};
         --ndb-ide-type-skeleton: #{color.change(#FF822E, $alpha: 0.5)};
         //--ndb-ide-primitive-type: var(--ndb-ide-language);
       }

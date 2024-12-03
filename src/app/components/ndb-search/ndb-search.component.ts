@@ -18,7 +18,6 @@ interface FilterItem {
 
 @Component({
   selector: 'ndb-search',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIconModule,

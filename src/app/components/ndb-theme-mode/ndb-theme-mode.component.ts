@@ -7,7 +7,6 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 
 @Component({
   selector: 'ndb-theme-mode',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIconModule,

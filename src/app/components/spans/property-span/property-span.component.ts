@@ -8,7 +8,6 @@ import {NDBFormatOffsetPipe} from "../../../pipes/ndb-format-offset.pipe";
 
 @Component({
   selector: 'property-span',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatIconModule,

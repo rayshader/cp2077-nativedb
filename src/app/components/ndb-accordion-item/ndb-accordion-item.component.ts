@@ -6,7 +6,6 @@ import {MatDividerModule} from "@angular/material/divider";
 
 @Component({
   selector: 'ndb-accordion-item',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CdkAccordionModule,

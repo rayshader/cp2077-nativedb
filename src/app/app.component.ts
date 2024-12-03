@@ -9,7 +9,7 @@ import {
   ViewChild
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {NavigationEnd, Router, RouterLink, RouterOutlet} from '@angular/router';
+import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {NDBTabsComponent} from "./components/ndb-tabs/ndb-tabs.component";
 import {IconsService} from "../shared/services/icons.service";
@@ -36,12 +36,10 @@ export interface AppData {
 
 @Component({
   selector: 'app',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     CommonModule,
     RouterOutlet,
-    RouterLink,
     MatIconModule,
     MatChipsModule,
     MatButtonModule,

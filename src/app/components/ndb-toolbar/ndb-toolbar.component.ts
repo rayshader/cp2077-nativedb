@@ -17,7 +17,6 @@ import {NDBMoreMenuComponent} from "../ndb-more-menu/ndb-more-menu.component";
 
 @Component({
   selector: 'ndb-toolbar',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     RouterLink,

@@ -18,7 +18,6 @@ interface RecentVisitData {
 
 @Component({
   selector: 'ndb-page-recent-visits',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     AsyncPipe,

@@ -18,7 +18,6 @@ import {WikiClassDto, WikiFunctionDto, WikiGlobalDto} from "../../../../shared/d
 
 @Component({
   selector: 'function-span',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     MatMenu,
