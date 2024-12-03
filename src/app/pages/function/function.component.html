@@ -1,7 +1,6 @@
 @if (data$ | async; as data) {
   <ndb-title-bar [title]="data.function.name"
                  [node]="data.function"
-                 [hideDocumentation]="true"
                  [hidden]="true">
     <mat-icon class="badge-function" svgIcon="function" matTooltip="function"></mat-icon>
   </ndb-title-bar>

@@ -6,4 +6,8 @@ p {
   flex: 1;
   margin: 0 16px 16px 0;
   padding: 16px;
+
+  @media (max-width: 1025px) {
+    margin-right: 0;
+  }
 }

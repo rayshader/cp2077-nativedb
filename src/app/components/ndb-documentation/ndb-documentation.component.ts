@@ -9,10 +9,14 @@ import {CodeSyntax} from "../../../shared/services/settings.service";
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
+import {ResponsiveService} from "../../../shared/services/responsive.service";
+import {Observable} from "rxjs";
+import {AsyncPipe} from "@angular/common";
 
 @Component({
   selector: 'ndb-documentation',
   imports: [
+    AsyncPipe,
     MatIcon,
     MatIconButton,
     MatMenu,
@@ -35,8 +39,13 @@ export class NDBDocumentationComponent {
   @Input()
   method?: RedFunctionAst;
 
-  constructor(private readonly router: Router) {
+  constructor(private readonly responsiveService: ResponsiveService,
+              private readonly router: Router) {
 
+  }
+
+  get isMobile$(): Observable<boolean> {
+    return this.responsiveService.mobile$;
   }
 
   onLinkClicked(event: Event): void {

@@ -2,27 +2,29 @@
    (click)="onLinkClicked($event)"
    [innerHTML]="body | ndbFormatDocumentation"></p>
 
-<button mat-icon-button
-        [matMenuTriggerFor]="menu">
-  <mat-icon>more_vert</mat-icon>
-</button>
-
-<mat-menu #menu="matMenu">
-  <button mat-menu-item
-          (click)="editGitBook()">
-    <mat-icon>edit</mat-icon>
-    Edit in GitBook
+@if (!(isMobile$ | async)) {
+  <button mat-icon-button
+          [matMenuTriggerFor]="menu">
+    <mat-icon>more_vert</mat-icon>
   </button>
 
-  <button mat-menu-item
-          (click)="showGitBook()">
-    <mat-icon>visibility</mat-icon>
-    Show in GitBook
-  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item
+            (click)="editGitBook()">
+      <mat-icon>edit</mat-icon>
+      Edit in GitBook
+    </button>
 
-  <button mat-menu-item
-          (click)="openGuidelines()">
-    <mat-icon>help_outline</mat-icon>
-    Show guidelines
-  </button>
-</mat-menu>
+    <button mat-menu-item
+            (click)="showGitBook()">
+      <mat-icon>visibility</mat-icon>
+      Show in GitBook
+    </button>
+
+    <button mat-menu-item
+            (click)="openGuidelines()">
+      <mat-icon>help_outline</mat-icon>
+      Show guidelines
+    </button>
+  </mat-menu>
+}
