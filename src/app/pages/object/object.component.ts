@@ -400,8 +400,16 @@ export class ObjectComponent implements AfterViewInit {
     });
   }
 
-  togglePropertyFilter(badge: BadgeFilterItem<RedPropertyAst>): void {
-    if (badge.isEmpty) {
+  getLostPropertyFilter(): BadgeFilterItem<RedPropertyAst> | undefined {
+    return this.badgesProperty.find((badge) => badge.isEnabled && !badge.isEmpty);
+  }
+
+  getLostFunctionFilter(): BadgeFilterItem<RedFunctionAst> | undefined {
+    return this.badgesFunction.find((badge) => badge.isEnabled && !badge.isEmpty);
+  }
+
+  togglePropertyFilter(badge: BadgeFilterItem<RedPropertyAst>, force: boolean = false): void {
+    if (badge.isEmpty && !force) {
       return;
     }
     let isEnabled: boolean = false;
@@ -440,8 +448,8 @@ export class ObjectComponent implements AfterViewInit {
     this.filtersSubject.next();
   }
 
-  toggleFunctionFilter(badge: BadgeFilterItem<RedFunctionAst>): void {
-    if (badge.isEmpty) {
+  toggleFunctionFilter(badge: BadgeFilterItem<RedFunctionAst>, force: boolean = false): void {
+    if (badge.isEmpty && !force) {
       return;
     }
     let isEnabled: boolean = false;
@@ -617,7 +625,12 @@ export class ObjectComponent implements AfterViewInit {
   }
 
   private filterProperties(properties: RedPropertyAst[], request: SearchRequest): RedPropertyAst[] {
+    const lostBadge = this.getLostPropertyFilter();
+
     this.computePropertyFilters(properties);
+    if (lostBadge && lostBadge.isEmpty) {
+      this.togglePropertyFilter(lostBadge, true);
+    }
     if (!SearchService.isPropertyOrUsage(request) && this.propertySearchFilter !== 'empty') {
       this.propertySearchFilter = 'empty';
       this.enableBadges('property');
@@ -634,7 +647,12 @@ export class ObjectComponent implements AfterViewInit {
   }
 
   private filterFunctions(functions: FunctionDocumentation[], request: SearchRequest): FunctionDocumentation[] {
+    const lostBadge = this.getLostFunctionFilter();
+
     this.computeFunctionFilters(functions);
+    if (lostBadge && lostBadge.isEmpty) {
+      this.toggleFunctionFilter(lostBadge, true);
+    }
     if (!SearchService.isFunctionOrUsage(request) && this.functionSearchFilter !== 'empty') {
       this.functionSearchFilter = 'empty';
       this.enableBadges('function');
