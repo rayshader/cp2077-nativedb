@@ -630,6 +630,7 @@ export class ObjectComponent implements AfterViewInit {
     this.computePropertyFilters(properties);
     if (lostBadge && lostBadge.isEmpty) {
       this.togglePropertyFilter(lostBadge, true);
+      this.isPropertiesFiltered = false;
     }
     if (!SearchService.isPropertyOrUsage(request) && this.propertySearchFilter !== 'empty') {
       this.propertySearchFilter = 'empty';
