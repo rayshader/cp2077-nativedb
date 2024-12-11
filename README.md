@@ -21,23 +21,23 @@ You can generate RTTI dump assets yourself. You will need [RTTIDumper]:
 
 ## Development server
 
-Run `npm run start` for a dev server. Navigate to `http://localhost:4200/`. 
+Run `pnpm run start` for a dev server. Navigate to `http://localhost:4200/`. 
 The application will automatically reload if you change any of the source 
 files.
 
 ## Test
-Run `npm run test` to run unit tests with [Jest].
+Run `pnpm run test` to run unit tests with [Jest].
 
 ## Build
 
-Run `npm run build` to build the project. The build artefacts will be stored 
+Run `pnpm run build` to build the project. The build artefacts will be stored 
 in the `dist/browser/` directory. It will compress build files using `brotli` 
 algorithm. The biggest AST file will be around ~800KB. It should be small 
 enough given the usage of a Service Worker.
 
 ## Test server
 
-Run `npm run prod` after you built the project. Navigate to 
+Run `pnpm run prod` after you built the project. Navigate to 
 `http://localhost:4400`. The application will run with Service Worker enabled. 
 You might need to disable your antivirus to serve compressed files.
 
