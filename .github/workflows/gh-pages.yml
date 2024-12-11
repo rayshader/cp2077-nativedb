@@ -18,14 +18,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
-          node-version: '18'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build --if-present
-      - run: npm run test
-      - uses: actions/upload-artifact@v4
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install / Build / Test
+        run: |
+          pnpm install
+          pnpm run build
+          pnpm run test
+
+      - name: Pack artifact
+        uses: actions/upload-artifact@v4
         with:
           name: ndb-dist
           path: dist/browser/
