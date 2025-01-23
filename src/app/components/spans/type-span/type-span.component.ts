@@ -62,4 +62,12 @@ export class TypeSpanComponent {
     }
   }
 
+  disableScrolling(event: MouseEvent): boolean {
+    if (!this.node || event.button !== 1) {
+      return true;
+    }
+    event.preventDefault();
+    return false;
+  }
+
 }

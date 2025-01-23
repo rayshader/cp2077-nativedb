@@ -46,11 +46,13 @@
         @case (redscript) {
           <span class="stx-type redirect"
                 [class.disabled]="isEmpty"
+                (mousedown)="disableScrolling($event)"
                 (mouseup)="onRedirect($event)">{{node.aliasName ?? node.name}}</span>
         }
         @default {
           <span class="stx-type redirect"
                 [class.disabled]="isEmpty"
+                (mousedown)="disableScrolling($event)"
                 (mouseup)="onRedirect($event)">{{node.name}}</span>
         }
       }
