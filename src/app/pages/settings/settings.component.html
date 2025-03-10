@@ -70,6 +70,18 @@
 
 <div class="setting">
   <p>
+    Format shared link with Markdown syntax.
+  </p>
+
+  <mat-slide-toggle color="primary" [formControl]="formatShareLink">
+    {{formatShareLink.value ? "On" : "Off"}}
+  </mat-slide-toggle>
+</div>
+
+<mat-divider></mat-divider>
+
+<div class="setting">
+  <p>
     Highlight empty classes and structs when they have no properties nor functions.
   </p>
 

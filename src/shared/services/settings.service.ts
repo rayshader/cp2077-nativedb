@@ -8,6 +8,7 @@ export interface Settings {
   readonly scrollBehavior: PageScrollBehavior;
   readonly showDocumentation: boolean;
   readonly showMembers: boolean;
+  readonly formatShareLink: boolean;
   readonly highlightEmptyObject: boolean;
   readonly showEmptyAccordion: boolean;
   readonly mergeObject: boolean;
@@ -36,6 +37,7 @@ export class SettingsService {
   private readonly scrollBehaviorSubject: BehaviorSubject<PageScrollBehavior> = new BehaviorSubject<PageScrollBehavior>('smooth');
   private readonly showDocumentationSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly showMembersSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private readonly formatShareLinkSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly highlightEmptyObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   private readonly showEmptyAccordionSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   private readonly mergeObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
@@ -75,6 +77,11 @@ export class SettingsService {
    * Whether members of parents should be visible?
    */
   readonly showMembers$: Observable<boolean> = this.showMembersSubject.asObservable();
+
+  /**
+   * Whether share links should use Markdown format?
+   */
+  readonly formatShareLink$: Observable<boolean> = this.formatShareLinkSubject.asObservable();
 
   /**
    * Whether empty class/struct should be highlighted?
@@ -118,6 +125,7 @@ export class SettingsService {
     const scrollBehavior: PageScrollBehavior = (localStorage.getItem('scroll-behavior') ?? 'smooth') as PageScrollBehavior;
     const showDocumentation: boolean = (localStorage.getItem('show-documentation') ?? 'true') === 'true';
     const showMembers: boolean = (localStorage.getItem('show-members') ?? 'false') === 'true';
+    const formatShareLink: boolean = (localStorage.getItem('format-share-link') ?? 'true') === 'true';
     const highlightEmptyObject: boolean = (localStorage.getItem('highlight-empty-object') ?? 'true') === 'true';
     const showEmptyAccordion: boolean = (localStorage.getItem('show-empty-accordion') ?? 'false') === 'true';
     const mergeObject: boolean = (localStorage.getItem('merge-object') ?? 'true') === 'true';
@@ -131,6 +139,7 @@ export class SettingsService {
     this.scrollBehaviorSubject.next(scrollBehavior);
     this.showDocumentationSubject.next(showDocumentation);
     this.showMembersSubject.next(showMembers);
+    this.formatShareLinkSubject.next(formatShareLink);
     this.highlightEmptyObjectSubject.next(highlightEmptyObject);
     this.showEmptyAccordionSubject.next(showEmptyAccordion);
     this.mergeObjectSubject.next(mergeObject);
@@ -147,6 +156,7 @@ export class SettingsService {
       this.scrollBehavior$,
       this.showDocumentation$,
       this.showMembers$,
+      this.formatShareLink$,
       this.highlightEmptyObject$,
       this.showEmptyAccordion$,
       this.mergeObject$,
@@ -162,6 +172,7 @@ export class SettingsService {
                scrollBehavior,
                showDocumentation,
                showMembers,
+               formatShareLink,
                highlightEmptyObject,
                showEmptyAccordion,
                mergeObject,
@@ -176,6 +187,7 @@ export class SettingsService {
             scrollBehavior: scrollBehavior,
             showDocumentation: showDocumentation,
             showMembers: showMembers,
+            formatShareLink: formatShareLink,
             highlightEmptyObject: highlightEmptyObject,
             showEmptyAccordion: showEmptyAccordion,
             mergeObject: mergeObject,
@@ -219,6 +231,11 @@ export class SettingsService {
   updateShowMembers(state: boolean): void {
     localStorage.setItem('show-members', `${state}`);
     this.showMembersSubject.next(state);
+  }
+
+  updateFormatShareLink(state: boolean): void {
+    localStorage.setItem('format-share-link', `${state}`);
+    this.formatShareLinkSubject.next(state);
   }
 
   updateHighlightEmptyObject(state: boolean): void {
