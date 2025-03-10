@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, Output} from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
-import {SettingsService} from "../../../shared/services/settings.service";
+import {Settings, SettingsService} from "../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {take} from "rxjs";
 import {RedNodeAst, RedNodeKind} from "../../../shared/red-ast/red-node.ast";
@@ -43,6 +43,8 @@ export class NDBTitleBarComponent {
   @HostBinding('class.pin')
   isPinned: boolean = true;
 
+  useMarkdown: boolean = true;
+
   isBookmarked: boolean = false;
 
   protected readonly RedNodeKind = RedNodeKind;
@@ -50,7 +52,7 @@ export class NDBTitleBarComponent {
   constructor(private readonly settingsService: SettingsService,
               private readonly bookmarkService: BookmarkService,
               private readonly searchService: SearchService) {
-    this.settingsService.isBarPinned$.pipe(take(1), takeUntilDestroyed()).subscribe(this.onSettingsLoaded.bind(this));
+    this.settingsService.settings$.pipe(take(1), takeUntilDestroyed()).subscribe(this.onSettingsLoaded.bind(this));
   }
 
   protected _node?: RedNodeAst;
@@ -73,8 +75,11 @@ export class NDBTitleBarComponent {
   }
 
   copyUrl(): void {
-    const data: string = `${window.location.origin}/${this.title}`;
+    let data: string = `${window.location.origin}/${this.title}`;
 
+    if (this.useMarkdown) {
+      data = `[${this.title}](${data})`;
+    }
     navigator.clipboard.writeText(data);
   }
 
@@ -91,7 +96,8 @@ export class NDBTitleBarComponent {
     this.settingsService.updateIsBarPinned(this.isPinned);
   }
 
-  private onSettingsLoaded(state: boolean): void {
-    this.isPinned = state;
+  private onSettingsLoaded(settings: Settings): void {
+    this.isPinned = settings.isBarPinned;
+    this.useMarkdown = settings.formatShareLink;
   }
 }

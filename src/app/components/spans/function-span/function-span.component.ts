@@ -8,13 +8,14 @@ import {RedFunctionAst} from "../../../../shared/red-ast/red-function.ast";
 import {RedClassAst} from "../../../../shared/red-ast/red-class.ast";
 import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
 import {NDBDocumentationComponent} from "../../ndb-documentation/ndb-documentation.component";
-import {CodeSyntax, SettingsService} from "../../../../shared/services/settings.service";
+import {CodeSyntax, Settings, SettingsService} from "../../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {CodeFormatterService} from "../../../../shared/services/code-formatter.service";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatDivider} from "@angular/material/divider";
 import {WikiClassDto, WikiFunctionDto, WikiGlobalDto} from "../../../../shared/dtos/wiki.dto";
+import {take} from "rxjs";
 
 @Component({
   selector: 'function-span',
@@ -79,9 +80,12 @@ export class FunctionSpanComponent {
 
   protected readonly CodeSyntax = CodeSyntax;
 
+  private useMarkdown: boolean = true;
+
   constructor(protected readonly fmtService: CodeFormatterService,
               private readonly settingsService: SettingsService,
               private readonly dr: DestroyRef) {
+    this.settingsService.settings$.pipe(take(1), takeUntilDestroyed()).subscribe(this.onSettingsLoaded.bind(this));
   }
 
   @Input('node')
@@ -199,8 +203,11 @@ export class FunctionSpanComponent {
     } else {
       uri = this.node.name;
     }
-    const data: string = `${window.location.origin}/${uri}`;
+    let data: string = `${window.location.origin}/${uri}`;
 
+    if (this.useMarkdown) {
+      data = `[${uri}](${data})`;
+    }
     await navigator.clipboard.writeText(data);
   }
 
@@ -209,6 +216,10 @@ export class FunctionSpanComponent {
       return;
     }
     this.isVisible = state;
+  }
+
+  private onSettingsLoaded(settings: Settings): void {
+    this.useMarkdown = settings.formatShareLink;
   }
 
 }
