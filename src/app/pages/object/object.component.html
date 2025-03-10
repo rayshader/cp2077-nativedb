@@ -46,7 +46,7 @@
             color="primary"
             (change)="onShowMembersToggled($event, data.parents)"
             [formControl]="showMembers">
-            {{showMembers.value ? 'Show' : 'Hide'}} members of all parents
+            Members of all parents are {{showMembers.value ? 'visible' : 'hidden'}}
           </mat-slide-toggle>
         </div>
 
