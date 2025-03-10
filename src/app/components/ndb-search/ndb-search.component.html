@@ -4,7 +4,7 @@
   @if (query.value?.length ?? 0 > 0) {
     <button matSuffix
             mat-icon-button
-            matTooltip="Clear search query"
+            matTooltip="Clear query"
             (click)="clear()">
       <mat-icon>close</mat-icon>
     </button>
@@ -17,6 +17,10 @@
               matBadgePosition="below after"
               matBadgeSize="small">tune</mat-icon>
   </button>
+
+  <mat-checkbox matSuffix
+                matTooltip="Strict mode"
+                [formControl]="strict" />
 </mat-form-field>
 
 <mat-menu #menu="matMenu">

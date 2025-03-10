@@ -50,6 +50,15 @@ export class RedFunctionAst {
     return args.length > 0;
   }
 
+  static filterByStrictUsage(func: RedFunctionAst, query: string): boolean {
+    if (func.returnType && RedTypeAst.hasStrictType(func.returnType!, query)) {
+      return true;
+    }
+    const args: RedArgumentAst[] = func.arguments.filter((arg) => RedTypeAst.hasStrictType(arg.type, query));
+
+    return args.length > 0;
+  }
+
   static filterByUsage(func: RedFunctionAst, words: string[]): boolean {
     if (func.returnType && RedTypeAst.hasType(func.returnType!, words)) {
       return true;

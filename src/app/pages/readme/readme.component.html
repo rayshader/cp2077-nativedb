@@ -30,7 +30,8 @@
   <p>
     You can search in this database to filter enums, bitfields, classes, structs and functions. The list on the left
     will update itself as you type in. You can write multiple words to query content with an AND-like operation. You
-    can write native and/or script names (also called aliases). It will search for both anyway.
+    can write native and/or script names (also called aliases). It will search for both anyway. Search is always
+    case-insensitive.
   </p>
 
   <p>
@@ -43,6 +44,11 @@
     <li><code class="stx">*ID</code> : ends with <code class="stx">ID</code>.</li>
     <li><code class="stx">*task*</code> : this is useless and the same as <code class="stx">task</code> alone.</li>
   </ul>
+
+  <p>
+    On the opposite, you can search for an exact match by turning strict mode on <mat-icon>check_box</mat-icon>. It
+    works with options below too.
+  </p>
 
   <p>
     You can choose what your query will search for. This icon <mat-icon>tune</mat-icon> provides a few options:
