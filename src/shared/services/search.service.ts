@@ -19,11 +19,12 @@ export enum FilterBy {
 export interface SearchRequest {
   readonly query: string;
   readonly filter: FilterBy;
+  readonly strict: boolean;
 }
 
 interface Query {
   readonly filter: FilterBy;
-  readonly fn: <T extends RedNodeAst>(nodes: T[], query: string) => T[];
+  readonly fn: <T extends RedNodeAst>(nodes: T[], query: string, strict: boolean) => T[];
 }
 
 @Injectable({
@@ -79,12 +80,16 @@ export class SearchService {
     if (request.filter === FilterBy.usage) {
       if (rule) {
         return properties.filter((prop) => RedPropertyAst.testByUsage(prop, rule));
+      } else if (request.strict) {
+        return properties.filter((prop) => RedPropertyAst.filterByStrictUsage(prop, query));
       } else {
         return properties.filter((prop) => RedPropertyAst.filterByUsage(prop, words));
       }
     }
     if (rule) {
       return properties.filter((prop) => RedNodeAst.testName(prop, rule));
+    } else if (request.strict) {
+      return properties.filter((prop) => RedNodeAst.hasStrictName(prop, query));
     } else {
       return properties.filter((prop) => RedNodeAst.hasName(prop, words));
     }
@@ -101,23 +106,27 @@ export class SearchService {
     if (request.filter === FilterBy.usage) {
       if (rule) {
         return functions.filter((func) => RedFunctionAst.testByUsage(key(func), rule));
+      } else if (request.strict) {
+        return functions.filter((func) => RedFunctionAst.filterByStrictUsage(key(func), query));
       } else {
         return functions.filter((func) => RedFunctionAst.filterByUsage(key(func), words));
       }
     }
     if (rule) {
       return functions.filter((func) => RedNodeAst.testName(key(func), rule));
+    } else if (request.strict) {
+      return functions.filter((func) => RedNodeAst.hasStrictName(key(func), query));
     } else {
       return functions.filter((func) => RedNodeAst.hasName(key(func), words));
     }
   }
 
-  search(query: string, filter: FilterBy): void {
-    this.querySubject.next({query: query, filter: filter});
+  search(query: string, filter: FilterBy, strict: boolean): void {
+    this.querySubject.next({query: query, filter: filter, strict: strict});
   }
 
-  requestSearch(query: string, filter: FilterBy): void {
-    this.changeQuerySubject.next({query: query, filter: filter});
+  requestSearch(query: string, filter: FilterBy, strict: boolean): void {
+    this.changeQuerySubject.next({query: query, filter: filter, strict: strict});
   }
 
   private transformData<T extends RedNodeAst>(data$: Observable<T[]>): Observable<TabItemNode[]> {
@@ -183,12 +192,12 @@ export class SearchService {
         if (!query) {
           return nodes;
         }
-        return query.fn(nodes, request.query);
+        return query.fn(nodes, request.query, request.strict);
       })
     );
   }
 
-  private filterByName<T extends RedNodeAst>(nodes: T[], query: string): T[] {
+  private filterByName<T extends RedNodeAst>(nodes: T[], query: string, strict: boolean): T[] {
     query = query.toLowerCase();
     const words: string[] = query.split(' ');
     const rule: RegExp | undefined = SearchService.createRule(query);
@@ -199,6 +208,8 @@ export class SearchService {
 
       if (rule) {
         return rule.test(name) || (!!aliasName && rule.test(aliasName));
+      } else if (strict) {
+        return name === query || (!!aliasName && aliasName === query);
       } else {
         return words.every((word) => name.includes(word)) ||
           (!!aliasName && words.every((word) => aliasName.includes(word)));
@@ -206,7 +217,7 @@ export class SearchService {
     });
   }
 
-  private filterByProperty<T extends RedNodeAst>(nodes: T[], query: string): T[] {
+  private filterByProperty<T extends RedNodeAst>(nodes: T[], query: string, strict: boolean): T[] {
     query = query.toLowerCase();
     const words: string[] = query.split(' ');
     const rule: RegExp | undefined = SearchService.createRule(query);
@@ -220,6 +231,8 @@ export class SearchService {
 
       if (rule) {
         properties = properties.filter((prop) => RedNodeAst.testName(prop, rule));
+      } else if (strict) {
+        properties = properties.filter((prop) => RedNodeAst.hasStrictName(prop, query));
       } else {
         properties = properties.filter((prop) => RedNodeAst.hasName(prop, words));
       }
@@ -227,9 +240,9 @@ export class SearchService {
     });
   }
 
-  private filterByFunction<T extends RedNodeAst>(nodes: T[], query: string): T[] {
+  private filterByFunction<T extends RedNodeAst>(nodes: T[], query: string, strict: boolean): T[] {
     query = query.toLowerCase();
-    const words: string[] = query.split(' ');
+    const words: string[] = strict ? [query] : query.split(' ');
     const rule: RegExp | undefined = SearchService.createRule(query);
 
     return nodes.filter((node) => {
@@ -241,6 +254,8 @@ export class SearchService {
 
       if (rule) {
         functions = functions.filter((func) => RedNodeAst.testName(func, rule));
+      } else if (strict) {
+        functions = functions.filter((func) => RedNodeAst.hasStrictName(func, query));
       } else {
         functions = functions.filter((func) => RedNodeAst.hasName(func, words));
       }
@@ -248,9 +263,9 @@ export class SearchService {
     });
   }
 
-  private filterByUsage<T extends RedNodeAst>(nodes: T[], query: string): T[] {
+  private filterByUsage<T extends RedNodeAst>(nodes: T[], query: string, strict: boolean): T[] {
     query = query.toLowerCase();
-    const words: string[] = query.split(' ');
+    const words: string[] = strict ? [query] : query.split(' ');
     const rule: RegExp | undefined = SearchService.createRule(query);
 
     return nodes.filter((node) => {
@@ -260,6 +275,8 @@ export class SearchService {
       if (node.kind === RedNodeKind.function) {
         if (rule) {
           return RedFunctionAst.testByUsage(node as unknown as RedFunctionAst, rule);
+        } else if (strict) {
+          return RedFunctionAst.filterByStrictUsage(node as unknown as RedFunctionAst, query);
         } else {
           return RedFunctionAst.filterByUsage(node as unknown as RedFunctionAst, words);
         }
@@ -271,6 +288,9 @@ export class SearchService {
       if (rule) {
         properties = properties.filter((prop) => RedPropertyAst.testByUsage(prop, rule));
         functions = functions.filter((func) => RedFunctionAst.testByUsage(func, rule));
+      } else if (strict) {
+        properties = properties.filter((prop) => RedPropertyAst.filterByStrictUsage(prop, query));
+        functions = functions.filter((func) => RedFunctionAst.filterByStrictUsage(func, query));
       } else {
         properties = properties.filter((prop) => RedPropertyAst.filterByUsage(prop, words));
         functions = functions.filter((func) => RedFunctionAst.filterByUsage(func, words));

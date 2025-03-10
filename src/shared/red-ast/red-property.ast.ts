@@ -40,6 +40,10 @@ export class RedPropertyAst {
     return RedTypeAst.testType(prop.type, rule);
   }
 
+  static filterByStrictUsage(prop: RedPropertyAst, query: string): boolean {
+    return RedTypeAst.hasStrictType(prop.type, query);
+  }
+
   static filterByUsage(prop: RedPropertyAst, words: string[]): boolean {
     return RedTypeAst.hasType(prop.type, words);
   }

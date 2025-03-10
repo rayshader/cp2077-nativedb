@@ -33,6 +33,12 @@ export class RedNodeAst {
     return rule.test(name);
   }
 
+  static hasStrictName(node: RedNodeAst, query: string): boolean {
+    const name: string = node.name.toLowerCase();
+
+    return name === query;
+  }
+
   static hasName(node: RedNodeAst, words: string[]): boolean {
     const name: string = node.name.toLowerCase();
 

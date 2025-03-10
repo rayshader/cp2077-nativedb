@@ -10,6 +10,7 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatMenuModule} from "@angular/material/menu";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatBadgeModule} from "@angular/material/badge";
+import {MatCheckbox} from "@angular/material/checkbox";
 
 interface FilterItem {
   value: FilterBy;
@@ -20,6 +21,7 @@ interface FilterItem {
   selector: 'ndb-search',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    MatCheckbox,
     MatIconModule,
     MatMenuModule,
     MatBadgeModule,
@@ -38,6 +40,9 @@ export class NDBSearchComponent implements OnInit {
   search: EventEmitter<void> = new EventEmitter<void>();
 
   query: FormControl<string | null> = new FormControl('');
+  strict: FormControl<boolean | null> = new FormControl(false);
+
+  strictMode: boolean = false;
   filter: FilterBy = FilterBy.name;
   filterBadgeLabel?: string;
 
@@ -53,6 +58,7 @@ export class NDBSearchComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.strict.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onStrictChanged.bind(this));
     this.searchService.changeQuery$.pipe(
       takeUntilDestroyed(this.dr)
     ).subscribe((request) => {
@@ -63,6 +69,7 @@ export class NDBSearchComponent implements OnInit {
       }
       this.updateFilter(request.filter);
       this.query.setValue(request.query);
+      this.strict.setValue(request.strict);
     });
     this.query.valueChanges.pipe(
       debounceTime(300),
@@ -70,7 +77,7 @@ export class NDBSearchComponent implements OnInit {
     ).subscribe((query) => {
       query ??= '';
       query = query.trim();
-      this.searchService.search(query, this.filter);
+      this.searchService.search(query, this.filter, this.strictMode);
       if (query.length > 0) {
         this.search.emit();
       }
@@ -93,6 +100,11 @@ export class NDBSearchComponent implements OnInit {
       return;
     }
     this.query.setValue(query);
+  }
+
+  onStrictChanged(isStrict: boolean | null): void {
+    this.strictMode = isStrict === true;
+    this.query.setValue(this.query.value);
   }
 
   private updateFilter(filter: FilterBy): void {

@@ -39,6 +39,19 @@ export class RedTypeAst {
     return rule.test(name) || (!!aliasName && rule.test(aliasName));
   }
 
+  static hasStrictType(type: RedTypeAst, query: string): boolean {
+    if (RedTypeAst.isPrimitive(type)) {
+      return false;
+    }
+    if (type.innerType) {
+      return this.hasStrictType(type.innerType, query);
+    }
+    const name: string = type.name.toLowerCase();
+    const aliasName: string | undefined = type.aliasName?.toLowerCase();
+
+    return name === query || (!!aliasName && aliasName === query);
+  }
+
   static hasType(type: RedTypeAst, words: string[]): boolean {
     if (RedTypeAst.isPrimitive(type)) {
       return false;

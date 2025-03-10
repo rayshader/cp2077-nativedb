@@ -71,7 +71,7 @@ export class NDBTitleBarComponent {
   }
 
   searchByUsage(): void {
-    this.searchService.requestSearch(this.title, FilterBy.usage);
+    this.searchService.requestSearch(this.title, FilterBy.usage, true);
   }
 
   copyUrl(): void {

@@ -36,7 +36,7 @@ export class RouterService {
 
   async navigateByUsage(name: string, inTab: boolean = false): Promise<void> {
     // TODO: implement search by usage feature in a new tab?
-    this.searchService.requestSearch(name, FilterBy.usage);
+    this.searchService.requestSearch(name, FilterBy.usage, true);
   }
 
 }
