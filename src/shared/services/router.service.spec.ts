@@ -190,7 +190,7 @@ describe('RouterService', () => {
       await service.navigateByUsage('GameInstance');
 
       // THEN
-      expect(searchMock.requestSearch).toHaveBeenCalledWith('GameInstance', FilterBy.usage);
+      expect(searchMock.requestSearch).toHaveBeenCalledWith('GameInstance', FilterBy.usage, true);
     });
   });
 });
