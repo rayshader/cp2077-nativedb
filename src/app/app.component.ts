@@ -8,7 +8,7 @@ import {
   OnInit,
   ViewChild
 } from '@angular/core';
-import {CommonModule} from '@angular/common';
+
 import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {NDBTabsComponent} from "./components/ndb-tabs/ndb-tabs.component";
@@ -38,7 +38,6 @@ export interface AppData {
   selector: 'app',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    CommonModule,
     RouterOutlet,
     MatIconModule,
     MatChipsModule,
@@ -48,7 +47,7 @@ export interface AppData {
     NDBTabsComponent,
     NDBToolbarComponent,
     NDBBottomBarComponent
-  ],
+],
   providers: [
     {provide: MAT_FORM_FIELD_DEFAULT_OPTIONS, useValue: {appearance: 'outline'}}
   ],
