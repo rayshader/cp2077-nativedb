@@ -1,4 +1,14 @@
-import {ChangeDetectionStrategy, Component, EventEmitter, HostBinding, Input, Output} from '@angular/core';
+import {
+  booleanAttribute,
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  HostBinding,
+  input,
+  output,
+  signal
+} from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {Settings, SettingsService} from "../../../shared/services/settings.service";
@@ -22,30 +32,26 @@ import {FilterBy, SearchService} from "../../../shared/services/search.service";
 })
 export class NDBTitleBarComponent {
 
-  @Input()
-  title: string = '';
+  readonly node = input<RedNodeAst | undefined>();
+  readonly title = input.required<string>();
+  readonly altTitle = input<string | undefined>();
+  readonly hideDocumentation = input(false, {transform: booleanAttribute});
+  readonly hasDocumentation = input(false, {transform: booleanAttribute});
+  readonly hidden = input(false, {transform: booleanAttribute});
 
-  @Input()
-  altTitle?: string;
-
-  @Input()
-  hideDocumentation: boolean = false;
-
-  @Input()
-  hasDocumentation: boolean = false;
-
-  @Input()
-  hidden: boolean = false;
-
-  @Output()
-  toggleDocumentation: EventEmitter<void> = new EventEmitter();
+  readonly toggleDocumentation = output<void>();
 
   @HostBinding('class.pin')
   isPinned: boolean = true;
 
   useMarkdown: boolean = true;
 
-  isBookmarked: boolean = false;
+  readonly isBookmarked = signal<boolean>(false);
+  readonly canSearchByUsage = computed(() => {
+    const node: RedNodeAst | undefined = this.node();
+
+    return node && node.kind !== RedNodeKind.function;
+  });
 
   protected readonly RedNodeKind = RedNodeKind;
 
@@ -53,42 +59,47 @@ export class NDBTitleBarComponent {
               private readonly bookmarkService: BookmarkService,
               private readonly searchService: SearchService) {
     this.settingsService.settings$.pipe(take(1), takeUntilDestroyed()).subscribe(this.onSettingsLoaded.bind(this));
-  }
+    effect(() => {
+      const node: RedNodeAst | undefined = this.node();
 
-  protected _node?: RedNodeAst;
-
-  @Input()
-  set node(value: RedNodeAst) {
-    this._node = value;
-    this.isBookmarked = this.bookmarkService.isBookmarked(value.id);
+      if (!node) {
+        return;
+      }
+      this.bookmarkService.isBookmarked(node.id);
+    });
   }
 
   copyAltTitle(): void {
-    if (!this.altTitle) {
+    const altTitle: string | undefined = this.altTitle();
+
+    if (!altTitle) {
       return;
     }
-    navigator.clipboard.writeText(this.altTitle);
+    navigator.clipboard.writeText(altTitle);
   }
 
   searchByUsage(): void {
-    this.searchService.requestSearch(this.title, FilterBy.usage, true);
+    this.searchService.requestSearch(this.title(), FilterBy.usage, true);
   }
 
   copyUrl(): void {
-    let data: string = `${window.location.origin}/${this.title}`;
+    const title: string = this.title();
+    let data: string = `${window.location.origin}/${title}`;
 
     if (this.useMarkdown) {
-      data = `[${this.title}](${data})`;
+      data = `[${title}](${data})`;
     }
     navigator.clipboard.writeText(data);
   }
 
   toggleBookmark(): void {
-    if (!this._node) {
+    const node: RedNodeAst | undefined = this.node();
+
+    if (!node) {
       return;
     }
-    this.isBookmarked = !this.isBookmarked;
-    this.bookmarkService.toggleBookmark(this._node.id);
+    this.isBookmarked.set(!this.isBookmarked);
+    this.bookmarkService.toggleBookmark(node.id);
   }
 
   togglePin(): void {
