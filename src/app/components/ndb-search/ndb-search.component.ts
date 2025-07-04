@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, OnInit, Output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, output} from '@angular/core';
 import {MatInputModule} from "@angular/material/input";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatIconModule} from "@angular/material/icon";
@@ -36,11 +36,13 @@ interface FilterItem {
 })
 export class NDBSearchComponent implements OnInit {
 
-  @Output()
-  search: EventEmitter<void> = new EventEmitter<void>();
+  private readonly searchService: SearchService = inject(SearchService);
+  private readonly dr: DestroyRef = inject(DestroyRef);
 
-  query: FormControl<string | null> = new FormControl('');
-  strict: FormControl<boolean | null> = new FormControl(false);
+  readonly search = output<void>();
+
+  readonly query: FormControl<string | null> = new FormControl('');
+  readonly strict: FormControl<boolean | null> = new FormControl(false);
 
   strictMode: boolean = false;
   filter: FilterBy = FilterBy.name;
@@ -52,10 +54,6 @@ export class NDBSearchComponent implements OnInit {
     {value: FilterBy.function, name: 'Function'},
     {value: FilterBy.usage, name: 'Usage'},
   ];
-
-  constructor(private readonly searchService: SearchService,
-              private readonly dr: DestroyRef) {
-  }
 
   ngOnInit(): void {
     this.strict.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onStrictChanged.bind(this));

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, output} from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
 import {MatChipsModule} from "@angular/material/chips";
 import {MatIconModule} from "@angular/material/icon";
@@ -37,8 +37,7 @@ import {NDBMoreMenuComponent} from "../ndb-more-menu/ndb-more-menu.component";
 })
 export class NDBToolbarComponent {
 
-  @Output()
-  readonly toggle: EventEmitter<void> = new EventEmitter<void>();
+  readonly toggle = output<void>();
 
   protected isTabsOpen: boolean = true;
 

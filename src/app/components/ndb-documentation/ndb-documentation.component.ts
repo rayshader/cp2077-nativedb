@@ -1,4 +1,4 @@
-import {Component, Input} from '@angular/core';
+import {Component, inject, input} from '@angular/core';
 import {NDBFormatDocumentationPipe} from "../../pipes/ndb-format-documentation.pipe";
 import {Router} from "@angular/router";
 import {MatTooltipModule} from "@angular/material/tooltip";
@@ -10,13 +10,11 @@ import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {ResponsiveService} from "../../../shared/services/responsive.service";
-import {Observable} from "rxjs";
-import {AsyncPipe} from "@angular/common";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'ndb-documentation',
   imports: [
-    AsyncPipe,
     MatIcon,
     MatIconButton,
     MatMenu,
@@ -30,23 +28,14 @@ import {AsyncPipe} from "@angular/common";
 })
 export class NDBDocumentationComponent {
 
-  @Input()
-  body: string = '';
+  private readonly responsiveService: ResponsiveService = inject(ResponsiveService);
+  private readonly router: Router = inject(Router);
 
-  @Input()
-  object?: RedClassAst;
+  readonly body = input.required<string>();
+  readonly object = input<RedClassAst | undefined>();
+  readonly method = input<RedFunctionAst | undefined>();
 
-  @Input()
-  method?: RedFunctionAst;
-
-  constructor(private readonly responsiveService: ResponsiveService,
-              private readonly router: Router) {
-
-  }
-
-  get isMobile$(): Observable<boolean> {
-    return this.responsiveService.mobile$;
-  }
+  readonly isMobile = toSignal(this.responsiveService.mobile$);
 
   onLinkClicked(event: Event): void {
     const $element: HTMLElement = event.target as HTMLElement;
@@ -89,12 +78,14 @@ export class NDBDocumentationComponent {
   }
 
   private getGitBookPath(): string {
-    if (!this.object) {
+    const object = this.object();
+
+    if (!object) {
       return `globals#${this.formatFragment()}`;
     }
-    let path: string = `classes/${this.object.name.toLowerCase()}`;
+    let path: string = `classes/${object.name.toLowerCase()}`;
 
-    if (!this.method) {
+    if (!this.method()) {
       path = `${path}#description`;
     } else {
       path = `${path}#${this.formatFragment()}`;
@@ -103,12 +94,14 @@ export class NDBDocumentationComponent {
   }
 
   private formatFragment(): string {
-    if (!this.method) {
+    const method = this.method();
+
+    if (!method) {
       return '';
     }
-    const tokens: string[] = [this.method.name];
+    const tokens: string[] = [method.name];
 
-    for (const argument of this.method.arguments) {
+    for (const argument of method.arguments) {
       if (argument.isOptional) {
         tokens.push('opt');
       }
@@ -119,7 +112,7 @@ export class NDBDocumentationComponent {
       tokens.push(this.formatFragmentType(argument.type));
     }
     tokens.push('greater-than');
-    tokens.push(this.formatFragmentType(this.method.returnType));
+    tokens.push(this.formatFragmentType(method.returnType));
     return tokens.join('-').toLowerCase();
   }
 

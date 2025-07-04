@@ -1,18 +1,21 @@
+@let _altTitle = altTitle();
+@let _node = node();
+
 <div class="title">
   <h1 class="stx stx-type"
-      [class.stx-highlight]="!!altTitle"
-      [attr.clickable]="!!altTitle"
-      [matTooltip]="altTitle ?? ''"
+      [class.stx-highlight]="!!_altTitle"
+      [attr.clickable]="!!_altTitle"
+      [matTooltip]="_altTitle"
       matTooltipPosition="right"
       matTooltipShowDelay="500"
-      (click)="copyAltTitle()">{{title}}</h1>
+      (click)="copyAltTitle()">{{title()}}</h1>
   <div class="prototype">
     <ng-content></ng-content>
   </div>
 </div>
 
 <div class="actions">
-  @if (_node !== undefined && _node.kind !== RedNodeKind.function) {
+  @if (canSearchByUsage()) {
     <button mat-icon-button
             matTooltip="Search by usage"
             (click)="searchByUsage()">
@@ -27,19 +30,24 @@
   </button>
 
   @if (_node !== undefined) {
-    @if (!hideDocumentation) {
+    @let _hideDocumentation = hideDocumentation();
+    @let _isBookmarked = isBookmarked();
+
+    @if (!_hideDocumentation) {
+      @let _hasDocumentation = hasDocumentation();
+
       <button mat-icon-button
-              [matTooltip]="hasDocumentation ? 'Documentation' : 'Start documenting with GitBook'"
-              [class.stx-doc]="hasDocumentation"
+              [matTooltip]="_hasDocumentation ? 'Documentation' : 'Start documenting with GitBook'"
+              [class.stx-doc]="_hasDocumentation"
               (click)="toggleDocumentation.emit()">
         <mat-icon>info_outline</mat-icon>
       </button>
     }
 
     <button mat-icon-button
-            [matTooltip]="isBookmarked ? 'Remove bookmark' : 'Add bookmark'"
+            [matTooltip]="_isBookmarked ? 'Remove bookmark' : 'Add bookmark'"
             (click)="toggleBookmark()">
-      @if (isBookmarked) {
+      @if (_isBookmarked) {
         <mat-icon>bookmark</mat-icon>
       } @else {
         <mat-icon>bookmark_border</mat-icon>
@@ -47,7 +55,7 @@
     </button>
   }
 
-  @if (!hidden) {
+  @if (!hidden()) {
     <button mat-icon-button
             class="pin"
             [matTooltip]="isPinned ? 'Unpin title when scrolling' : 'Pin title to the top when scrolling'"

@@ -1,7 +1,5 @@
-import {Injectable} from '@angular/core';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {effect, inject, Injectable, Signal, signal} from '@angular/core';
 import {Theme, ThemeService} from "./theme.service";
-import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {LazyLoaderService} from "./lazy-loader.service";
 
 export enum IDETheme {
@@ -19,50 +17,46 @@ export interface IDEThemeChanged {
   providedIn: 'root'
 })
 export class IDEThemeService {
-  private theme: BehaviorSubject<IDEThemeChanged> = new BehaviorSubject<IDEThemeChanged>({
+  private readonly themeService: ThemeService = inject(ThemeService);
+  private readonly lazyLoaderService: LazyLoaderService = inject(LazyLoaderService);
+
+  private readonly ideTheme = signal<IDEThemeChanged>({
     old: IDETheme.vscode,
     current: IDETheme.vscode,
   });
-  private currentTheme: IDETheme = IDETheme.vscode;
+
   private isDarkLoaded: boolean = false;
 
-  constructor(private readonly themeService: ThemeService,
-              private readonly lazyLoaderService: LazyLoaderService) {
+  constructor() {
     const localIdeTheme: string | null = localStorage.getItem('ide-theme');
-    let ideTheme: IDETheme;
+    const ideTheme: IDETheme = (!localIdeTheme) ? IDETheme.vscode : +localIdeTheme;
 
-    if (!localIdeTheme) {
-      ideTheme = IDETheme.vscode;
-    } else {
-      ideTheme = +localIdeTheme;
-    }
     this.updateTheme(ideTheme);
-    this.themeService.onThemeChanged.pipe(takeUntilDestroyed()).subscribe(this.onThemeModeChanged.bind(this));
+    effect(() => {
+      const theme: Theme = this.themeService.theme();
+
+      if (theme === 'light-theme' || this.isDarkLoaded) {
+        return;
+      }
+      this.lazyLoaderService.loadStylesheet('dark-ide-theme');
+      this.isDarkLoaded = true;
+    });
   }
 
-  public get onThemeChanged(): Observable<IDEThemeChanged> {
-    return this.theme.asObservable();
+  public get theme(): Signal<IDEThemeChanged> {
+    return this.ideTheme;
   }
 
   /**
-   * Update IDE theme and emit changes with old and new value.
+   * Update the IDE theme and emit changes with old and new value.
    */
   public updateTheme(theme: IDETheme): void {
-    const oldTheme: IDETheme = this.currentTheme;
+    const oldTheme: IDETheme = this.ideTheme().current;
 
-    this.currentTheme = theme;
-    this.theme.next({
+    this.ideTheme.set({
       old: oldTheme,
-      current: this.currentTheme
+      current: theme
     });
     localStorage.setItem('ide-theme', `${theme}`);
-  }
-
-  private onThemeModeChanged(theme: Theme): void {
-    if (theme === 'light-theme' || this.isDarkLoaded) {
-      return;
-    }
-    this.lazyLoaderService.loadStylesheet('dark-ide-theme');
-    this.isDarkLoaded = true;
   }
 }

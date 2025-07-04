@@ -1,5 +1,5 @@
 <button mat-icon-button
-        [matTooltip]="themeModeTitle"
+        [matTooltip]="title()"
         (click)="toggleTheme()">
-  <mat-icon>{{themeModeIcon}}</mat-icon>
+  <mat-icon>{{icon()}}</mat-icon>
 </button>

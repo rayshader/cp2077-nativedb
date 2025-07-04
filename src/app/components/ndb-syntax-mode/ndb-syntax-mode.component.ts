@@ -1,13 +1,12 @@
-import {Component} from '@angular/core';
+import {Component, computed, inject} from '@angular/core';
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {MatMenuModule} from "@angular/material/menu";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {CodeSyntax, SettingsService} from "../../../shared/services/settings.service";
 import {MatDivider} from "@angular/material/divider";
-import {combineLatest, map, Observable} from "rxjs";
-import {AsyncPipe} from "@angular/common";
 import {ResponsiveService} from "../../../shared/services/responsive.service";
+import {toSignal} from "@angular/core/rxjs-interop";
 
 interface SyntaxOption {
   readonly value: CodeSyntax;
@@ -16,8 +15,8 @@ interface SyntaxOption {
 }
 
 interface SyntaxData {
-  readonly codeSyntax: CodeSyntax;
-  readonly clipboardSyntax: CodeSyntax;
+  readonly code: CodeSyntax;
+  readonly clipboard: CodeSyntax;
 
   readonly isMobile: boolean;
 }
@@ -25,7 +24,6 @@ interface SyntaxData {
 @Component({
   selector: 'ndb-syntax-mode',
   imports: [
-    AsyncPipe,
     MatDivider,
     MatIconModule,
     MatMenuModule,
@@ -37,6 +35,13 @@ interface SyntaxData {
 })
 export class NDBSyntaxModeComponent {
 
+  private readonly settingsService: SettingsService = inject(SettingsService);
+  private readonly responsiveService: ResponsiveService = inject(ResponsiveService);
+
+  private readonly clipboard = toSignal(this.settingsService.clipboard$);
+  private readonly code = toSignal(this.settingsService.code$);
+  private readonly isMobile = toSignal(this.responsiveService.mobile$);
+
   readonly clipboardOptions: SyntaxOption[] = [
     {value: CodeSyntax.redscript, name: 'Redscript', disabled: false},
     {value: CodeSyntax.lua, name: 'Lua · CET', disabled: false},
@@ -47,12 +52,20 @@ export class NDBSyntaxModeComponent {
     {value: CodeSyntax.redscript, name: 'Redscript', disabled: false},
   ];
 
-  readonly data$: Observable<SyntaxData>;
+  readonly data = computed<SyntaxData | undefined>(() => {
+    const clipboard = this.clipboard();
+    const code = this.code();
+    const isMobile = this.isMobile();
 
-  constructor(private readonly settingsService: SettingsService,
-              private readonly responsiveService: ResponsiveService) {
-    this.data$ = this.getData();
-  }
+    if (clipboard === undefined || code === undefined || isMobile === undefined) {
+      return undefined;
+    }
+    return {
+      clipboard: clipboard + 1,
+      code: code + 1,
+      isMobile: isMobile
+    };
+  });
 
   public selectClipboardSyntax(syntax: SyntaxOption): void {
     this.settingsService.updateClipboard(syntax.value);
@@ -60,20 +73,6 @@ export class NDBSyntaxModeComponent {
 
   public selectCodeSyntax(syntax: SyntaxOption): void {
     this.settingsService.updateCode(syntax.value);
-  }
-
-  private getData(): Observable<SyntaxData> {
-    return combineLatest([
-      this.settingsService.clipboard$.pipe(map((code) => code + 1)),
-      this.settingsService.code$.pipe(map((code) => code + 1)),
-      this.responsiveService.mobile$,
-    ]).pipe(map(([clipboard, code, isMobile]) => {
-      return {
-        clipboardSyntax: clipboard,
-        codeSyntax: code,
-        isMobile: isMobile
-      };
-    }));
   }
 
 }
