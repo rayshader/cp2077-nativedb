@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, effect, inject, output, signal} from '@angular/core';
 import {MatButtonModule} from "@angular/material/button";
 import {MatChipsModule} from "@angular/material/chips";
 import {MatIconModule} from "@angular/material/icon";
@@ -37,49 +37,47 @@ import {NDBMoreMenuComponent} from "../ndb-more-menu/ndb-more-menu.component";
 })
 export class NDBToolbarComponent {
 
+  private readonly responsiveService: ResponsiveService = inject(ResponsiveService);
+  private readonly router: Router = inject(Router);
+
   readonly toggle = output<void>();
 
-  protected isTabsOpen: boolean = true;
+  readonly isMobile = this.responsiveService.isMobile;
+  readonly isTabsOpen = signal<boolean>(true);
 
-  private isMobile: boolean = false;
-
-  constructor(private readonly responsiveService: ResponsiveService,
-              private readonly router: Router,
-              private readonly cdr: ChangeDetectorRef) {
-    this.responsiveService.mobile$.pipe(takeUntilDestroyed()).subscribe(this.onMobile.bind(this));
+  constructor() {
     this.router.events.pipe(
       filter((event) => event instanceof NavigationEnd),
       takeUntilDestroyed()
     ).subscribe(this.onRouteChanged.bind(this));
+
+    effect(() => {
+      const isMobile: boolean = this.isMobile();
+      this.isTabsOpen.set(!isMobile);
+    });
   }
 
   toggleTabs(): void {
-    this.isTabsOpen = !this.isTabsOpen;
+    this.isTabsOpen.set(!this.isTabsOpen());
     this.toggle.emit();
   }
 
   onSearch(): void {
-    if (!this.isMobile) {
+    if (!this.isMobile()) {
       return;
     }
-    if (this.isTabsOpen) {
+    if (this.isTabsOpen()) {
       return;
     }
-    this.isTabsOpen = true;
+    this.isTabsOpen.set(true);
     this.toggle.emit();
   }
 
-  private onMobile(isMobile: boolean): void {
-    this.isMobile = isMobile;
-    this.isTabsOpen = !isMobile;
-  }
-
   private onRouteChanged(): void {
-    if (!this.isMobile) {
+    if (!this.isMobile()) {
       return;
     }
-    this.isTabsOpen = false;
-    this.cdr.markForCheck();
+    this.isTabsOpen.set(false);
   }
 
 }

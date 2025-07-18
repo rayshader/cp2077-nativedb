@@ -1,67 +1,70 @@
-@if (syntax$ | async; as syntax) {
-  @if (node) {
-    @if (node.innerType) {
-      @switch (syntax) {
-        @case (vanilla) {
-          @if (node.size === undefined) {
-            <span class="stx-lang">{{node | ndbFormatCode:syntax}}</span>
-            <span class="stx-text">:</span>
-            <type-span [node]="node.innerType"></type-span>
-          } @else {
-            <span class="stx-parenthesis">[</span>
-            <span class="stx-number">{{node.size}}</span>
-            <span class="stx-parenthesis">]</span>
-            <type-span [node]="node.innerType"></type-span>
-          }
+@let _syntax = syntax();
+@let _node = node();
+
+@if (_syntax && _node) {
+  @if (_node.innerType) {
+    @switch (_syntax) {
+      @case (vanilla) {
+        @if (_node.size === undefined) {
+          <span class="stx-lang">{{ _node | ndbFormatCode:_syntax }}</span>
+          <span class="stx-text">:</span>
+          <type-span [node]="_node.innerType"></type-span>
+        } @else {
+          <span class="stx-parenthesis">[</span>
+          <span class="stx-number">{{ _node.size }}</span>
+          <span class="stx-parenthesis">]</span>
+          <type-span [node]="_node.innerType"></type-span>
         }
-        @case (redscript) {
-          @if (node.size === undefined) {
-            <span class="stx-lang">{{node | ndbFormatCode:syntax}}</span>
-            <span class="stx-type"><</span>
-            <type-span [node]="node.innerType"></type-span>
-            <span class="stx-type">></span>
-          } @else {
-            <span class="stx-parenthesis">[</span>
-            <type-span [node]="node.innerType"></type-span>
-            <span class="stx-text">;&nbsp;</span>
-            <span class="stx-number">{{node.size}}</span>
-            <span class="stx-parenthesis">]</span>
-          }
-        }
-        @case (cpp) {
-          <span class="stx-lang">{{node | ndbFormatCode:syntax}}</span>
+      }
+      @case (redscript) {
+        @if (_node.size === undefined) {
+          <span class="stx-lang">{{ _node | ndbFormatCode:_syntax }}</span>
           <span class="stx-type"><</span>
-          <type-span [node]="node.innerType"></type-span>
-          @if (node.size !== undefined) {
-            <span class="stx-type">,&nbsp;</span>
-            <span class="stx-number">{{node.size}}</span>
-          }
+          <type-span [node]="_node.innerType"></type-span>
           <span class="stx-type">></span>
+        } @else {
+          <span class="stx-parenthesis">[</span>
+          <type-span [node]="_node.innerType"></type-span>
+          <span class="stx-text">;&nbsp;</span>
+          <span class="stx-number">{{ _node.size }}</span>
+          <span class="stx-parenthesis">]</span>
         }
       }
-    } @else if (isPrimitive) {
-      <span class="stx-primitive-type">{{node | ndbFormatCode:syntax}}</span>
-    } @else {
-      @switch (syntax) {
-        @case (redscript) {
-          <span class="stx-type redirect"
-                [class.disabled]="isEmpty"
-                (mousedown)="disableScrolling($event)"
-                (mouseup)="onRedirect($event)">{{node.aliasName ?? node.name}}</span>
+      @case (cpp) {
+        <span class="stx-lang">{{ _node | ndbFormatCode:_syntax }}</span>
+        <span class="stx-type"><</span>
+        <type-span [node]="_node.innerType"></type-span>
+        @if (_node.size !== undefined) {
+          <span class="stx-type">,&nbsp;</span>
+          <span class="stx-number">{{ _node.size }}</span>
         }
-        @default {
-          <span class="stx-type redirect"
-                [class.disabled]="isEmpty"
-                (mousedown)="disableScrolling($event)"
-                (mouseup)="onRedirect($event)">{{node.name}}</span>
-        }
+        <span class="stx-type">></span>
       }
     }
+  } @else if (isPrimitive()) {
+    <span class="stx-primitive-type">{{ _node | ndbFormatCode:_syntax }}</span>
   } @else {
-    @if (syntax === cpp) {
-      <span class="stx-primitive-type">void</span>
-    } @else {
-      <span class="stx-primitive-type">Void</span>
+    @let _isEmpty = isEmpty();
+
+    @switch (_syntax) {
+      @case (redscript) {
+        <span class="stx-type redirect"
+              [class.disabled]="_isEmpty"
+              (mousedown)="disableScrolling($event)"
+              (mouseup)="onRedirect($event)">{{ _node.aliasName ?? _node.name }}</span>
+      }
+      @default {
+        <span class="stx-type redirect"
+              [class.disabled]="_isEmpty"
+              (mousedown)="disableScrolling($event)"
+              (mouseup)="onRedirect($event)">{{ _node.name }}</span>
+      }
     }
+  }
+} @else {
+  @if (_syntax === cpp) {
+    <span class="stx-primitive-type">void</span>
+  } @else {
+    <span class="stx-primitive-type">Void</span>
   }
 }

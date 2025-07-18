@@ -5,7 +5,7 @@ import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
 import {RedPropertyAst} from "../red-ast/red-property.ast";
 import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
-import {RedDumpWorkerLoad, RedDumpWorkerLoadAliases} from "./red-dump.service";
+import {RedDumpWorkerLoad, RedDumpWorkerLoadAliases, RedDumpWorkerLoadInheritance} from "./red-dump.service";
 import {InheritData} from "../../app/pages/object/object.component";
 
 interface RedDumpData {
@@ -96,29 +96,37 @@ async function load(port?: MessagePort): Promise<void> {
   const nodes: RedNodeAst[] = [...data.enums, ...data.bitfields, ...data.functions, ...data.objects];
 
   loadAliases(nodes);
-
   send(NDBCommand.rd_load_aliases, port, <RedDumpWorkerLoadAliases>{
     functions: data.functions,
     classes: data.classes,
     structs: data.structs
   });
+
   isReady = true;
 }
 
 function onLoadInheritance(request: {token: string, id: number}, port?: MessagePort): void {
-  const object: RedClassAst | undefined = data.objects.find((object) => object.id === request.id);
+  const klass: RedClassAst | undefined = data.objects.find((klass) => klass.id === request.id);
 
-  if (!object) {
+  if (!klass) {
     return;
   }
-  if (object.isInheritanceLoaded) {
-    send(NDBCommand.rd_load_inheritance, port, [request.token, object.id, object.parents, object.children]);
+  if (klass.isInheritanceLoaded) {
+    send(NDBCommand.rd_load_inheritance, port, <RedDumpWorkerLoadInheritance>{
+      token: request.token,
+      id: klass.id,
+      klass: klass
+    });
     return;
   }
-  loadParents(data.objects, object);
-  loadChildren(data.objects, object);
-  object.isInheritanceLoaded = true;
-  send(NDBCommand.rd_load_inheritance, port, [request.token, object.id, object.parents, object.children]);
+  loadParents(data.objects, klass);
+  loadChildren(data.objects, klass);
+  klass.isInheritanceLoaded = true;
+  send(NDBCommand.rd_load_inheritance, port, <RedDumpWorkerLoadInheritance>{
+    token: request.token,
+    id: klass.id,
+    klass: klass
+  });
 }
 
 function send(command: NDBCommand, port?: MessagePort, data?: any): void {

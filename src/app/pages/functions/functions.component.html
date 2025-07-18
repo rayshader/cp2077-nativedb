@@ -1,4 +1,6 @@
-@if (data$ | async; as data) {
+@let _globals = globals();
+
+@if (_globals) {
   <ndb-title-bar [title]="'Global functions'">
     <div class="setting">
       <mat-icon class="badge-function" svgIcon="function" matTooltip="function"></mat-icon>
@@ -9,14 +11,14 @@
     </div>
   </ndb-title-bar>
 
-  @for (func of data.functions; track func.func.fullName) {
-    <function-span [node]="func.func"
-                   [documentation]="func.documentation"
+  @for (global of _globals; track global.func.fullName) {
+    <function-span [node]="global.func"
+                   [documentation]="global.documentation"
                    [canCopy]="true"
                    [canDocument]="true"
                    [canShare]="false" />
 
-    @if (data.isMobile && !$last) {
+    @if (isMobile() && !$last) {
       <mat-divider></mat-divider>
     }
   }

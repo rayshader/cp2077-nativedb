@@ -56,11 +56,13 @@
   }
 
   @if (!hidden()) {
+    @let _isPinned = isPinned();
+
     <button mat-icon-button
             class="pin"
-            [matTooltip]="isPinned ? 'Unpin title when scrolling' : 'Pin title to the top when scrolling'"
+            [matTooltip]="_isPinned ? 'Unpin title when scrolling' : 'Pin title to the top when scrolling'"
             (click)="togglePin()">
-      <mat-icon [svgIcon]="isPinned ? 'pin-off' : 'pin'"></mat-icon>
+      <mat-icon [svgIcon]="_isPinned ? 'pin-off' : 'pin'"></mat-icon>
     </button>
   }
 </div>

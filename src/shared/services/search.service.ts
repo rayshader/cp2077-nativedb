@@ -1,6 +1,5 @@
-import {Injectable} from "@angular/core";
+import {computed, inject, Injectable, signal, Signal} from "@angular/core";
 import {RedDumpService} from "./red-dump.service";
-import {BehaviorSubject, combineLatestWith, map, Observable, OperatorFunction, pipe, shareReplay} from "rxjs";
 import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
 import {TabItemNode} from "../../app/components/ndb-tabs/ndb-tabs.component";
 import {RedClassAst} from "../red-ast/red-class.ast";
@@ -31,22 +30,28 @@ interface Query {
   providedIn: 'root'
 })
 export class SearchService {
-  readonly enums$: Observable<TabItemNode[]>;
-  readonly bitfields$: Observable<TabItemNode[]>;
-  readonly classes$: Observable<TabItemNode[]>;
-  readonly structs$: Observable<TabItemNode[]>;
-  readonly functions$: Observable<TabItemNode[]>;
+  private readonly settingsService: SettingsService = inject(SettingsService);
+  private readonly dumpService: RedDumpService = inject(RedDumpService);
 
-  private readonly querySubject: BehaviorSubject<SearchRequest> = new BehaviorSubject(<SearchRequest>{
+  private readonly _query = signal<SearchRequest>({
     query: '',
-    filter: FilterBy.name
+    filter: FilterBy.name,
+    strict: false
   });
-  public readonly query$: Observable<SearchRequest> = this.querySubject.asObservable();
-  private readonly changeQuerySubject: BehaviorSubject<SearchRequest> = new BehaviorSubject(<SearchRequest>{
+  private readonly _changeQuery = signal<SearchRequest>({
     query: '',
-    filter: FilterBy.name
+    filter: FilterBy.name,
+    strict: false
   });
-  public readonly changeQuery$: Observable<SearchRequest> = this.changeQuerySubject.asObservable();
+
+  readonly enums = computed<TabItemNode[]>(() => this.toItemNode(this.dumpService.enums));
+  readonly bitfields = computed<TabItemNode[]>(() => this.toItemNode(this.dumpService.bitfields));
+  readonly classes = computed<TabItemNode[]>(() => this.toItemNode(this.dumpService.classes));
+  readonly structs = computed<TabItemNode[]>(() => this.toItemNode(this.dumpService.structs));
+  readonly functions = computed<TabItemNode[]>(() => this.toItemNode(this.dumpService.functions));
+
+  readonly query: Signal<SearchRequest> = this._query;
+  readonly changeQuery: Signal<SearchRequest> = this._changeQuery;
 
   private readonly queries: Query[] = [
     {filter: FilterBy.name, fn: this.filterByName.bind(this)},
@@ -54,15 +59,6 @@ export class SearchService {
     {filter: FilterBy.function, fn: this.filterByFunction.bind(this)},
     {filter: FilterBy.usage, fn: this.filterByUsage.bind(this)},
   ];
-
-  constructor(private readonly settingsService: SettingsService,
-              dumpService: RedDumpService) {
-    this.enums$ = this.transformData(dumpService.enums$);
-    this.bitfields$ = this.transformData(dumpService.bitfields$);
-    this.classes$ = this.transformData(dumpService.classes$);
-    this.structs$ = this.transformData(dumpService.structs$);
-    this.functions$ = this.transformData(dumpService.functions$);
-  }
 
   public static isPropertyOrUsage(request: SearchRequest) {
     return request.query.length > 0 && (request.filter === FilterBy.property || request.filter === FilterBy.usage);
@@ -122,79 +118,49 @@ export class SearchService {
   }
 
   search(query: string, filter: FilterBy, strict: boolean): void {
-    this.querySubject.next({query: query, filter: filter, strict: strict});
+    this._query.set({query: query, filter: filter, strict: strict});
   }
 
   requestSearch(query: string, filter: FilterBy, strict: boolean): void {
-    this.changeQuerySubject.next({query: query, filter: filter, strict: strict});
+    this._changeQuery.set({query: query, filter: filter, strict: strict});
   }
 
-  private transformData<T extends RedNodeAst>(data$: Observable<T[]>): Observable<TabItemNode[]> {
-    return data$.pipe(
-      this.filterScriptOnly(),
-      this.filterByQuery(),
-      this.getTabData()
-    );
-  }
+  private toItemNode(storage: Signal<RedNodeAst[]>): TabItemNode[] {
+    let nodes = storage();
 
-  private getTabData<T extends RedNodeAst>(): OperatorFunction<T[], TabItemNode[]> {
-    return pipe(
-      combineLatestWith(
-        this.settingsService.highlightEmptyObject$,
-        this.settingsService.code$
-      ),
-      map(([nodes, highlightEmptyObject, syntax]) => nodes.map((node) => {
-        const isEmpty: boolean = RedNodeAst.isEmpty(node);
-        let name: string = node.name;
-
-        if (syntax === CodeSyntax.redscript && node.aliasName) {
-          name = node.aliasName;
+    const scriptOnly = this.settingsService.scriptOnly();
+    if (scriptOnly) {
+      nodes = nodes.filter((node) => {
+        if (node.kind !== RedNodeKind.class && node.kind !== RedNodeKind.struct) {
+          return true;
         }
-        return <TabItemNode>{
-          id: node.id,
-          uri: `/${RedNodeKind[node.kind][0]}/${node.id}`,
-          name: name,
-          isEmpty: highlightEmptyObject && isEmpty,
-        };
-      })),
-      shareReplay(),
-    );
-  }
+        const object: RedClassAst = node as unknown as RedClassAst;
 
-  private filterScriptOnly<T extends RedNodeAst>(): OperatorFunction<T[], T[]> {
-    return pipe(
-      combineLatestWith(this.settingsService.scriptOnly$),
-      map(([nodes, scriptOnly]) => {
-        if (!scriptOnly) {
-          return nodes;
-        }
-        return nodes.filter((node) => {
-          if (node.kind !== RedNodeKind.class && node.kind !== RedNodeKind.struct) {
-            return true;
-          }
-          const object: RedClassAst = node as unknown as RedClassAst;
+        return object.origin === RedOriginDef.script;
+      });
+    }
 
-          return object.origin === RedOriginDef.script;
-        });
-      })
-    );
-  }
+    const request: SearchRequest = this.query();
+    if (request.query.length !== 0) {
+      const query: Query | undefined = this.queries.find((item) => item.filter === request.filter);
+      if (query) {
+        nodes = query.fn(nodes, request.query, request.strict);
+      }
+    }
 
-  private filterByQuery<T extends RedNodeAst>(): OperatorFunction<T[], T[]> {
-    return pipe(
-      combineLatestWith(this.query$),
-      map(([nodes, request]: [T[], SearchRequest]) => {
-        if (request.query.length === 0) {
-          return nodes;
-        }
-        const query: Query | undefined = this.queries.find((item) => item.filter === request.filter);
+    const highlightEmptyObject = this.settingsService.highlightEmptyObject();
+    const syntax = this.settingsService.code();
+    return nodes.map((node) => {
+      const isEmpty: boolean = RedNodeAst.isEmpty(node);
+      const name: string = (syntax === CodeSyntax.redscript && node.aliasName) ? node.aliasName : node.name;
 
-        if (!query) {
-          return nodes;
-        }
-        return query.fn(nodes, request.query, request.strict);
-      })
-    );
+      return <TabItemNode>{
+        id: node.id,
+        uri: `/${RedNodeKind[node.kind][0]}/${node.id}`,
+        name: name,
+        isEmpty: highlightEmptyObject && isEmpty,
+      };
+    })
   }
 
   private filterByName<T extends RedNodeAst>(nodes: T[], query: string, strict: boolean): T[] {

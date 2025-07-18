@@ -1,127 +1,153 @@
-@if (data$ | async; as data) {
-  <ndb-title-bar [title]="data.name"
-                 [altTitle]="data.altName"
-                 [node]="data.object"
-                 [hasDocumentation]="data.hasComment"
-                 (toggleDocumentation)="toggleDocumentation(data.object.name, data.hasComment)">
-    <mat-icon class="badge" [attr.data-scope]="data.scope" svgIcon="scope" [matTooltip]="data.scope"></mat-icon>
-    @if (data.isAbstract) {
+@let _isLoading = isLoading();
+@let _scope = scope();
+
+@if (!_isLoading) {
+  @let _object = object()!;
+  @let _titleBar = titleBar();
+  @let _isMobile = isMobile();
+  @let _isPinned = isPinned();
+  @let _highlightEmpty = highlightEmptyObject();
+  @let _badgesCount = badges();
+  @let _align = align();
+
+  <ndb-title-bar [title]="_titleBar.name"
+                 [altTitle]="_titleBar.altName"
+                 [node]="_object"
+                 [hasDocumentation]="_titleBar.hasComment"
+                 (toggleDocumentation)="toggleDocumentation(_object.name, _titleBar.hasComment)">
+    <mat-icon class="badge" [attr.data-scope]="_scope" svgIcon="scope" [matTooltip]="_scope"></mat-icon>
+    @if (_object.isAbstract) {
       <mat-icon class="badge" svgIcon="abstract" matTooltip="abstract"></mat-icon>
     }<!--
       @if (data.isFinal) {
         <mat-icon class="badge" svgIcon="final" title="final"></mat-icon>
       }-->
-    @if (data.object.origin === nativeOrigin) {
+    @if (isNative()) {
       <mat-icon class="badge" svgIcon="native" matTooltip="native"></mat-icon>
-    } @else if (data.object.origin === importOnlyOrigin) {
+    } @else if (isImportOnly()) {
       <mat-icon class="badge" svgIcon="importonly" matTooltip="importonly"></mat-icon>
     } @else {
       <mat-icon class="badge" svgIcon="static" matTooltip="script"></mat-icon>
     }
-    @if (!data.object.isStruct) {
+    @if (!_object.isStruct) {
       <mat-icon class="badge-class" svgIcon="class" matTooltip="class"></mat-icon>
     } @else {
       <mat-icon class="badge-struct" svgIcon="struct" matTooltip="struct"></mat-icon>
     }
   </ndb-title-bar>
 
-  @if (data.showComment && data.hasComment) {
-    <ndb-documentation [body]="data.documentation!.comment"
-                       [object]="data.object"></ndb-documentation>
+  @if (showDocumentation() && _titleBar.hasComment) {
+    @let _documentation = documentation();
+
+    <ndb-documentation [body]="_documentation!.comment"
+                       [object]="_object"></ndb-documentation>
   }
 
   <cdk-accordion multi="true">
-    @if (data.showParents) {
-      <ndb-accordion-item [expanded]="data.parents.length > 0"
-                          [disabled]="data.parents.length === 0">
+    @if (showParents()) {
+      @let _parents = parents();
+      @let _parentsCount = _parents.length;
+
+      <ndb-accordion-item [expanded]="_parentsCount > 0"
+                          [disabled]="_parentsCount === 0">
         <div header>
           <h3>Inherits</h3>
-          <mat-chip [highlighted]="data.parents.length > 0"
-                    [disabled]="data.parents.length === 0"
-                    [disableRipple]="true">{{data.parents.length}}</mat-chip>
+          <mat-chip [highlighted]="_parentsCount > 0"
+                    [disabled]="_parentsCount === 0"
+                    [disableRipple]="true">{{_parentsCount}}</mat-chip>
         </div>
 
         <div actions>
           <mat-slide-toggle
             color="primary"
-            (change)="onShowMembersToggled($event, data.parents)"
+            (change)="toggleAllMembers($event)"
             [formControl]="showMembers">
             Members of all parents are {{showMembers.value ? 'visible' : 'hidden'}}
           </mat-slide-toggle>
         </div>
 
-        @for (parent of data.parents; track parent.id) {
+        @for (parent of _parents; track parent.id) {
           <div class="inheritance stx">
-            @if (!data.isMobile) {
-              <div class="align" [style.width]="data.align"></div>
+            @if (!_isMobile) {
+              <div class="align" [style.width]="_align"></div>
             }
 
             <mat-icon class="btn"
                       [class.disabled]="parent.isEmpty"
-                      (click)="toggleMembers(parent, data.parents)">
+                      (click)="toggleMembers(parent)">
               {{areMembersVisible(parent) ? 'check_box' : 'check_box_outline_blank'}}
             </mat-icon>
 
             <mat-icon>subdirectory_arrow_right</mat-icon>
 
-            <type-span [node]="parent" [isEmpty]="data.highlightEmpty && parent.isEmpty" />
+            <type-span [node]="parent" [isEmpty]="_highlightEmpty && parent.isEmpty" />
           </div>
         }
       </ndb-accordion-item>
     }
 
-    @if (data.showChildren) {
-      <ndb-accordion-item [disabled]="data.children.length === 0">
+    @if (showChildren()) {
+      @let _children = children();
+      @let _childrenCount = _children.length;
+
+      <ndb-accordion-item [disabled]="_childrenCount === 0">
         <div header>
           <h3>Inherited by</h3>
-          <mat-chip [highlighted]="data.children.length > 0"
-                    [disabled]="data.children.length === 0"
-                    [disableRipple]="true">{{data.children.length}}</mat-chip>
+          <mat-chip [highlighted]="_childrenCount > 0"
+                    [disabled]="_childrenCount === 0"
+                    [disableRipple]="true">{{_childrenCount}}</mat-chip>
         </div>
 
-        @for (child of data.children; track child.id) {
+        @for (child of _children; track child.id) {
           <div class="inheritance stx">
-            @if (!data.isMobile) {
-              <div class="align" [style.width]="data.align"></div>
+            @if (!_isMobile) {
+              <div class="align" [style.width]="_align"></div>
             }
 
             <mat-icon></mat-icon>
 
             <mat-icon>subdirectory_arrow_left</mat-icon>
 
-            <type-span [node]="child" [isEmpty]="data.highlightEmpty && child.isEmpty"></type-span>
+            <type-span [node]="child" [isEmpty]="_highlightEmpty && child.isEmpty"></type-span>
           </div>
         }
       </ndb-accordion-item>
     }
 
-    @if (data.showProperties) {
-      <ndb-accordion-item [class.sticky]="data.isPinned"
-                          [expanded]="data.properties.length > 0"
-                          [disabled]="data.properties.length === 0">
+    @if (showProperties()) {
+      @let _properties = filteredProperties();
+      @let _showOffset = showOffset();
+      @let _badges = propertyBadges();
+      @let _isFiltered = propertyBadge() !== undefined;
+
+      <ndb-accordion-item [class.sticky]="_isPinned"
+                          [expanded]="_properties.length > 0"
+                          [disabled]="_properties.length === 0">
         <div header>
           <h3>Properties</h3>
-          <mat-chip [highlighted]="data.properties.length > 0"
-                    [disabled]="data.properties.length === 0"
-                    [disableRipple]="true">{{data.properties.length}}</mat-chip>
+          <mat-chip [highlighted]="_properties.length > 0"
+                    [disabled]="_properties.length === 0"
+                    [disableRipple]="true">{{_properties.length}}</mat-chip>
         </div>
 
         <div actions>
-          @for (badge of badgesProperty; track badge.title) {
+          @for (badge of _badges; track badge.title) {
             <mat-icon class="badge"
                       [svgIcon]="badge.icon"
-                      [matTooltip]="getFilterTooltip(badge, isPropertiesFiltered)"
+                      [matTooltip]="getFilterTooltip(badge, _isFiltered)"
                       [matTooltipDisabled]="badge.isEmpty"
                       [attr.data-scope]="badge.dataScope"
                       [class.disabled]="!badge.isEnabled"
                       [class.empty]="badge.isEmpty"
-                      (click)="togglePropertyFilter(badge)"></mat-icon>
+                      (click)="togglePropertyBadge(badge)"></mat-icon>
           }
-          @if (canShowOffset) {
+          @if (_showOffset) {
+            @let _sort = sortProperty();
+
             <mat-icon class="badge sort"
-                      [matTooltip]="propertySort === 'name' ? 'Sort by offset' : 'Sort by name'"
-                      (click)="togglePropertySort()"
-                      [svgIcon]="propertySort === 'name' ? 'sort-numeric' : 'sort-alpha'">
+                      [matTooltip]="_sort === 'name' ? 'Sort by offset' : 'Sort by name'"
+                      (click)="toggleSortByOffset()"
+                      [svgIcon]="_sort === 'name' ? 'sort-numeric' : 'sort-alpha'">
             </mat-icon>
           }
 
@@ -133,40 +159,44 @@
                     (click)="togglePropertySearchFilter()">search</mat-icon>
         </div>
 
-        @for (prop of data.properties; track prop.name) {
+        @for (prop of _properties; track prop.name) {
           <property-span ndbHighlight
                          [id]="prop.id"
                          [node]="prop"
-                         [badges]="data.badges"
-                         [showOffset]="canShowOffset"></property-span>
-          @if (data.isMobile && !$last) {
+                         [badges]="_badgesCount"
+                         [showOffset]="_showOffset"></property-span>
+          @if (_isMobile && !$last) {
             <mat-divider></mat-divider>
           }
         }
       </ndb-accordion-item>
     }
 
-    @if (data.showFunctions) {
-      <ndb-accordion-item [class.sticky]="data.isPinned"
-                          [expanded]="data.functions.length > 0"
-                          [disabled]="data.functions.length === 0">
+    @if (showFunctions()) {
+      @let _functions = filteredFunctions();
+      @let _badges = functionBadges();
+      @let _isFiltered = functionBadge() !== undefined;
+
+      <ndb-accordion-item [class.sticky]="_isPinned"
+                          [expanded]="_functions.length > 0"
+                          [disabled]="_functions.length === 0">
         <div header>
           <h3>Functions</h3>
-          <mat-chip [highlighted]="data.functions.length > 0"
-                    [disabled]="data.functions.length === 0"
-                    [disableRipple]="true">{{data.functions.length}}</mat-chip>
+          <mat-chip [highlighted]="_functions.length > 0"
+                    [disabled]="_functions.length === 0"
+                    [disableRipple]="true">{{_functions.length}}</mat-chip>
         </div>
 
         <div actions>
-          @for (badge of badgesFunction; track badge.title) {
+          @for (badge of _badges; track badge.title) {
             <mat-icon class="badge"
                       [svgIcon]="badge.icon"
-                      [matTooltip]="getFilterTooltip(badge, isFunctionsFiltered)"
+                      [matTooltip]="getFilterTooltip(badge, _isFiltered)"
                       [matTooltipDisabled]="badge.isEmpty"
                       [attr.data-scope]="badge.dataScope"
                       [class.disabled]="!badge.isEnabled"
                       [class.empty]="badge.isEmpty"
-                      (click)="toggleFunctionFilter(badge)"></mat-icon>
+                      (click)="toggleFunctionBadge(badge)"></mat-icon>
           }
           <mat-icon class="badge search"
                     [matTooltip]="functionSearchFilter === 'enable' ? 'Reset filter' : 'Filter by query'"
@@ -177,7 +207,7 @@
         </div>
 
         <!-- NOTE: tracking with id will crash webapp when filtering per badge several times. -->
-        @for (func of data.functions; track func.function.fullName) {
+        @for (func of _functions; track func.function.fullName) {
           <function-span ndbHighlight
                          [id]="cyrb53(func.function.name)"
                          [node]="func.function"
@@ -185,8 +215,8 @@
                          [documentation]="func.documentation"
                          [canCopy]="true"
                          [canDocument]="true"
-                         [badges]="data.badges"></function-span>
-          @if (data.isMobile && !$last) {
+                         [badges]="_badgesCount"></function-span>
+          @if (_isMobile && !$last) {
             <mat-divider></mat-divider>
           }
         }
@@ -194,9 +224,11 @@
     }
   </cdk-accordion>
 } @else {
+  @let _isMobile = isMobile();
+
   <div class="actions">
     <span class="skt-circle"></span>
-    @if (isMobile$ | async; as isMobile) {
+    @if (_isMobile) {
     } @else {
       <span class="skt-circle"></span>
     }
@@ -210,9 +242,9 @@
     <div class="prototype">
       <span class="skt-circle skt-scope"></span>
       <span class="skt-circle skt-scope"></span>
-      @if (kind === classKind) {
+      @if (isClass()) {
         <span class="skt-circle skt-class"></span>
-      } @else if (kind === structKind) {
+      } @else if (isStruct()) {
         <span class="skt-circle skt-struct"></span>
       }
     </div>

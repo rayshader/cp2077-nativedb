@@ -1,4 +1,4 @@
-import {Injectable} from "@angular/core";
+import {inject, Injectable, Signal} from "@angular/core";
 import {CodeFormatter} from "../formatters/formatter";
 import {CodeSyntax, SettingsService} from "./settings.service";
 import {RedscriptFormatter} from "../formatters/redscript.formatter";
@@ -17,21 +17,17 @@ interface CodeFormatterItem {
 })
 export class CodeFormatterService {
 
+  private readonly settingsService: SettingsService = inject(SettingsService);
+
   private readonly formatters: CodeFormatterItem[] = [
     {syntax: CodeSyntax.redscript, fmt: new RedscriptFormatter()},
     {syntax: CodeSyntax.lua, fmt: new LuaFormatter()},
     {syntax: CodeSyntax.cppRedLib, fmt: new CppRedLibFormatter()},
   ];
 
-  private _syntax: CodeSyntax = CodeSyntax.lua;
+  private readonly _syntax = this.settingsService.clipboard;
 
-  constructor(private readonly settingsService: SettingsService) {
-    this.settingsService.clipboard$.subscribe(this.onClipboardChanged.bind(this));
-  }
-
-  public get syntax(): CodeSyntax {
-    return this._syntax;
-  }
+  readonly syntax: Signal<CodeSyntax> = this._syntax;
 
   formatPrototype(func: RedFunctionAst): string {
     const formatter: CodeFormatter = this.getCodeFormatter();
@@ -52,7 +48,8 @@ export class CodeFormatterService {
   }
 
   private getCodeFormatter(): CodeFormatter {
-    const item = this.formatters.find((item) => item.syntax === this._syntax);
+    const syntax = this.syntax();
+    const item = this.formatters.find((item) => item.syntax === syntax);
 
     if (!item) {
       throw Error();
@@ -60,7 +57,4 @@ export class CodeFormatterService {
     return item.fmt;
   }
 
-  private onClipboardChanged(syntax: CodeSyntax): void {
-    this._syntax = syntax;
-  }
 }

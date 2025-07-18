@@ -1,5 +1,4 @@
-import {Injectable} from "@angular/core";
-import {BehaviorSubject, Observable} from "rxjs";
+import {Injectable, signal} from "@angular/core";
 
 @Injectable({
   providedIn: 'root'
@@ -7,9 +6,8 @@ import {BehaviorSubject, Observable} from "rxjs";
 export class ResponsiveService {
 
   private readonly mediaQuery: MediaQueryList;
-  private readonly mobileSubject: BehaviorSubject<boolean> = new BehaviorSubject(false);
 
-  readonly mobile$: Observable<boolean> = this.mobileSubject.asObservable();
+  readonly isMobile = signal<boolean>(false);
 
   constructor() {
     this.onWidthChanged();
@@ -18,7 +16,7 @@ export class ResponsiveService {
   }
 
   private onWidthChanged(): void {
-    this.mobileSubject.next(document.body.clientWidth < 1025);
+    this.isMobile.set(document.body.clientWidth < 1025);
   }
 
 }

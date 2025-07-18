@@ -1,10 +1,10 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit, output} from '@angular/core';
+import {ChangeDetectionStrategy, Component, DestroyRef, effect, inject, OnInit, output} from '@angular/core';
 import {MatInputModule} from "@angular/material/input";
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatIconModule} from "@angular/material/icon";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {debounceTime} from "rxjs";
-import {FilterBy, SearchService} from "../../../shared/services/search.service";
+import {FilterBy, SearchRequest, SearchService} from "../../../shared/services/search.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {MatButtonModule} from "@angular/material/button";
 import {MatMenuModule} from "@angular/material/menu";
@@ -55,11 +55,9 @@ export class NDBSearchComponent implements OnInit {
     {value: FilterBy.usage, name: 'Usage'},
   ];
 
-  ngOnInit(): void {
-    this.strict.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onStrictChanged.bind(this));
-    this.searchService.changeQuery$.pipe(
-      takeUntilDestroyed(this.dr)
-    ).subscribe((request) => {
+  constructor() {
+    effect(() => {
+      const request: SearchRequest = this.searchService.changeQuery();
       const query: string = this.query.value ?? '';
 
       if (query === request.query) {
@@ -69,6 +67,10 @@ export class NDBSearchComponent implements OnInit {
       this.query.setValue(request.query);
       this.strict.setValue(request.strict);
     });
+  }
+
+  ngOnInit(): void {
+    this.strict.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onStrictChanged.bind(this));
     this.query.valueChanges.pipe(
       debounceTime(300),
       takeUntilDestroyed(this.dr)

@@ -6,7 +6,6 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 import {CodeSyntax, SettingsService} from "../../../shared/services/settings.service";
 import {MatDivider} from "@angular/material/divider";
 import {ResponsiveService} from "../../../shared/services/responsive.service";
-import {toSignal} from "@angular/core/rxjs-interop";
 
 interface SyntaxOption {
   readonly value: CodeSyntax;
@@ -38,9 +37,9 @@ export class NDBSyntaxModeComponent {
   private readonly settingsService: SettingsService = inject(SettingsService);
   private readonly responsiveService: ResponsiveService = inject(ResponsiveService);
 
-  private readonly clipboard = toSignal(this.settingsService.clipboard$);
-  private readonly code = toSignal(this.settingsService.code$);
-  private readonly isMobile = toSignal(this.responsiveService.mobile$);
+  private readonly clipboard = this.settingsService.clipboard;
+  private readonly code = this.settingsService.code;
+  private readonly isMobile = this.responsiveService.isMobile;
 
   readonly clipboardOptions: SyntaxOption[] = [
     {value: CodeSyntax.redscript, name: 'Redscript', disabled: false},

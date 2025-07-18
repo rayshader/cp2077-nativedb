@@ -1,14 +1,11 @@
-import {Component, Input} from '@angular/core';
+import {Component, computed, inject, input} from '@angular/core';
 import {TypeSpanComponent} from "../type-span/type-span.component";
 import {RedArgumentAst} from "../../../../shared/red-ast/red-argument.ast";
-import {map, Observable} from "rxjs";
 import {CodeSyntax, SettingsService} from "../../../../shared/services/settings.service";
-import {AsyncPipe} from "@angular/common";
 
 @Component({
   selector: 'argument-span',
   imports: [
-    AsyncPipe,
     TypeSpanComponent
   ],
   templateUrl: './argument-span.component.html',
@@ -16,14 +13,11 @@ import {AsyncPipe} from "@angular/common";
 })
 export class ArgumentSpanComponent {
 
-  @Input()
-  node?: RedArgumentAst;
+  private readonly settingsService: SettingsService = inject(SettingsService);
 
-  protected readonly syntax$: Observable<number>;
-  protected readonly cpp: number = CodeSyntax.cppRED4ext + 1;
+  readonly node = input<RedArgumentAst>();
 
-  constructor(private readonly settingsService: SettingsService) {
-    this.syntax$ = this.settingsService.code$.pipe(map((value) => value + 1));
-  }
+  readonly syntax = computed(() => this.settingsService.code() + 1);
+  readonly cpp: number = CodeSyntax.cppRED4ext + 1;
 
 }

@@ -1,9 +1,7 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject} from '@angular/core';
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {BookmarkService} from "../../../shared/services/bookmark.service";
-import {combineLatest, map, Observable, of} from "rxjs";
 import {getRedNodeKindName, RedNodeAst, RedNodeKind} from "../../../shared/red-ast/red-node.ast";
-import {AsyncPipe} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
 import {MatDividerModule} from "@angular/material/divider";
@@ -19,7 +17,6 @@ interface BookmarkItem {
   selector: 'ndb-page-bookmarks',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AsyncPipe,
     MatIconModule,
     MatTooltipModule,
     TypeSpanComponent,
@@ -28,36 +25,30 @@ interface BookmarkItem {
   templateUrl: './bookmarks.component.html',
   styleUrl: './bookmarks.component.scss'
 })
-export class BookmarksComponent implements OnInit {
+export class BookmarksComponent {
 
-  bookmarks$: Observable<BookmarkItem[]> = of([]);
+  private readonly dumpService: RedDumpService = inject(RedDumpService);
+  private readonly bookmarkService: BookmarkService = inject(BookmarkService);
 
-  constructor(private readonly dumpService: RedDumpService,
-              private readonly bookmarkService: BookmarkService) {
-  }
+  readonly bookmarks = computed<BookmarkItem[]>(() => {
+    const bookmarks = this.bookmarkService.getAll();
+    const nodes: RedNodeAst[] = this.dumpService.nodes();
 
-  ngOnInit(): void {
-    const bookmarks: number[] = this.bookmarkService.getAll();
-    const bookmarks$ = bookmarks.map((id) => this.dumpService.getById(id));
+    return bookmarks.map((bookmark) => nodes.find((node) => node.id === bookmark))
+      .filter((node) => !!node)
+      .map((node) => <BookmarkItem>{
+        node: node,
+        icon: RedNodeKind[node!.kind],
+        alt: getRedNodeKindName(node!.kind)
+      })
+      .sort((a, b) => {
+        let delta: number = a.node.kind - b.node.kind;
+        if (delta !== 0) {
+          return delta;
+        }
 
-    this.bookmarks$ = combineLatest(bookmarks$).pipe(
-      map((nodes: (RedNodeAst | undefined)[]) => nodes
-        .filter((node) => !!node)
-        .map((node) => <BookmarkItem>{
-          node: node,
-          icon: RedNodeKind[node!.kind],
-          alt: getRedNodeKindName(node!.kind)
-        })
-        .sort((a, b) => {
-          let delta: number = a.node.kind - b.node.kind;
-
-          if (delta !== 0) {
-            return delta;
-          }
-          return a.node.name.localeCompare(b.node.name);
-        })
-      )
-    );
-  }
+        return a.node.name.localeCompare(b.node.name);
+      });
+  });
 
 }
