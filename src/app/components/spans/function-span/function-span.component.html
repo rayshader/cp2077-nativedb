@@ -1,13 +1,23 @@
-@if (node) {
-  @if (canDocument && isVisible) {
-    <ndb-documentation [body]="documentation?.comment ?? ''"
-                       [object]="memberOf"
-                       [method]="node"></ndb-documentation>
+@let _node = node();
+
+@if (_node) {
+  @let _memberOf = memberOf();
+  @let _hasFullname = hasFullname();
+  @let _canDocument = canDocument();
+  @let _documentation = wiki();
+  @let _scope = scope();
+
+  @if (_canDocument && isVisible) {
+    <ndb-documentation [body]="_documentation?.comment ?? ''"
+                       [object]="_memberOf"
+                       [method]="_node"></ndb-documentation>
   }
 
   <div class="content">
     <div class="badges">
-      @if (canCopy) {
+      @if (canCopy()) {
+        @let _syntax = syntax();
+
         <button mat-icon-button
                 class="badge clipboard"
                 matTooltip="Copy code to clipboard"
@@ -16,50 +26,52 @@
         <mat-menu #copyMenu="matMenu">
           <button mat-menu-item (click)="copyPrototype()">Copy prototype</button>
           <button mat-menu-item (click)="copyCall()">Copy call</button>
-          @if (fmtService.syntax === CodeSyntax.redscript) {
+          @if (_syntax === CodeSyntax.redscript) {
             <mat-divider></mat-divider>
-            @if (!memberOf) {
+            @if (!_memberOf) {
               <button mat-menu-item
-                      [disabled]="node.isNative"
+                      [disabled]="_node.isNative"
                       matTooltip="You cannot replace a native global method."
-                      [matTooltipDisabled]="!node.isNative"
+                      [matTooltipDisabled]="!_node.isNative"
                       (click)="copySpecial('replaceGlobal')">Copy replaceGlobal</button>
             } @else {
               <button mat-menu-item
-                      [disabled]="node.isNative"
+                      [disabled]="_node.isNative"
                       matTooltip="You cannot wrap a native method."
-                      [matTooltipDisabled]="!node.isNative"
+                      [matTooltipDisabled]="!_node.isNative"
                       (click)="copySpecial('wrapMethod')">Copy wrapMethod</button>
               <button mat-menu-item
-                      [disabled]="node.isNative"
+                      [disabled]="_node.isNative"
                       matTooltip="You cannot replace a native method."
-                      [matTooltipDisabled]="!node.isNative"
+                      [matTooltipDisabled]="!_node.isNative"
                       (click)="copySpecial('replaceMethod')">Copy replaceMethod</button>
             }
-          } @else if (fmtService.syntax === CodeSyntax.lua) {
+          } @else if (_syntax === CodeSyntax.lua) {
+            @let _isListener = isListener();
+
             <mat-divider></mat-divider>
             <button mat-menu-item (click)="copySpecial('Observe')">Copy Observe</button>
             <button mat-menu-item (click)="copySpecial('ObserveAfter')">Copy ObserveAfter</button>
             <button mat-menu-item (click)="copySpecial('Override')">Copy Override</button>
             <button mat-menu-item
                     matTooltip="Only for Listener classes"
-                    [matTooltipDisabled]="isListener"
-                    [disabled]="!isListener"
+                    [matTooltipDisabled]="_isListener"
+                    [disabled]="!_isListener"
                     (click)="copySpecial('NewProxy')">Copy NewProxy</button>
           }
         </mat-menu>
       }
-      @if (canDocument) {
+      @if (_canDocument) {
         <button mat-icon-button
                 class="badge"
-                [matTooltip]="documentation === undefined ? 'Copy GitBook signature' : 'Documentation'"
+                [matTooltip]="_documentation === undefined ? 'Copy GitBook signature' : 'Documentation'"
                 matTooltipShowDelay="1500"
-                [class.stx-doc]="hasDocumentation"
+                [class.stx-doc]="hasDocumentation()"
                 (click)="toggleDocumentation()">
           <mat-icon>info_outline</mat-icon>
         </button>
       }
-      @if (canShare) {
+      @if (canShare()) {
         <button mat-icon-button
                 class="badge"
                 matTooltip="Copy URL to clipboard"
@@ -68,47 +80,47 @@
           <mat-icon>share</mat-icon>
         </button>
       }
-      <mat-icon class="badge" [attr.data-scope]="scope" svgIcon="scope" [matTooltip]="scope"></mat-icon>
-      @if (node.isNative) {
+      <mat-icon class="badge" [attr.data-scope]="_scope" svgIcon="scope" [matTooltip]="_scope"></mat-icon>
+      @if (_node.isNative) {
         <mat-icon class="badge" svgIcon="native" matTooltip="native"></mat-icon>
       }
-      @if (node.isStatic) {
+      @if (_node.isStatic) {
         <mat-icon class="badge" svgIcon="static" matTooltip="static"></mat-icon>
       }
-      @if (node.isFinal) {
+      @if (_node.isFinal) {
         <mat-icon class="badge" svgIcon="final" matTooltip="final"></mat-icon>
       }
-      @if (node.isThreadSafe) {
+      @if (_node.isThreadSafe) {
         <mat-icon class="badge" svgIcon="timer" matTooltip="threadsafe"></mat-icon>
       }
-      @if (node.isCallback) {
+      @if (_node.isCallback) {
         <mat-icon class="badge" svgIcon="callback" matTooltip="callback"></mat-icon>
       }
-      @if (node.isConst) {
+      @if (_node.isConst) {
         <mat-icon class="badge" svgIcon="const" matTooltip="const"></mat-icon>
       }
-      @if (node.isQuest) {
+      @if (_node.isQuest) {
         <mat-icon class="badge" svgIcon="quest" matTooltip="quest"></mat-icon>
       }
-      @if (node.isTimer) {
+      @if (_node.isTimer) {
         <mat-icon class="badge" svgIcon="timer" matTooltip="timer"></mat-icon>
       }
-      <div [style.width]="align"></div>
+      <div [style.width]="align()"></div>
     </div>
 
-    <div class="prototype stx" [class.break]="node.arguments.length > 0">
+    <div class="prototype stx" [class.break]="_node.arguments.length > 0">
       <div class="group">
         <span class="stx-function"
-              [class.stx-highlight]="hasFullName"
-              [attr.clickable]="hasFullName"
-              [matTooltip]="hasFullName ? node.fullName : ''"
+              [class.stx-highlight]="_hasFullname"
+              [attr.clickable]="_hasFullname"
+              [matTooltip]="_hasFullname ? _node.fullName : ''"
               matTooltipShowDelay="200"
               matTooltipClass="tooltip-highlight"
-              (click)="copyFullName()">{{node.name}}</span>
+              (click)="copyFullName()">{{_node.name}}</span>
         <span class="stx-parenthesis">(</span>
       </div>
 
-      @for (arg of node.arguments; track arg.name) {
+      @for (arg of _node.arguments; track arg.name) {
         <div class="group">
           <argument-span [node]="arg"></argument-span>
           @if (!$last) {
@@ -120,7 +132,7 @@
       <div class="group">
         <span class="stx-parenthesis">)</span>
         <span class="stx-text">&nbsp;→&nbsp;</span>
-        <type-span [node]="node.returnType"></type-span>
+        <type-span [node]="_node.returnType"></type-span>
       </div>
     </div>
   </div>

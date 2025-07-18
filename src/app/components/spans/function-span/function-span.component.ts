@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, DestroyRef, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input, signal} from '@angular/core';
 import {ArgumentSpanComponent} from "../argument-span/argument-span.component";
 import {TypeSpanComponent} from "../type-span/type-span.component";
 
@@ -8,14 +8,12 @@ import {RedFunctionAst} from "../../../../shared/red-ast/red-function.ast";
 import {RedClassAst} from "../../../../shared/red-ast/red-class.ast";
 import {RedVisibilityDef} from "../../../../shared/red-ast/red-definitions.ast";
 import {NDBDocumentationComponent} from "../../ndb-documentation/ndb-documentation.component";
-import {CodeSyntax, Settings, SettingsService} from "../../../../shared/services/settings.service";
-import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {CodeSyntax, SettingsService} from "../../../../shared/services/settings.service";
 import {CodeFormatterService} from "../../../../shared/services/code-formatter.service";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {MatDivider} from "@angular/material/divider";
 import {WikiClassDto, WikiFunctionDto, WikiGlobalDto} from "../../../../shared/dtos/wiki.dto";
-import {take} from "rxjs";
 
 @Component({
   selector: 'function-span',
@@ -37,189 +35,154 @@ import {take} from "rxjs";
 })
 export class FunctionSpanComponent {
 
+  private readonly fmtService: CodeFormatterService = inject(CodeFormatterService);
+  private readonly settingsService: SettingsService = inject(SettingsService);
+
+  readonly node = input<RedFunctionAst>();
+  readonly memberOf = input<RedClassAst>();
+  readonly documentation = input<WikiFunctionDto | WikiClassDto>();
+  readonly badges = input<number>(1);
+  readonly canCopy = input<boolean>(true);
+  readonly canDocument = input<boolean>(false);
+  readonly canShare = input<boolean>(true);
+
+  readonly wiki = signal<WikiFunctionDto | WikiGlobalDto | undefined>(undefined);
+
+  readonly syntax = this.fmtService.syntax;
+  readonly useMarkdown = computed<boolean>(() => this.settingsService.formatShareLink());
+  readonly hasDocumentation = computed<boolean>(() => {
+    const documentation = this.documentation();
+    return !!documentation && documentation.comment.length > 0;
+  })
+  readonly scope = computed<string>(() => {
+    const node = this.node();
+    return (node) ? RedVisibilityDef[node.visibility] : '';
+  });
+  readonly hasFullname = computed<boolean>(() => {
+    const node = this.node();
+    return !!node && (node.name !== node.fullName);
+  });
+  readonly isListener = computed<boolean>(() => {
+    const memberOf = this.memberOf();
+    return !!memberOf && (memberOf.aliasName ?? memberOf.name).endsWith('Listener');
+  });
+
   /**
-   * Offset in pixels to add between badges and function's name, with at least 12px.
+   * Offset in pixels to add between badges and the function's name, with at least 12 px.
    */
-  align: string = '12px';
+  readonly align = computed<string>(() => {
+    const node = this.node();
+    let count: number = this.badges() - 1;
+
+    if (node?.isNative) count--;
+    if (node?.isStatic) count--;
+    if (node?.isFinal) count--;
+    if (node?.isCallback) count--;
+    if (node?.isTimer) count--;
+    if (node?.isConst) count--;
+    if (node?.isQuest) count--;
+    if (node?.isThreadSafe) count--;
+    count = Math.max(count, 0);
+    return `${count * 24 + 12}px`;
+  });
 
   /**
    * Whether documentation should be visible?
    */
   isVisible: boolean = false;
 
-  scope: string = '';
-  hasFullName: boolean = false;
-  isListener: boolean = false;
+  readonly CodeSyntax = CodeSyntax;
 
-  node?: RedFunctionAst;
+  constructor() {
+    effect(() => {
+      const documentation = this.documentation();
+      if (!documentation) {
+        this.isVisible = false;
+        this.wiki.set(undefined);
+        return;
+      }
 
-  /**
-   * Optional, when this function is a member of a class or a struct.
-   */
-  memberOf?: RedClassAst;
+      if (documentation.comment.length > 0) {
+        this.isVisible = this.settingsService.showDocumentation();
+      }
 
-  /**
-   * Whether grab code feature can be used?
-   */
-  @Input()
-  canCopy: boolean = true;
-
-  /**
-   * Whether documentation feature can be used?
-   */
-  @Input()
-  canDocument: boolean = false;
-
-  /**
-   * Whether share feature can be used?
-   */
-  @Input()
-  canShare: boolean = true;
-
-  documentation?: WikiFunctionDto;
-
-  protected readonly CodeSyntax = CodeSyntax;
-
-  private useMarkdown: boolean = true;
-
-  constructor(protected readonly fmtService: CodeFormatterService,
-              private readonly settingsService: SettingsService,
-              private readonly dr: DestroyRef) {
-    this.settingsService.settings$.pipe(take(1), takeUntilDestroyed()).subscribe(this.onSettingsLoaded.bind(this));
+      if ('functions' in documentation) {
+        const node = this.node()!;
+        const klass = documentation as WikiClassDto;
+        this.wiki.set(klass.functions.find((method) => method.id === node.id));
+      } else {
+        this.wiki.set(documentation as WikiGlobalDto);
+      }
+    });
   }
 
-  @Input('node')
-  set _node(value: RedFunctionAst | undefined) {
-    this.node = value;
-    this.scope = (this.node) ? RedVisibilityDef[this.node.visibility] : '';
-    this.hasFullName = !!this.node && (this.node.name !== this.node.fullName);
-  }
-
-  @Input('memberOf')
-  set _memberOf(value: RedClassAst | undefined) {
-    this.memberOf = value;
-    this.isListener = !!this.memberOf && (this.memberOf.aliasName ?? this.memberOf.name).endsWith('Listener');
-  }
-
-  @Input('documentation')
-  set _documentation(value: WikiClassDto | WikiFunctionDto | undefined) {
-    if (!value) {
-      this.documentation = undefined;
+  async toggleDocumentation(): Promise<void> {
+    const node = this.node();
+    if (!node) {
       return;
     }
-    if ('functions' in value) {
-      const wikiClass = value as WikiClassDto;
+    if (this.documentation() === undefined) {
+      const prototype: string = RedFunctionAst.toGitBook(node);
 
-      this.documentation = wikiClass.functions.find((method) => method.id === this.node!.id);
-    } else {
-      this.documentation = value as WikiGlobalDto;
-    }
-    this.settingsService.showDocumentation$
-      .pipe(takeUntilDestroyed(this.dr))
-      .subscribe(this.onShowDocumentation.bind(this));
-  }
-
-  /**
-   * Total number of badges to align with.
-   */
-  @Input()
-  set badges(count: number) {
-    // Compute remaining empty badges to align with.
-    count--;
-    if (this.node?.isNative) count--;
-    if (this.node?.isStatic) count--;
-    if (this.node?.isFinal) count--;
-    if (this.node?.isCallback) count--;
-    if (this.node?.isTimer) count--;
-    if (this.node?.isConst) count--;
-    if (this.node?.isQuest) count--;
-    if (this.node?.isThreadSafe) count--;
-    count = Math.max(count, 0);
-    this.align = `${count * 24 + 12}px`;
-  }
-
-  /**
-   * Whether this function is documented?
-   */
-  get hasDocumentation(): boolean {
-    return this.documentation !== undefined && this.documentation.comment.length > 0;
-  }
-
-  toggleDocumentation(): void {
-    if (!this.node) {
-      return;
-    }
-    if (this.documentation === undefined) {
-      const prototype: string = RedFunctionAst.toGitBook(this.node);
-
-      navigator.clipboard.writeText(prototype);
+      await navigator.clipboard.writeText(prototype);
       return;
     }
     this.isVisible = !this.isVisible;
   }
 
   async copyFullName(): Promise<void> {
-    if (!this.node || this.node.fullName === this.node.name) {
+    const node = this.node();
+    if (!node || node.fullName === node.name) {
       return;
     }
-    await navigator.clipboard.writeText(this.node.fullName);
+
+    await navigator.clipboard.writeText(node.fullName);
   }
 
-  protected async copyPrototype(): Promise<void> {
-    if (!this.node) {
+  async copyPrototype(): Promise<void> {
+    const node = this.node();
+    if (!node) {
       return;
     }
-    const code: string = this.fmtService.formatPrototype(this.node);
 
+    const code: string = this.fmtService.formatPrototype(node);
     await navigator.clipboard.writeText(code);
   }
 
-  protected async copyCall(): Promise<void> {
-    if (!this.node) {
+  async copyCall(): Promise<void> {
+    const node = this.node();
+    if (!node) {
       return;
     }
-    const code: string = this.fmtService.formatCall(this.node, this.memberOf);
 
+    const code: string = this.fmtService.formatCall(node, this.memberOf());
     await navigator.clipboard.writeText(code);
   }
 
-  protected async copySpecial(type: string): Promise<void> {
-    if (!this.node) {
+  async copySpecial(type: string): Promise<void> {
+    const node = this.node();
+    if (!node) {
       return;
     }
-    const code: string = this.fmtService.formatSpecial(type, this.node, this.memberOf);
 
+    const code: string = this.fmtService.formatSpecial(type, node, this.memberOf());
     await navigator.clipboard.writeText(code);
   }
 
-  protected async copyUrlToClipboard(): Promise<void> {
-    if (!this.node) {
+  async copyUrlToClipboard(): Promise<void> {
+    const node = this.node();
+    if (!node) {
       return;
     }
-    let uri: string;
 
-    if (this.memberOf) {
-      uri = `${this.memberOf.name}#${this.node.name}`;
-    } else {
-      uri = this.node.name;
-    }
+    const memberOf = this.memberOf();
+    const uri: string = memberOf ? `${memberOf.name}#${node.name}` : node.name;
+
     let data: string = `${window.location.origin}/${uri}`;
-
-    if (this.useMarkdown) {
+    if (this.useMarkdown()) {
       data = `[${uri}](${data})`;
     }
     await navigator.clipboard.writeText(data);
-  }
-
-  private onShowDocumentation(state: boolean): void {
-    if (!this.hasDocumentation) {
-      return;
-    }
-    this.isVisible = state;
-  }
-
-  private onSettingsLoaded(settings: Settings): void {
-    this.useMarkdown = settings.formatShareLink;
   }
 
 }

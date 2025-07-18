@@ -1,24 +1,26 @@
+@let _visits = visits();
+
 <div class="header">
   <h1>Last recent visits</h1>
 
   <button mat-icon-button
           matTooltip="Remove all recent visits"
           (click)="onClearAll()"
-          [disabled]="cannotClearAll$ | async">
+          [disabled]="disableClearAll()">
     <mat-icon>clear</mat-icon>
   </button>
 </div>
 
 <mat-divider></mat-divider>
 
-@if (recentVisits$ | async; as recentVisits) {
-  @for (recentVisit of recentVisits; track recentVisit.node.id) {
+@if (_visits) {
+  @for (visit of _visits; track visit.node.id) {
     <div class="stx item">
-      <mat-icon class="badge-{{recentVisit.icon}}"
-                [svgIcon]="recentVisit.icon"
-                [matTooltip]="recentVisit.alt"></mat-icon>
+      <mat-icon class="badge-{{visit.icon}}"
+                [svgIcon]="visit.icon"
+                [matTooltip]="visit.alt"></mat-icon>
 
-      <type-span [node]="recentVisit.node"></type-span>
+      <type-span [node]="visit.node"></type-span>
     </div>
   }
 }

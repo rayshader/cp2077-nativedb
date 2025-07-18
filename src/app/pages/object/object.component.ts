@@ -1,25 +1,11 @@
-import {AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, Input} from '@angular/core';
-import {AsyncPipe} from "@angular/common";
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked} from '@angular/core';
 import {CdkAccordionModule} from "@angular/cdk/accordion";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
 import {MatIconModule} from "@angular/material/icon";
 import {PropertySpanComponent} from "../../components/spans/property-span/property-span.component";
 import {NDBAccordionItemComponent} from "../../components/ndb-accordion-item/ndb-accordion-item.component";
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
-import {
-  BehaviorSubject,
-  combineLatest, combineLatestWith,
-  delay,
-  EMPTY,
-  map,
-  Observable,
-  of,
-  OperatorFunction,
-  pipe,
-  shareReplay,
-  switchMap,
-  take
-} from "rxjs";
+import {map} from "rxjs";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {RedNodeKind} from "../../../shared/red-ast/red-node.ast";
 import {ActivatedRoute} from "@angular/router";
@@ -30,18 +16,18 @@ import {RedPropertyAst} from "../../../shared/red-ast/red-property.ast";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {RedOriginDef, RedVisibilityDef} from "../../../shared/red-ast/red-definitions.ast";
 import {PageService} from "../../../shared/services/page.service";
-import {CodeSyntax, Settings, SettingsService} from "../../../shared/services/settings.service";
+import {CodeSyntax, SettingsService} from "../../../shared/services/settings.service";
 import {MatButtonModule} from "@angular/material/button";
 import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
 import {RecentVisitService} from "../../../shared/services/recent-visit.service";
 import {ResponsiveService} from "../../../shared/services/responsive.service";
 import {MatDividerModule} from "@angular/material/divider";
 import {cyrb53} from "../../../shared/string";
-import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {toSignal} from "@angular/core/rxjs-interop";
 import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
 import {NDBDocumentationComponent} from "../../components/ndb-documentation/ndb-documentation.component";
 import {MatTooltipModule} from "@angular/material/tooltip";
-import {SearchRequest, SearchService} from "../../../shared/services/search.service";
+import {SearchService} from "../../../shared/services/search.service";
 import {WikiService} from "../../../shared/services/wiki.service";
 import {WikiClassDto} from "../../../shared/dtos/wiki.dto";
 import {MatSlideToggle, MatSlideToggleChange} from "@angular/material/slide-toggle";
@@ -49,6 +35,8 @@ import {FormControl, ReactiveFormsModule} from "@angular/forms";
 
 export interface InheritData extends RedTypeAst {
   readonly isEmpty: boolean;
+
+  visible: boolean;
 }
 
 interface ObjectData {
@@ -81,10 +69,21 @@ interface ObjectData {
   readonly showFunctions: boolean;
 }
 
+interface TitleBarData {
+  readonly name: string;
+  readonly altName?: string;
+  readonly hasComment: boolean;
+}
+
 interface FunctionDocumentation {
   readonly memberOf: RedClassAst;
   readonly function: RedFunctionAst;
   readonly documentation?: WikiClassDto;
+}
+
+interface MemberVisibility {
+  readonly id: string;
+  readonly visible: boolean;
 }
 
 interface BadgeFilterItem<T> {
@@ -108,7 +107,6 @@ type PropertySort = 'name' | 'offset';
   selector: 'ndb-page-object',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AsyncPipe,
     CdkAccordionModule,
     MatIconModule,
     MatChipsModule,
@@ -128,9 +126,223 @@ type PropertySort = 'name' | 'offset';
   templateUrl: './object.component.html',
   styleUrl: './object.component.scss'
 })
-export class ObjectComponent implements AfterViewInit {
+export class ObjectComponent {
 
-  readonly badgesProperty: BadgeFilterItem<RedPropertyAst>[] = [
+  // Dependencies //
+  private readonly dumpService: RedDumpService = inject(RedDumpService);
+  private readonly wikiService: WikiService = inject(WikiService);
+  private readonly pageService: PageService = inject(PageService);
+  private readonly searchService: SearchService = inject(SearchService);
+  private readonly settingsService: SettingsService = inject(SettingsService);
+  private readonly responsiveService: ResponsiveService = inject(ResponsiveService);
+  private readonly recentVisitService: RecentVisitService = inject(RecentVisitService);
+  private readonly route: ActivatedRoute = inject(ActivatedRoute);
+
+  // Inputs //
+  readonly id = input.required<string>();
+  readonly fragment = toSignal(this.route.fragment);
+  readonly kind = toSignal<RedNodeKind>(this.route.data.pipe(map((data: any) => data.kind)));
+
+  // Signals //
+  readonly isLoading = computed<boolean>(() => !!this.id() && !this.object());
+  readonly isMobile = this.responsiveService.isMobile;
+  readonly isPinned = this.settingsService.isBarPinned;
+  readonly highlightEmptyObject = this.settingsService.highlightEmptyObject;
+  readonly showDocumentation = signal<boolean>(true);
+  readonly inherits = signal<number[]>([]);
+  readonly sortProperty = signal<PropertySort>('name');
+
+  readonly badges = this.dumpService.badges;
+  readonly align = computed(() => `${104 + (this.badges() - 2) * 24}px`);
+
+  readonly object = computed<RedClassAst | undefined>(() => {
+    // NOTE: make sure the first loading pass is done.
+    const isReady = this.dumpService.isReady();
+    if (!isReady) {
+      return undefined;
+    }
+
+    // NOTE: re-compute whenever id's input is changed.
+    const id: number = +this.id();
+    const kind = this.kind();
+
+    let node: RedClassAst | undefined;
+    switch (kind) {
+      case RedNodeKind.class:
+        node = this.dumpService.getClassById(+id);
+        // NOTE: re-compute when inheritance is finally loaded.
+        this.dumpService.inheritance();
+        break;
+      case RedNodeKind.struct:
+        node = this.dumpService.getStructById(+id);
+        break;
+      default:
+        node = undefined;
+        break;
+    }
+
+    if (kind === RedNodeKind.struct && node) {
+      return node;
+    }
+    return node?.isInheritanceLoaded ? node : undefined;
+  });
+  readonly parents = computed<InheritData[]>(() => {
+    const object = this.object();
+    if (!object) {
+      return [];
+    }
+
+    return object.parents;
+  });
+  readonly children = computed<InheritData[]>(() => {
+    const object = this.object();
+    if (!object) {
+      return [];
+    }
+
+    return object.children;
+  })
+  readonly properties = computed<RedPropertyAst[]>(() => {
+    const object = this.object();
+    if (!object) {
+      return [];
+    }
+
+    let properties = [...object.properties];
+    properties.push(
+      ...this.inherits()
+        .map((id) => this.dumpService.getClassById(id))
+        .filter((inherit) => !!inherit)
+        .flatMap((inherit) => inherit.properties ?? [])
+    );
+
+    const sort = this.sortProperty();
+    properties.sort(sort === 'name' ? RedPropertyAst.sort : RedPropertyAst.sortByOffset);
+
+    return properties;
+  });
+  readonly functions = computed<FunctionDocumentation[]>(() => {
+    const object = this.object();
+    if (!object) {
+      return [];
+    }
+
+    const documentation = this.documentation();
+    let functions = object.functions.map<FunctionDocumentation>((func) => {
+      return {memberOf: object, function: func, documentation: documentation};
+    });
+
+    for (const id of this.inherits()) {
+      const inherit = this.dumpService.getClassById(id);
+      if (!inherit) {
+        continue;
+      }
+
+      const wiki = undefined;// toSignal(this.wikiService.getClass(inherit.name))();
+      for (const func of inherit.functions) {
+        const index: number = functions.findIndex((item) => item.function.fullName === func.fullName);
+
+        if (index !== -1) {
+          continue;
+        }
+        functions.push({memberOf: inherit, function: func, documentation: wiki});
+      }
+    }
+
+    functions.sort((a, b) => RedFunctionAst.sort(a.function, b.function));
+
+    return functions;
+  })
+  readonly filteredProperties = computed<RedPropertyAst[]>(() => {
+    let properties = this.properties();
+
+    const badge = this.propertyBadge();
+    if (badge) {
+      properties = properties.filter((property) => badge.filter(property));
+    }
+
+    return properties;
+  });
+  readonly filteredFunctions = computed<FunctionDocumentation[]>(() => {
+    let functions = this.functions();
+
+    const badge = this.functionBadge();
+    if (badge) {
+      functions = functions.filter((func) => badge.filter(func.function));
+    }
+
+    return functions;
+  })
+  readonly documentation = computed<WikiClassDto | undefined>(() => {
+    const object = this.object();
+    return undefined;// TODO: object ? this.wikiService.getClass(object.name) : undefined;
+  });
+
+  readonly titleBar = computed<TitleBarData>(() => {
+    const settings = this.settingsService.settings();
+    const object = this.object();
+    if (!object) {
+      return {
+        name: '',
+        altName: '',
+        hasComment: false,
+      };
+    }
+
+    const documentation = this.documentation();
+    const reverse: boolean = settings.codeSyntax === CodeSyntax.redscript && !!object.aliasName;
+    const name: string = reverse ? object.aliasName! : object.name;
+    const altName: string | undefined = reverse ? object.name : object.aliasName;
+    return {
+      name,
+      altName,
+      hasComment: !!documentation && documentation.comment.length > 0,
+    };
+  });
+
+  readonly scope = computed(() => RedVisibilityDef[this.object()?.visibility ?? 0]);
+  readonly isNative = computed(() => this.object()?.origin === RedOriginDef.native);
+  readonly isImportOnly = computed(() => this.object()?.origin === RedOriginDef.importOnly);
+  readonly isClass = computed(() => this.kind() === RedNodeKind.class);
+  readonly isStruct = computed(() => this.kind() === RedNodeKind.struct);
+
+  readonly showParents = computed(() => {
+    const object = this.object();
+    if (!object) {
+      return false;
+    }
+
+    return object.parents.length > 0 || this.settingsService.showEmptyAccordion();
+  });
+  readonly showChildren = computed(() => {
+    const object = this.object();
+    if (!object) {
+      return false;
+    }
+
+    return object.children.length > 0 || this.settingsService.showEmptyAccordion();
+  });
+  readonly showProperties = computed(() => {
+    const object = this.object();
+    if (!object) {
+      return false;
+    }
+
+    return this.filteredProperties().length > 0 || this.settingsService.showEmptyAccordion();
+  });
+  readonly showFunctions = computed(() => {
+    const object = this.object();
+    if (!object) {
+      return false;
+    }
+
+    return this.filteredFunctions().length > 0 || this.settingsService.showEmptyAccordion();
+  });
+  readonly showOffset = computed(() => {
+    return this.settingsService.code() === CodeSyntax.pseudocode && !this.responsiveService.isMobile();
+  });
+
+  readonly propertyBadges = signal<BadgeFilterItem<RedPropertyAst>[]>([
     {
       isEnabled: true,
       isEmpty: false,
@@ -156,8 +368,15 @@ export class ObjectComponent implements AfterViewInit {
     },
 
     {isEnabled: true, isEmpty: false, icon: 'scope', title: 'persistent', filter: (prop) => prop.isPersistent}
-  ];
-  readonly badgesFunction: BadgeFilterItem<RedFunctionAst>[] = [
+  ]);
+  readonly propertyBadge = computed<BadgeFilterItem<RedPropertyAst> | undefined>(() => {
+    const badges = this.propertyBadges();
+    const isFiltered = badges.filter((badge) => badge.isEnabled).length === 1;
+
+    return isFiltered ? badges.find((badge) => badge.isEnabled) : undefined;
+  });
+
+  readonly functionBadges = signal<BadgeFilterItem<RedFunctionAst>[]>([
     {
       isEnabled: true,
       isEmpty: false,
@@ -190,53 +409,342 @@ export class ObjectComponent implements AfterViewInit {
     {isEnabled: true, isEmpty: false, icon: 'const', title: 'const', filter: (func) => func.isConst},
     {isEnabled: true, isEmpty: false, icon: 'quest', title: 'quest', filter: (func) => func.isQuest},
     {isEnabled: true, isEmpty: false, icon: 'timer', title: 'timer', filter: (func) => func.isTimer}
-  ];
+  ]);
+  readonly functionBadge = computed<BadgeFilterItem<RedFunctionAst> | undefined>(() => {
+    const badges = this.functionBadges();
+    const isFiltered = badges.filter((badge) => badge.isEnabled).length === 1;
 
-  data$: Observable<ObjectData | undefined> = EMPTY;
+    return isFiltered ? badges.find((badge) => badge.isEnabled) : undefined;
+  });
 
-  showMembers: FormControl<boolean> = new FormControl(false, {nonNullable: true});
+  readonly showMembers: FormControl<boolean> = new FormControl(false, {nonNullable: true});
 
-  protected readonly isMobile$: Observable<boolean>;
+  readonly cyrb53 = cyrb53;
 
-  protected readonly kind: RedNodeKind;
+  propertySearchFilter: MemberFilter = 'empty';
+  functionSearchFilter: MemberFilter = 'empty';
 
-  protected readonly classKind: RedNodeKind = RedNodeKind.class;
-  protected readonly structKind: RedNodeKind = RedNodeKind.struct;
+  constructor() {
+    const showDocumentation = this.settingsService.showDocumentation();
+    const showMembers = this.settingsService.showMembers();
 
-  protected readonly nativeOrigin: RedOriginDef = RedOriginDef.native;
-  protected readonly importOnlyOrigin: RedOriginDef = RedOriginDef.importOnly;
+    effect(() => {
+      const id = +this.id();
+      this.recentVisitService.pushLastVisit(+id);
 
-  protected readonly cyrb53 = cyrb53;
+      // TODO: check for regression when fragment is set for functions
+      const fragment = untracked(this.fragment);
+      if (fragment === null) {
+        this.pageService.restoreScroll();
+      }
 
-  protected isPropertiesFiltered: boolean = false;
-  protected isFunctionsFiltered: boolean = false;
-  protected canShowOffset: boolean = false;
-  protected propertySearchFilter: MemberFilter = 'empty';
-  protected functionSearchFilter: MemberFilter = 'empty';
-  protected propertySort: PropertySort = 'name';
+      this.showDocumentation.set(showDocumentation);
+      this.showMembers.setValue(showMembers);
+      this.inherits.set([]);
+    });
 
-  private readonly showDocumentationSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  private readonly showDocumentation$: Observable<boolean> = this.showDocumentationSubject.asObservable();
-  private readonly filtersSubject: BehaviorSubject<void> = new BehaviorSubject<void>(undefined);
-  private readonly filters$: Observable<void> = this.filtersSubject.asObservable();
-  private readonly sortSubject: BehaviorSubject<PropertySort> = new BehaviorSubject<PropertySort>('name');
-  private readonly sort$: Observable<PropertySort> = this.sortSubject.asObservable();
-  private readonly inheritsSubject: BehaviorSubject<InheritData[]> = new BehaviorSubject<InheritData[]>([]);
-  private readonly inherits$: Observable<InheritData[]> = this.inheritsSubject.asObservable();
+    effect(() => {
+      const parents = this.parents().filter((parent) => !parent.isEmpty);
+      const inherits = this.inherits();
+      const showMembers = this.showMembers.value;
 
-  constructor(private readonly dumpService: RedDumpService,
-              private readonly wikiService: WikiService,
-              private readonly pageService: PageService,
-              private readonly recentVisitService: RecentVisitService,
-              private readonly settingsService: SettingsService,
-              private readonly responsiveService: ResponsiveService,
-              private readonly searchService: SearchService,
-              private readonly route: ActivatedRoute,
-              private readonly dr: DestroyRef) {
-    this.kind = (this.route.snapshot.data as any).kind;
-    this.isMobile$ = this.responsiveService.mobile$;
+      if (inherits.length === 0 && showMembers) {
+        this.showMembers.setValue(false);
+      } else if (inherits.length === parents.length && !showMembers) {
+        this.showMembers.setValue(true);
+      }
+    });
+
+    effect(() => {
+      const object = this.object();
+      if (!object) {
+        return;
+      }
+
+      this.resetBadges();
+      this.computeBadges(untracked(this.properties), untracked(this.functions));
+    });
   }
 
+  areMembersVisible(parent: InheritData): boolean {
+    return this.inherits().includes(parent.id);
+  }
+
+  getFilterTooltip(badge: BadgeFilterItem<any>, isFiltered: boolean): string {
+    if (!badge.isEnabled) {
+      return `Filter by ${badge.title}`;
+    }
+    if (!isFiltered) {
+      return `Filter by ${badge.title}`;
+    }
+    return 'Reset filter';
+  }
+
+  async toggleDocumentation(name: string, hasComment: boolean): Promise<void> {
+    if (!hasComment) {
+      await navigator.clipboard.writeText(`# ${name}`);
+      window.open('https://app.gitbook.com/o/-MP5ijqI11FeeX7c8-N8/s/iEOlL96xX95sTRIvzobZ/classes', '_blank');
+      return;
+    }
+    this.showDocumentation.set(!this.showDocumentation());
+  }
+
+  toggleMembers(parent: InheritData): void {
+    if (parent.isEmpty) {
+      return;
+    }
+    this.inherits.update((inherits) => {
+      const index = inherits.findIndex((id) => id === parent.id);
+
+      if (index !== -1) {
+        inherits = inherits.filter((id) => id !== parent.id);
+      } else {
+        inherits = [...inherits, parent.id];
+      }
+
+      return inherits;
+    })
+
+    this.resetBadges(true);
+    this.computeBadges(untracked(this.properties), untracked(this.functions));
+  }
+
+  toggleAllMembers(event: MatSlideToggleChange): void {
+    this.inherits.update((inherits) => {
+      if (event.checked) {
+        inherits = this.parents()
+          .filter((parent) => !parent.isEmpty)
+          .map((parent) => parent.id);
+      } else {
+        inherits = [];
+      }
+      return inherits;
+    });
+
+    this.resetBadges(true);
+    this.computeBadges(untracked(this.properties), untracked(this.functions));
+  }
+
+  togglePropertyBadge(badge: BadgeFilterItem<RedPropertyAst>, force: boolean = false): void {
+    if (badge.isEmpty && !force) {
+      return;
+    }
+    this.propertyBadges.update((badges) => {
+      const enabledBadges = badges.filter((item) => item.isEnabled);
+      const isOnlyBadgeEnabled = enabledBadges.length === 1 && enabledBadges[0] === badge;
+
+      if (isOnlyBadgeEnabled) {
+        badges.forEach((item) => item.isEnabled = true);
+      } else {
+        badges.forEach((item) => item.isEnabled = item === badge);
+      }
+      return [...badges];
+    });
+  }
+
+  toggleSortByOffset(): void {
+    this.sortProperty.set(this.sortProperty() === 'offset' ? 'name' : 'offset');
+  }
+
+  togglePropertySearchFilter(): void {
+
+  }
+
+  toggleFunctionBadge(badge: BadgeFilterItem<RedFunctionAst>, force: boolean = false): void {
+    if (badge.isEmpty && !force) {
+      return;
+    }
+    this.functionBadges.update((badges) => {
+      const enabledBadges = badges.filter((item) => item.isEnabled);
+      const isOnlyBadgeEnabled = enabledBadges.length === 1 && enabledBadges[0] === badge;
+
+      if (isOnlyBadgeEnabled) {
+        badges.forEach((item) => item.isEnabled = true);
+      } else {
+        badges.forEach((item) => item.isEnabled = item === badge);
+      }
+      return [...badges];
+    });
+  }
+
+  toggleFunctionSearchFilter(): void {
+
+  }
+
+  private resetBadges(onlyEmptiness: boolean = false): void {
+    this.propertyBadges.update((badges) => {
+      for (const badge of badges) {
+        badge.isEmpty = true;
+        if (!onlyEmptiness) {
+          badge.isEnabled = true;
+        }
+      }
+      return [...badges];
+    });
+    this.functionBadges.update((badges) => {
+      for (const badge of badges) {
+        badge.isEmpty = true;
+        if (!onlyEmptiness) {
+          badge.isEnabled = true;
+        }
+      }
+      return [...badges];
+    });
+  }
+
+  private computeBadges(properties: RedPropertyAst[],
+                        functions: FunctionDocumentation[]): void {
+    this.propertyBadges.update((badges) => {
+      for (const badge of badges) {
+        const hasEnabled = badges.filter((item) => item.isEnabled).length === 1;
+
+        for (const prop of properties) {
+          if (prop.visibility === RedVisibilityDef.public && badge.title === 'public') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+          if (prop.visibility === RedVisibilityDef.protected && badge.title === 'protected') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+          if (prop.visibility === RedVisibilityDef.private && badge.title === 'private') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+          if (prop.isPersistent && badge.title === 'persistent') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+        }
+      }
+
+      // Reset lost badge when filters changed and enables back non-empty badges.
+      const badgeLost = this.findLostBadge(badges);
+      if (badgeLost) {
+        for (const badge of badges) {
+          if (!badge.isEmpty && !badge.isEnabled) {
+            badge.isEnabled = true;
+          }
+        }
+      }
+      return [...badges];
+    });
+    this.functionBadges.update((badges) => {
+      const hasEnabled = badges.filter((item) => item.isEnabled).length === 1;
+
+      for (const badge of badges) {
+        for (const item of functions) {
+          if (item.function.visibility === RedVisibilityDef.public && badge.title === 'public') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+          if (item.function.visibility === RedVisibilityDef.protected && badge.title === 'protected') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+          if (item.function.visibility === RedVisibilityDef.private && badge.title === 'private') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+          if (item.function.isNative && badge.title === 'native') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+          if (item.function.isStatic && badge.title === 'static') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+          if (item.function.isFinal && badge.title === 'final') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+          if (item.function.isThreadSafe && badge.title === 'threadsafe') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+          if (item.function.isCallback && badge.title === 'callback') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+          if (item.function.isConst && badge.title === 'const') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+          if (item.function.isQuest && badge.title === 'quest') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+          if (item.function.isTimer && badge.title === 'timer') {
+            badge.isEmpty = false;
+            if (!hasEnabled) {
+              badge.isEnabled = true;
+            }
+            break;
+          }
+        }
+      }
+
+      // Reset lost badge when filters changed and enables back non-empty badges.
+      const badgeLost = this.findLostBadge(badges);
+      if (badgeLost) {
+        for (const badge of badges) {
+          if (!badge.isEmpty && !badge.isEnabled) {
+            badge.isEnabled = true;
+          }
+        }
+      }
+      return [...badges];
+    });
+  }
+
+  private findLostBadge(badges: BadgeFilterItem<any>[]): BadgeFilterItem<any> | undefined {
+    const lost = badges.filter((badge) => badge.isEnabled && badge.isEmpty);
+    return (lost.length === 1) ? lost[0] : undefined;
+  }
+
+  /*
   @Input()
   set id(id: string) {
     if (this.route.fragment === null) {
@@ -298,64 +806,6 @@ export class ObjectComponent implements AfterViewInit {
     return 'Reset filter';
   }
 
-  areMembersVisible(parent: InheritData): boolean {
-    return !!this.hasInherit(parent);
-  }
-
-  toggleDocumentation(name: string, hasComment: boolean): void {
-    if (!hasComment) {
-      navigator.clipboard.writeText(`# ${name}`);
-      window.open('https://app.gitbook.com/o/-MP5ijqI11FeeX7c8-N8/s/iEOlL96xX95sTRIvzobZ/classes', '_blank');
-      return;
-    }
-    this.showDocumentationSubject.next(!this.showDocumentationSubject.value);
-  }
-
-  toggleMembers(parent: InheritData, parents: InheritData[]): void {
-    if (parent.isEmpty) {
-      return;
-    }
-    parents = parents.filter((parent) => !parent.isEmpty);
-    let inherits: InheritData[] = [...this.inheritsSubject.value];
-    let isVisible: boolean = this.areMembersVisible(parent);
-
-    isVisible = !isVisible;
-    if (isVisible) {
-      inherits.push(parent);
-    } else {
-      inherits = inherits.filter((inherit) => inherit.id !== parent.id);
-    }
-    this.inheritsSubject.next(inherits);
-    if (inherits.length === 0 && this.showMembers.value) {
-      this.showMembers.setValue(false);
-    } else if (inherits.length === parents.length && !this.showMembers.value) {
-      this.showMembers.setValue(true);
-    }
-  }
-
-  computePropertyFilters(properties: RedPropertyAst[]): void {
-    this.badgesProperty.forEach((badge) => {
-      badge.isEmpty = true;
-    });
-    this.badgesProperty.forEach((badge) => {
-      for (const prop of properties) {
-        if (prop.visibility === RedVisibilityDef.public && badge.title === 'public') {
-          badge.isEmpty = false;
-          return;
-        } else if (prop.visibility === RedVisibilityDef.protected && badge.title === 'protected') {
-          badge.isEmpty = false;
-          return;
-        } else if (prop.visibility === RedVisibilityDef.private && badge.title === 'private') {
-          badge.isEmpty = false;
-          return;
-        } else if (prop.isPersistent && badge.title === 'persistent') {
-          badge.isEmpty = false;
-          return;
-        }
-      }
-    });
-  }
-
   computeFunctionFilters(functions: FunctionDocumentation[]): void {
     this.badgesFunction.forEach((badge) => {
       badge.isEmpty = true;
@@ -409,29 +859,11 @@ export class ObjectComponent implements AfterViewInit {
   }
 
   togglePropertyFilter(badge: BadgeFilterItem<RedPropertyAst>, force: boolean = false): void {
-    if (badge.isEmpty && !force) {
-      return;
-    }
-    let isEnabled: boolean = false;
-
-    if (!this.isPropertiesFiltered && badge.isEnabled) {
-      isEnabled = false;
-    } else if (this.isPropertiesFiltered && badge.isEnabled) {
-      isEnabled = true;
-    } else if (this.isPropertiesFiltered && !badge.isEnabled) {
-      badge.isEnabled = true;
-      isEnabled = false;
-    }
     if (this.propertySearchFilter === 'enable') {
       this.propertySearchFilter = 'disable';
       badge.isEnabled = true;
       isEnabled = false;
     }
-    this.badgesProperty
-      .filter((item) => item !== badge)
-      .forEach((item) => item.isEnabled = isEnabled);
-    this.isPropertiesFiltered = this.badgesProperty.filter((badge) => badge.isEnabled).length === 1;
-    this.filtersSubject.next();
   }
 
   togglePropertySearchFilter(): void {
@@ -488,37 +920,10 @@ export class ObjectComponent implements AfterViewInit {
     this.filtersSubject.next();
   }
 
-  togglePropertySort(): void {
-    if (!this.canShowOffset) {
-      return;
-    }
-    this.propertySort = (this.propertySort === 'name') ? 'offset' : 'name';
-    this.sortSubject.next(this.propertySort);
-  }
-
   resetFilters(): void {
     this.enableBadges();
     this.propertySearchFilter = 'empty';
     this.functionSearchFilter = 'empty';
-  }
-
-  resetInherits(): void {
-    this.showMembers.setValue(false);
-    if (this.inheritsSubject.value.length === 0) {
-      return;
-    }
-    this.inheritsSubject.next([]);
-  }
-
-  onShowMembersToggled(event: MatSlideToggleChange, parents: InheritData[]): void {
-    const inherits: InheritData[] = [];
-
-    for (const parent of parents) {
-      if (!parent.isEmpty && event.checked) {
-        inherits.push(parent);
-      }
-    }
-    this.inheritsSubject.next(inherits);
   }
 
   private enableBadges(member?: 'property' | 'function'): void {
@@ -770,5 +1175,6 @@ export class ObjectComponent implements AfterViewInit {
       shareReplay(1)
     );
   }
+  */
 
 }

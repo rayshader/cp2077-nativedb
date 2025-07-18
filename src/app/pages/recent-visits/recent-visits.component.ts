@@ -1,8 +1,6 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
-import {AsyncPipe} from "@angular/common";
+import {ChangeDetectionStrategy, Component, computed, inject, OnInit, signal} from '@angular/core';
 import {MatIconModule} from "@angular/material/icon";
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
-import {combineLatest, map, Observable, of} from "rxjs";
 import {getRedNodeKindName, RedNodeAst, RedNodeKind} from "../../../shared/red-ast/red-node.ast";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {RecentVisitItem, RecentVisitService} from "../../../shared/services/recent-visit.service";
@@ -11,7 +9,7 @@ import {MatDividerModule} from "@angular/material/divider";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {PageService} from "../../../shared/services/page.service";
 
-interface RecentVisitData {
+interface VisitData {
   readonly node: RedNodeAst;
   readonly icon: string;
   readonly alt: string;
@@ -21,7 +19,6 @@ interface RecentVisitData {
   selector: 'ndb-page-recent-visits',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AsyncPipe,
     MatIconModule,
     MatButtonModule,
     MatDividerModule,
@@ -33,39 +30,35 @@ interface RecentVisitData {
 })
 export class RecentVisitsComponent implements OnInit {
 
-  recentVisits$: Observable<RecentVisitData[]> = of([]);
-  cannotClearAll$: Observable<boolean> = of(true);
+  private readonly dumpService: RedDumpService = inject(RedDumpService);
+  private readonly pageService = inject(PageService);
+  private readonly recentVisitService: RecentVisitService = inject(RecentVisitService);
 
-  constructor(private readonly dumpService: RedDumpService,
-              private readonly pageService: PageService,
-              private readonly recentVisitService: RecentVisitService) {
-  }
+  readonly disableClearAll = signal<boolean>(true);
+
+  readonly visits = computed<VisitData[]>(() => {
+    const items: RecentVisitItem[] = this.recentVisitService.getAll();
+    items.sort((a, b) => b.visitedAt - a.visitedAt);
+
+    const nodes: RedNodeAst[] = this.dumpService.nodes();
+    return items.map((item) => nodes.find((node) => node.id === item.id))
+      .filter((node) => !!node)
+      .map((node) => <VisitData>{
+        node: node,
+        icon: RedNodeKind[node!.kind],
+        alt: getRedNodeKindName(node!.kind)
+      });
+  });
 
   ngOnInit(): void {
     this.pageService.updateTitle('NativeDB');
-
     const items: RecentVisitItem[] = this.recentVisitService.getAll();
-
-    items.sort((a, b) => b.visitedAt - a.visitedAt);
-    const items$ = items.map((item) => this.dumpService.getById(item.id));
-
-    this.cannotClearAll$ = of(items.length === 0);
-    this.recentVisits$ = combineLatest(items$).pipe(
-      map((nodes: (RedNodeAst | undefined)[]) => nodes
-        .filter((node) => !!node)
-        .map((node) => <RecentVisitData>{
-          node: node,
-          icon: RedNodeKind[node!.kind],
-          alt: getRedNodeKindName(node!.kind)
-        })
-      )
-    );
+    this.disableClearAll.set(items.length === 0);
   }
 
   onClearAll(): void {
     this.recentVisitService.clear();
-    this.cannotClearAll$ = of(true);
-    this.recentVisits$ = of([]);
+    this.disableClearAll.set(true);
   }
 
 }

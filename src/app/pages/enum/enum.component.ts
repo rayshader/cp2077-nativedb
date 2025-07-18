@@ -1,7 +1,5 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {RedDumpService} from "../../../shared/services/red-dump.service";
-import {combineLatest, EMPTY, filter, map, Observable} from "rxjs";
-import {AsyncPipe} from "@angular/common";
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {RedEnumAst} from "../../../shared/red-ast/red-enum.ast";
@@ -23,7 +21,6 @@ interface EnumData {
   selector: 'ndb-page-enum',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AsyncPipe,
     MatTooltip,
     MatIconModule,
     MatButtonModule,
@@ -35,43 +32,41 @@ interface EnumData {
 })
 export class EnumComponent {
 
-  data$: Observable<EnumData> = EMPTY;
+  private readonly dumpService: RedDumpService = inject(RedDumpService);
+  private readonly settingsService: SettingsService = inject(SettingsService);
+  private readonly pageService: PageService = inject(PageService);
+  private readonly recentVisitService: RecentVisitService = inject(RecentVisitService);
 
-  protected readonly cyrb53 = cyrb53;
+  readonly id = input.required<string>();
+  readonly enum = computed<EnumData | undefined>(() => {
+    const node = this.dumpService.getEnumById(+this.id());
+    if (!node) {
+      return undefined;
+    }
 
-  constructor(private readonly dumpService: RedDumpService,
-              private readonly settingsService: SettingsService,
-              private readonly pageService: PageService,
-              private readonly recentVisitService: RecentVisitService) {
-  }
+    const syntax = this.settingsService.code();
+    const reverse = syntax === CodeSyntax.redscript && !!node.aliasName;
+    const name: string = reverse ? node.aliasName! : node.name;
+    const altName: string | undefined = reverse ? node.name : node.aliasName;
+    return {
+      node: node,
+      name: name,
+      altName: altName
+    };
+  });
 
-  @Input()
-  set id(id: string) {
-    this.pageService.restoreScroll();
-    this.recentVisitService.pushLastVisit(+id);
-    this.data$ = combineLatest([
-      this.dumpService.getEnumById(+id),
-      this.settingsService.code$
-    ]).pipe(
-      filter(([node,]) => !!node),
-      map(([node, syntax]) => {
-        let name: string = node!.name;
-        let altName: string | undefined = node!.aliasName;
+  readonly cyrb53 = cyrb53;
 
-        if (syntax === CodeSyntax.redscript && node!.aliasName) {
-          name = node!.aliasName;
-          altName = node!.name;
-        }
-
-        this.pageService.updateTitle(`NDB · ${name}`);
-
-        return <EnumData>{
-          node: node,
-          name: name,
-          altName: altName
-        };
-      })
-    );
+  constructor() {
+    effect(() => {
+      const id = +this.id();
+      const node = this.enum();
+      this.pageService.restoreScroll();
+      if (data) {
+        this.pageService.updateTitle(`NDB · ${node.name}`);
+      }
+      this.recentVisitService.pushLastVisit(id);
+    });
   }
 
   protected async copyClipboard(node: RedEnumAst, key: string): Promise<void> {

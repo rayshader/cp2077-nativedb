@@ -1,36 +1,40 @@
-@if (syntax$ | async; as syntax) {
-  @if (node) {
-    @switch (syntax) {
+@let _syntax = syntax();
+
+@if (_syntax) {
+  @let _node = node();
+
+  @if (_node) {
+    @switch (_syntax) {
       @case (cpp) {
-        @if (node.isConst) {
+        @if (_node.isConst) {
           <span class="stx-lang">const&nbsp;</span>
         }
-        @if (node.isOptional) {
+        @if (_node.isOptional) {
           <span class="stx-lang">Optional</span>
           <span class="stx-type"><</span>
         }
-        <type-span [node]="node.type"></type-span>
-        @if (node.isOptional) {
+        <type-span [node]="_node.type"></type-span>
+        @if (_node.isOptional) {
           <span class="stx-type">></span>
         }
-        @if (node.isOut) {
+        @if (_node.isOut) {
           <span class="stx-text">&</span>
         }
-        <span class="stx-arg">&nbsp;{{node.name}}</span>
+        <span class="stx-arg">&nbsp;{{_node.name}}</span>
       }
       @default {
-        @if (node.isConst) {
+        @if (_node.isConst) {
           <span class="stx-lang">const&nbsp;</span>
         }
-        @if (node.isOut) {
+        @if (_node.isOut) {
           <span class="stx-lang">out&nbsp;</span>
         }
-        @if (node.isOptional) {
+        @if (_node.isOptional) {
           <span class="stx-lang">opt&nbsp;</span>
         }
-        <span class="stx-arg">{{node.name}}</span>
+        <span class="stx-arg">{{_node.name}}</span>
         <span class="stx-text">:&nbsp;</span>
-        <type-span [node]="node.type"></type-span>
+        <type-span [node]="_node.type"></type-span>
       }
     }
   }

@@ -92,8 +92,9 @@
     with primitive types such as <span class="stx-type">Float</span>, <span class="stx-type">CName</span>, etc.
   </p>
 
-  @if (getGameInstance$ | async; as func) {
-    <function-span [node]="func" [canCopy]="false" [canShare]="false"></function-span>
+  @let _gameInstance = gameInstance();
+  @if (_gameInstance) {
+    <function-span [node]="_gameInstance" [canCopy]="false" [canShare]="false"></function-span>
   }
 
   <p>
@@ -137,8 +138,9 @@
     copy the full name to your clipboard. Here an example:
   </p>
 
-  @if (addFact$ | async; as func) {
-    <function-span [node]="func" [canCopy]="false" [canShare]="false"></function-span>
+  @let _addFact = addFact();
+  @if (_addFact) {
+    <function-span [node]="_addFact" [canCopy]="false" [canShare]="false"></function-span>
   }
 
   <p>

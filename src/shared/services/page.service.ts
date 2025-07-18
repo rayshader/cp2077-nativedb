@@ -1,7 +1,5 @@
-import {Injectable} from "@angular/core";
-import {debounceTime, Observable, Subject} from "rxjs";
+import {inject, Injectable, Signal, signal} from "@angular/core";
 import {SettingsService} from "./settings.service";
-import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 
 export type PageScrollBehavior = ScrollBehavior | 'disabled';
 
@@ -10,29 +8,25 @@ export type PageScrollBehavior = ScrollBehavior | 'disabled';
 })
 export class PageService {
 
-  private readonly scrollSubject: Subject<PageScrollBehavior> = new Subject();
-  private scrollBehavior: PageScrollBehavior = 'smooth';
+  private readonly settingsService: SettingsService = inject(SettingsService);
 
-  readonly scroll$: Observable<PageScrollBehavior> = this.scrollSubject.asObservable().pipe(debounceTime(200));
+  private readonly _scroll = signal<PageScrollBehavior>('disabled', {equal: () => false});
+  private readonly _behavior: Signal<PageScrollBehavior> = this.settingsService.scrollBehavior;
 
-  constructor(private readonly settingsService: SettingsService) {
-    this.settingsService.scrollBehavior$.pipe(takeUntilDestroyed()).subscribe(this.onScrollBehaviorChanged.bind(this));
-  }
+  readonly scroll: Signal<PageScrollBehavior> = this._scroll;
 
   restoreScroll(): void {
-    if (this.scrollBehavior === 'disabled') {
+    const behavior: PageScrollBehavior = this._behavior();
+    if (behavior === 'disabled') {
       return;
     }
-    this.scrollSubject.next(this.scrollBehavior);
+
+    this._scroll.set(behavior);
   }
 
   updateTitle(title: string): void {
     const $title = document.querySelector('head title')! as HTMLTitleElement;
     $title.textContent = title;
-  }
-
-  private onScrollBehaviorChanged(behavior: PageScrollBehavior): void {
-    this.scrollBehavior = behavior;
   }
 
 }

@@ -1,5 +1,4 @@
-import {Injectable} from "@angular/core";
-import {BehaviorSubject, combineLatest, map, Observable} from "rxjs";
+import {computed, Injectable, Signal, signal} from "@angular/core";
 import {PageScrollBehavior} from "./page.service";
 
 export interface Settings {
@@ -32,19 +31,38 @@ export enum CodeSyntax {
 export class SettingsService {
 
   private firstUsage: boolean = true;
-  private readonly ignoreDuplicateSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  private readonly scriptOnlySubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  private readonly scrollBehaviorSubject: BehaviorSubject<PageScrollBehavior> = new BehaviorSubject<PageScrollBehavior>('smooth');
-  private readonly showDocumentationSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  private readonly showMembersSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  private readonly formatShareLinkSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  private readonly highlightEmptyObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  private readonly showEmptyAccordionSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  private readonly mergeObjectSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  private readonly tabsWidthSubject: BehaviorSubject<number> = new BehaviorSubject<number>(320);
-  private readonly isBarPinnedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  private readonly clipboardSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.lua);
-  private readonly codeSubject: BehaviorSubject<CodeSyntax> = new BehaviorSubject<CodeSyntax>(CodeSyntax.redscript);
+
+  private readonly currentIgnoreDuplicate = signal<boolean>(true);
+  private readonly currentScriptOnly = signal<boolean>(false);
+  private readonly currentScrollBehavior = signal<PageScrollBehavior>('smooth');
+  private readonly currentShowDocumentation = signal<boolean>(true);
+  private readonly currentShowMembers = signal<boolean>(false);
+  private readonly currentFormatShareLink = signal<boolean>(true);
+  private readonly currentHighlightEmptyObject = signal<boolean>(true);
+  private readonly currentShowEmptyAccordion = signal<boolean>(false);
+  private readonly currentMergeObject = signal<boolean>(true);
+  private readonly currentTabsWidth = signal<number>(320);
+  private readonly currentIsBarPinned = signal<boolean>(true);
+  private readonly currentClipboard = signal<CodeSyntax>(CodeSyntax.lua);
+  private readonly currentCode = signal<CodeSyntax>(CodeSyntax.redscript);
+
+  readonly settings = computed<Settings>(() => {
+    return {
+      ignoreDuplicate: this.currentIgnoreDuplicate(),
+      scriptOnly: this.currentScriptOnly(),
+      scrollBehavior: this.currentScrollBehavior(),
+      showDocumentation: this.currentShowDocumentation(),
+      showMembers: this.currentShowMembers(),
+      formatShareLink: this.currentFormatShareLink(),
+      highlightEmptyObject: this.currentHighlightEmptyObject(),
+      showEmptyAccordion: this.currentShowEmptyAccordion(),
+      mergeObject: this.currentMergeObject(),
+      tabsWidth: this.currentTabsWidth(),
+      isBarPinned: this.currentIsBarPinned(),
+      clipboardSyntax: this.currentClipboard(),
+      codeSyntax: this.currentCode()
+    }
+  });
 
   /**
    * Whether this application is used for the first time on this device?
@@ -56,67 +74,93 @@ export class SettingsService {
   /**
    * Whether duplicate operators/casts in global functions should be ignored (hidden)?
    */
-  readonly ignoreDuplicate$: Observable<boolean> = this.ignoreDuplicateSubject.asObservable();
+  get ignoreDuplicate(): Signal<boolean> {
+    return this.currentIgnoreDuplicate;
+  }
 
   /**
    * Whether only Redscript definitions should be visible?
    */
-  readonly scriptOnly$: Observable<boolean> = this.scriptOnlySubject.asObservable();
+  get scriptOnly(): Signal<boolean> {
+    return this.currentScriptOnly;
+  }
 
   /**
    * Which scrolling behavior should be used when navigating to a new page?
    */
-  readonly scrollBehavior$: Observable<PageScrollBehavior> = this.scrollBehaviorSubject.asObservable();
+  get scrollBehavior(): Signal<PageScrollBehavior> {
+    return this.currentScrollBehavior;
+  }
 
   /**
    * Whether documented properties/functions should be visible?
    */
-  readonly showDocumentation$: Observable<boolean> = this.showDocumentationSubject.asObservable();
+  get showDocumentation(): Signal<boolean> {
+    return this.currentShowDocumentation;
+  }
 
   /**
    * Whether members of parents should be visible?
    */
-  readonly showMembers$: Observable<boolean> = this.showMembersSubject.asObservable();
+  get showMembers(): Signal<boolean> {
+    return this.currentShowMembers;
+  }
 
   /**
-   * Whether share links should use Markdown format?
+   * Whether share links should use a Markdown format?
    */
-  readonly formatShareLink$: Observable<boolean> = this.formatShareLinkSubject.asObservable();
+  get formatShareLink(): Signal<boolean> {
+    return this.currentFormatShareLink;
+  }
 
   /**
-   * Whether empty class/struct should be highlighted?
+   * Whether an empty class / struct should be highlighted?
    */
-  readonly highlightEmptyObject$: Observable<boolean> = this.highlightEmptyObjectSubject.asObservable();
+  get highlightEmptyObject(): Signal<boolean> {
+    return this.currentHighlightEmptyObject;
+  }
 
   /**
    * Whether empty accordions of an object should be visible?
    */
-  readonly showEmptyAccordion$: Observable<boolean> = this.showEmptyAccordionSubject.asObservable();
+  get showEmptyAccordion(): Signal<boolean> {
+    return this.currentShowEmptyAccordion;
+  }
 
   /**
    * Whether classes and structs should be listed in one tab?
    */
-  readonly mergeObject$: Observable<boolean> = this.mergeObjectSubject.asObservable();
+  get mergeObject(): Signal<boolean> {
+    return this.currentMergeObject;
+  }
 
   /**
    * Width of the <ndb-tabs> panel (in pixels).
    */
-  readonly tabsWidth$: Observable<number> = this.tabsWidthSubject.asObservable();
+  get tabsWidth(): Signal<number> {
+    return this.currentTabsWidth;
+  }
 
   /**
-   * Whether title bar of a page must be pinned at the top when scrolling?
+   * Whether the title bar of a page must be pinned at the top when scrolling?
    */
-  readonly isBarPinned$: Observable<boolean> = this.isBarPinnedSubject.asObservable();
+  get isBarPinned(): Signal<boolean> {
+    return this.currentIsBarPinned;
+  }
 
   /**
    * Which code syntax must be used when copying code to the clipboard?
    */
-  readonly clipboard$: Observable<CodeSyntax> = this.clipboardSubject.asObservable();
+  get clipboard(): Signal<CodeSyntax> {
+    return this.currentClipboard;
+  }
 
   /**
    * Which code syntax must be used when formatting functions and properties?
    */
-  readonly code$: Observable<CodeSyntax> = this.codeSubject.asObservable();
+  get code(): Signal<CodeSyntax> {
+    return this.currentCode;
+  }
 
   constructor() {
     this.firstUsage = (localStorage.getItem('first-usage') ?? 'true') === 'true';
@@ -134,70 +178,19 @@ export class SettingsService {
     const clipboard: string = localStorage.getItem('clipboard-syntax') ?? CodeSyntax.lua.toString();
     const code: string = localStorage.getItem('code-syntax') ?? CodeSyntax.redscript.toString();
 
-    this.ignoreDuplicateSubject.next(ignoreDuplicate);
-    this.scriptOnlySubject.next(scriptOnly);
-    this.scrollBehaviorSubject.next(scrollBehavior);
-    this.showDocumentationSubject.next(showDocumentation);
-    this.showMembersSubject.next(showMembers);
-    this.formatShareLinkSubject.next(formatShareLink);
-    this.highlightEmptyObjectSubject.next(highlightEmptyObject);
-    this.showEmptyAccordionSubject.next(showEmptyAccordion);
-    this.mergeObjectSubject.next(mergeObject);
-    this.tabsWidthSubject.next(tabsWidth);
-    this.isBarPinnedSubject.next(isBarPinned);
-    this.clipboardSubject.next(+clipboard);
-    this.codeSubject.next(+code);
-  }
-
-  get settings$(): Observable<Settings> {
-    return combineLatest([
-      this.ignoreDuplicate$,
-      this.scriptOnly$,
-      this.scrollBehavior$,
-      this.showDocumentation$,
-      this.showMembers$,
-      this.formatShareLink$,
-      this.highlightEmptyObject$,
-      this.showEmptyAccordion$,
-      this.mergeObject$,
-      this.tabsWidth$,
-      this.isBarPinned$,
-      this.clipboard$,
-      this.code$
-    ])
-      .pipe(
-        map(([
-               ignoreDuplicate,
-               scriptOnly,
-               scrollBehavior,
-               showDocumentation,
-               showMembers,
-               formatShareLink,
-               highlightEmptyObject,
-               showEmptyAccordion,
-               mergeObject,
-               tabsWidth,
-               isBarPinned,
-               clipboard,
-               code
-             ]) => {
-          return {
-            ignoreDuplicate: ignoreDuplicate,
-            scriptOnly: scriptOnly,
-            scrollBehavior: scrollBehavior,
-            showDocumentation: showDocumentation,
-            showMembers: showMembers,
-            formatShareLink: formatShareLink,
-            highlightEmptyObject: highlightEmptyObject,
-            showEmptyAccordion: showEmptyAccordion,
-            mergeObject: mergeObject,
-            tabsWidth: tabsWidth,
-            isBarPinned: isBarPinned,
-            clipboardSyntax: clipboard,
-            codeSyntax: code
-          };
-        })
-      );
+    this.currentIgnoreDuplicate.set(ignoreDuplicate);
+    this.currentScriptOnly.set(scriptOnly);
+    this.currentScrollBehavior.set(scrollBehavior);
+    this.currentShowDocumentation.set(showDocumentation);
+    this.currentShowMembers.set(showMembers);
+    this.currentFormatShareLink.set(formatShareLink);
+    this.currentHighlightEmptyObject.set(highlightEmptyObject);
+    this.currentShowEmptyAccordion.set(showEmptyAccordion);
+    this.currentMergeObject.set(mergeObject);
+    this.currentTabsWidth.set(tabsWidth);
+    this.currentIsBarPinned.set(isBarPinned);
+    this.currentClipboard.set(+clipboard);
+    this.currentCode.set(+code);
   }
 
   toggleFirstUsage(): void {
@@ -210,67 +203,67 @@ export class SettingsService {
 
   updateIgnoreDuplicate(state: boolean): void {
     localStorage.setItem('ignore-duplicate', `${state}`);
-    this.ignoreDuplicateSubject.next(state);
+    this.currentIgnoreDuplicate.set(state);
   }
 
   updateScriptOnly(state: boolean): void {
     localStorage.setItem('script-only', `${state}`);
-    this.scriptOnlySubject.next(state);
+    this.currentScriptOnly.set(state);
   }
 
   updateScrollBehavior(behavior: PageScrollBehavior): void {
     localStorage.setItem('scroll-behavior', behavior);
-    this.scrollBehaviorSubject.next(behavior);
+    this.currentScrollBehavior.set(behavior);
   }
 
   updateShowDocumentation(state: boolean): void {
     localStorage.setItem('show-documentation', `${state}`);
-    this.showDocumentationSubject.next(state);
+    this.currentShowDocumentation.set(state);
   }
 
   updateShowMembers(state: boolean): void {
     localStorage.setItem('show-members', `${state}`);
-    this.showMembersSubject.next(state);
+    this.currentShowMembers.set(state);
   }
 
   updateFormatShareLink(state: boolean): void {
     localStorage.setItem('format-share-link', `${state}`);
-    this.formatShareLinkSubject.next(state);
+    this.currentFormatShareLink.set(state);
   }
 
   updateHighlightEmptyObject(state: boolean): void {
     localStorage.setItem('highlight-empty-object', `${state}`);
-    this.highlightEmptyObjectSubject.next(state);
+    this.currentHighlightEmptyObject.set(state);
   }
 
   updateShowEmptyAccordion(state: boolean): void {
     localStorage.setItem('show-empty-accordion', `${state}`);
-    this.showEmptyAccordionSubject.next(state);
+    this.currentShowEmptyAccordion.set(state);
   }
 
   updateMergeObject(state: boolean): void {
     localStorage.setItem('merge-object', `${state}`);
-    this.mergeObjectSubject.next(state);
+    this.currentMergeObject.set(state);
   }
 
   updateTabsWidth(width: number): void {
     localStorage.setItem('tabs-width', width.toString());
-    this.tabsWidthSubject.next(width);
+    this.currentTabsWidth.set(width);
   }
 
   updateIsBarPinned(state: boolean): void {
     localStorage.setItem('is-bar-pinned', `${state}`);
-    this.isBarPinnedSubject.next(state);
+    this.currentIsBarPinned.set(state);
   }
 
   updateClipboard(syntax: CodeSyntax): void {
     localStorage.setItem('clipboard-syntax', syntax.toString());
-    this.clipboardSubject.next(syntax);
+    this.currentClipboard.set(syntax);
   }
 
   updateCode(syntax: CodeSyntax): void {
     localStorage.setItem('code-syntax', syntax.toString());
-    this.codeSubject.next(syntax);
+    this.currentCode.set(syntax);
   }
 
 }

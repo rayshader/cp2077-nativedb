@@ -1,19 +1,4 @@
-import {Injectable, NgZone} from "@angular/core";
-import {
-  BehaviorSubject,
-  combineLatest,
-  combineLatestWith, filter,
-  firstValueFrom,
-  map,
-  Observable,
-  of,
-  OperatorFunction,
-  pipe,
-  shareReplay,
-  Subject,
-  switchMap,
-  take
-} from "rxjs";
+import {computed, inject, Injectable, NgZone, Signal, signal} from "@angular/core";
 import {RedNodeAst, RedNodeKind} from "../red-ast/red-node.ast";
 import {RedEnumAst} from "../red-ast/red-enum.ast";
 import {RedBitfieldAst} from "../red-ast/red-bitfield.ast";
@@ -22,7 +7,6 @@ import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {SettingsService} from "./settings.service";
 import {cyrb53} from "../string";
 import {NDBCommand, NDBCommandHandler, NDBMessage, NDBWorker} from "../worker.common";
-import {InheritData} from "../../app/pages/object/object.component";
 import {v4 as uuid} from "uuid";
 
 export interface RedDumpWorkerLoad {
@@ -40,9 +24,10 @@ export interface RedDumpWorkerLoadAliases {
   readonly structs: RedClassAst[];
 }
 
-interface Token<T> {
+export interface RedDumpWorkerLoadInheritance {
   readonly token: string;
-  readonly data: T;
+  readonly id: number;
+  readonly klass: RedClassAst;
 }
 
 @Injectable({
@@ -50,25 +35,45 @@ interface Token<T> {
 })
 export class RedDumpService {
 
-  readonly enums$: Observable<RedEnumAst[]>;
-  readonly bitfields$: Observable<RedBitfieldAst[]>;
-  readonly functions$: Observable<RedFunctionAst[]>;
-  readonly classes$: Observable<RedClassAst[]>;
-  readonly structs$: Observable<RedClassAst[]>;
-  readonly badges$: Observable<number>;
-  readonly isReady$: Observable<boolean>;
+  private readonly settingsService: SettingsService = inject(SettingsService);
+  private readonly ngZone: NgZone = inject(NgZone);
 
-  private readonly enums: BehaviorSubject<RedEnumAst[]> = new BehaviorSubject<RedEnumAst[]>([]);
-  private readonly bitfields: BehaviorSubject<RedBitfieldAst[]> = new BehaviorSubject<RedBitfieldAst[]>([]);
-  private readonly functions: BehaviorSubject<RedFunctionAst[]> = new BehaviorSubject<RedFunctionAst[]>([]);
-  private readonly classes: BehaviorSubject<RedClassAst[]> = new BehaviorSubject<RedClassAst[]>([]);
-  private readonly structs: BehaviorSubject<RedClassAst[]> = new BehaviorSubject<RedClassAst[]>([]);
-  private readonly badges: BehaviorSubject<number> = new BehaviorSubject<number>(1);
-  private readonly inheritance: Subject<Token<RedClassAst>> = new Subject<Token<RedClassAst>>();
-  private readonly isReady: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  private readonly _isReady = signal<boolean>(false);
+  private readonly _inheritance = signal<string | undefined>(undefined);
+  private readonly _badges = signal<number>(1);
 
-  private readonly nodes$: Observable<RedNodeAst[]>;
-  private readonly inheritance$: Observable<Token<RedClassAst>> = this.inheritance.asObservable();
+  private readonly _enums = signal<RedEnumAst[]>([]);
+  private readonly _bitfields = signal<RedBitfieldAst[]>([]);
+  private readonly _functions = signal<RedFunctionAst[]>([]);
+  private readonly _classes = signal<RedClassAst[]>([]);
+  private readonly _structs = signal<RedClassAst[]>([]);
+
+  readonly isReady: Signal<boolean> = this._isReady;
+  readonly inheritance: Signal<string | undefined> = this._inheritance;
+  readonly badges: Signal<number> = this._badges;
+
+  readonly nodes = computed<RedNodeAst[]>(() => [
+    ...this.enums(),
+    ...this.bitfields(),
+    ...this.classes(),
+    ...this.structs(),
+    ...this.functions()
+  ]);
+  readonly enums: Signal<RedEnumAst[]> = this._enums;
+  readonly bitfields: Signal<RedBitfieldAst[]> = this._bitfields;
+  readonly functions = computed<RedFunctionAst[]>(() => {
+    const functions = this._functions();
+    const ignoreDuplicate = this.settingsService.ignoreDuplicate();
+
+    if (!ignoreDuplicate) {
+      return functions;
+    }
+    return functions.filter((item) => {
+      return !item.name.startsWith('Operator') && !item.name.startsWith('Cast');
+    });
+  });
+  readonly classes: Signal<RedClassAst[]> = this._classes;
+  readonly structs: Signal<RedClassAst[]> = this._structs;
 
   private worker?: NDBWorker;
   private readonly commands: NDBCommandHandler[] = [
@@ -78,126 +83,67 @@ export class RedDumpService {
     {command: NDBCommand.dispose, fn: this.onWorkerDispose.bind(this)},
   ];
 
-  constructor(private readonly settingsService: SettingsService,
-              private readonly ngZone: NgZone) {
-    this.enums$ = this.enums.asObservable();
-    this.bitfields$ = this.bitfields.asObservable();
-    this.functions$ = this.functions.asObservable().pipe(
-      this.ignoreDuplicate()
-    );
-    this.classes$ = this.classes.asObservable();
-    this.structs$ = this.structs.asObservable();
-    this.badges$ = this.badges.asObservable();
-    this.isReady$ = this.isReady.asObservable();
+  constructor() {
     this.loadWorker();
-
-    this.nodes$ = combineLatest([
-      this.enums$,
-      this.bitfields$,
-      this.classes$,
-      this.structs$,
-      this.functions$,
-    ]).pipe(
-      map((data) => [
-        ...data[0] as RedNodeAst[],
-        ...data[1] as RedNodeAst[],
-        ...data[2] as RedNodeAst[],
-        ...data[3] as RedNodeAst[],
-        ...data[4] as RedNodeAst[],
-      ]),
-      shareReplay(1)
-    );
   }
 
-  getById(id: number, nameOnly?: boolean): Observable<RedNodeAst | undefined> {
+  getById(id: number, nameOnly?: boolean): RedNodeAst | undefined {
     nameOnly ??= false;
-    return this.nodes$.pipe(
-      map((nodes) => nodes.find((node) => {
-        let match: boolean;
 
-        if (nameOnly || node.kind === RedNodeKind.function) {
-          match = cyrb53(node.name) === id;
-        } else {
-          match = node.id === id;
-        }
-        if (!match && node.aliasName) {
-          match = cyrb53(node.aliasName) === id;
-        }
-        return match;
-      }))
-    );
+    return this.nodes().find((node) => {
+      let match: boolean;
+
+      if (nameOnly || node.kind === RedNodeKind.function) {
+        match = cyrb53(node.name) === id;
+      } else {
+        match = node.id === id;
+      }
+      if (!match && node.aliasName) {
+        match = cyrb53(node.aliasName) === id;
+      }
+      return match;
+    });
   }
 
-  getEnumById(id: number): Observable<RedEnumAst | undefined> {
-    return this.enums$.pipe(this.findById(id));
+  getEnumById(id: number): RedEnumAst | undefined {
+    return this.enums().find((item) => item.id === id);
   }
 
-  getBitfieldById(id: number): Observable<RedBitfieldAst | undefined> {
-    return this.bitfields$.pipe(this.findById(id));
+  getBitfieldById(id: number): RedBitfieldAst | undefined {
+    return this.bitfields().find((item) => item.id === id);
   }
 
-  getClassById(id: number): Observable<RedClassAst | undefined> {
-    return this.classes$.pipe(
-      this.findById(id),
-      this.loadInheritance()
-    );
+  getClassById(id: number): RedClassAst | undefined {
+    const klass: RedClassAst | undefined = this.classes().find((item) => item.id === id);
+
+    if (!klass) {
+      return undefined;
+    }
+    return this.loadInheritance(klass);
   }
 
-  getStructById(id: number): Observable<RedClassAst | undefined> {
-    return this.structs$.pipe(
-      this.findById(id),
-      this.loadInheritance()
-    );
+  getStructById(id: number): RedClassAst | undefined {
+    return this.structs().find((item) => item.id === id);
   }
 
-  getFunctionById(id: number): Observable<RedFunctionAst | undefined> {
-    return this.functions$.pipe(this.findById(id));
+  getFunctionById(id: number): RedFunctionAst | undefined {
+    return this.functions().find((item) => item.id === id);
   }
 
-  private ignoreDuplicate(): OperatorFunction<RedFunctionAst[], RedFunctionAst[]> {
-    return pipe(
-      combineLatestWith(this.settingsService.ignoreDuplicate$),
-      map(([functions, ignoreDuplicate]) => {
-        if (!ignoreDuplicate) {
-          return functions;
-        }
-        return functions.filter((func) => {
-          return !func.name.startsWith('Operator') && !func.name.startsWith('Cast');
-        });
-      })
-    );
-  }
-
-  private findById<T extends RedNodeAst>(id: number): OperatorFunction<T[], T | undefined> {
-    return pipe(
-      map((objects) => objects.find((object) => object.id === id))
-    );
-  }
-
-  private loadInheritance(): OperatorFunction<RedClassAst | undefined, RedClassAst | undefined> {
+  private loadInheritance(object: RedClassAst): RedClassAst {
+    if (object.isInheritanceLoaded) {
+      return object;
+    }
     const token: string = uuid();
 
-    return pipe(
-      switchMap((object) => {
-        if (!object) {
-          return of(object);
-        }
-        if (object.isInheritanceLoaded) {
-          return of(object);
-        }
-        this.worker?.postMessage(<NDBMessage>{
-          command: NDBCommand.rd_load_inheritance,
-          data: {
-            token: token,
-            id: object.id,
-          }
-        });
-        return this.inheritance$.pipe(
-          filter((request: Token<RedClassAst>) => request.token === token),
-          map((request: Token<RedClassAst>) => request.data)
-        );
-      })
-    );
+    this.worker?.postMessage(<NDBMessage>{
+      command: NDBCommand.rd_load_inheritance,
+      data: {
+        token: token,
+        id: object.id,
+      }
+    });
+    return object;
   }
 
   private loadWorker(): void {
@@ -227,36 +173,40 @@ export class RedDumpService {
   }
 
   private onWorkerLoad(data: RedDumpWorkerLoad): void {
-    this.enums.next(data.enums);
-    this.bitfields.next(data.bitfields);
-    this.functions.next(data.functions);
-    this.classes.next(data.classes);
-    this.structs.next(data.structs);
-    this.badges.next(data.badges);
-    this.isReady.next(true);
+    this._enums.set(data.enums);
+    this._bitfields.set(data.bitfields);
+    this._functions.set(data.functions);
+    this._classes.set(data.classes);
+    this._structs.set(data.structs);
+    this._badges.set(data.badges);
+    this._isReady.set(true);
   }
 
   private onWorkerLoadAliases(data: RedDumpWorkerLoadAliases): void {
     if (data.functions) {
-      this.functions.next(data.functions);
+      this._functions.set(data.functions);
     }
-    this.classes.next(data.classes);
-    this.structs.next(data.structs);
+    this._classes.set(data.classes);
+    this._structs.set(data.structs);
   }
 
-  private async onWorkerLoadInheritance([token, id, parents, children]: [string, number, InheritData[], InheritData[]]): Promise<void> {
-    const object: RedClassAst | undefined = await firstValueFrom(this.getById(id)) as RedClassAst;
+  private async onWorkerLoadInheritance(data: RedDumpWorkerLoadInheritance): Promise<void> {
+    this._classes.update((classes) => {
+      const index: number = classes.findIndex((klass) => klass.id === data.id);
+      if (index === -1) {
+        return classes;
+      }
 
-    if (!object || object.isInheritanceLoaded) {
-      return;
-    }
-    object.parents.push(...parents);
-    object.children.push(...children);
-    object.isInheritanceLoaded = true;
-    this.inheritance.next({
-      token: token,
-      data: object
+      const klass = classes[index];
+      if (klass.isInheritanceLoaded) {
+        return classes;
+      }
+
+      classes = [...classes];
+      classes[index] = data.klass;
+      return classes;
     });
+    this._inheritance.set(data.token);
   }
 
   private onWorkerDispose(): void {

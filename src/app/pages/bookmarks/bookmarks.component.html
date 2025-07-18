@@ -1,13 +1,13 @@
+@let _bookmarks = bookmarks();
+
 <h1>Bookmarks</h1>
 
 <mat-divider></mat-divider>
 
-@if (bookmarks$ | async; as bookmarks) {
-  @for (bookmark of bookmarks; track bookmark.node.id) {
-    <div class="stx">
-      <mat-icon class="badge-{{bookmark.icon}}" [svgIcon]="bookmark.icon" [matTooltip]="bookmark.alt"></mat-icon>
+@for (bookmark of _bookmarks; track bookmark.node.id) {
+  <div class="stx">
+    <mat-icon class="badge-{{bookmark.icon}}" [svgIcon]="bookmark.icon" [matTooltip]="bookmark.alt"></mat-icon>
 
-      <type-span [node]="bookmark.node"></type-span>
-    </div>
-  }
+    <type-span [node]="bookmark.node"></type-span>
+  </div>
 }

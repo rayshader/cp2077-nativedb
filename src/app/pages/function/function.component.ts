@@ -1,8 +1,6 @@
-import {ChangeDetectionStrategy, Component, Input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
 import {MatIconModule} from "@angular/material/icon";
-import {combineLatest, EMPTY, filter, map, Observable} from "rxjs";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
-import {AsyncPipe} from "@angular/common";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {PageService} from "../../../shared/services/page.service";
@@ -21,7 +19,6 @@ interface FunctionData {
   selector: 'ndb-page-function',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AsyncPipe,
     MatTooltip,
     MatIconModule,
     FunctionSpanComponent,
@@ -32,14 +29,28 @@ interface FunctionData {
 })
 export class FunctionComponent {
 
-  data$: Observable<FunctionData | undefined> = EMPTY;
+  private readonly dumpService: RedDumpService = inject(RedDumpService);
+  private readonly wikiService: WikiService = inject(WikiService);
+  private readonly pageService: PageService = inject(PageService);
+  private readonly recentVisitService: RecentVisitService = inject(RecentVisitService);
 
-  constructor(private readonly dumpService: RedDumpService,
-              private readonly wikiService: WikiService,
-              private readonly pageService: PageService,
-              private readonly recentVisitService: RecentVisitService) {
+  readonly id = input.required<string>();
+  readonly global = computed<RedFunctionAst | undefined>(() => {
+    return this.dumpService.getFunctionById(+this.id());
+  });
+  readonly documentation = computed<WikiGlobalDto | undefined>(() => {
+    return undefined; // TODO: this.wikiService.getGlobal(+this.id());
+  });
+
+  constructor() {
+    effect(() => {
+      const id = +this.id();
+      this.pageService.restoreScroll();
+      this.recentVisitService.pushLastVisit(id);
+    });
   }
 
+  /*
   @Input()
   set id(id: string) {
     this.pageService.restoreScroll();
@@ -60,5 +71,6 @@ export class FunctionComponent {
         }
       }));
   }
+  */
 
 }

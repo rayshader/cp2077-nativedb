@@ -3,17 +3,18 @@ import {
   ApplicationRef,
   ChangeDetectionStrategy,
   Component,
+  computed,
   DestroyRef,
   HostListener,
+  inject,
   QueryList,
   Renderer2,
   ViewChild,
   ViewChildren
 } from '@angular/core';
 import {MatTabGroup, MatTabsModule} from "@angular/material/tabs";
-import {combineLatest, filter, first, map, Observable} from "rxjs";
+import {filter, first} from "rxjs";
 import {MatIconModule} from "@angular/material/icon";
-import {AsyncPipe} from "@angular/common";
 import {RouterLink} from "@angular/router";
 import {SearchService} from "../../../shared/services/search.service";
 import {CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport} from "@angular/cdk/scrolling";
@@ -47,7 +48,6 @@ interface ViewData {
   selector: 'ndb-tabs',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AsyncPipe,
     RouterLink,
     CdkVirtualForOf,
     CdkFixedSizeVirtualScroll,
@@ -64,13 +64,49 @@ interface ViewData {
 })
 export class NDBTabsComponent implements AfterViewInit {
 
+  private readonly searchService: SearchService = inject(SearchService);
+  private readonly settingsService: SettingsService = inject(SettingsService);
+  private readonly responsiveService: ResponsiveService = inject(ResponsiveService);
+  private readonly renderer: Renderer2 = inject(Renderer2);
+  private readonly app: ApplicationRef = inject(ApplicationRef);
+  private readonly dr: DestroyRef = inject(DestroyRef);
+
+  readonly data = computed<ViewData>(() => {
+    const enums = this.searchService.enums();
+    const bitfields = this.searchService.bitfields();
+    const classes = this.searchService.classes();
+    const structs = this.searchService.structs();
+    const globals = this.searchService.functions();
+
+    const objects: TabItem[] = [];
+    if (!this.settingsService.mergeObject()) {
+      objects.push(
+        {icon: 'class', alt: 'Classes', nodes: classes},
+        {icon: 'struct', alt: 'Structs', nodes: structs}
+      );
+    } else {
+      const nodes: TabItemNode[] = [...classes, ...structs];
+      nodes.sort((a, b) => a.name.localeCompare(b.name));
+      objects.push(
+        {icon: '', alt: 'Classes & structs', nodes: nodes},
+      );
+    }
+    objects.push(
+      {icon: 'function', alt: 'Global functions', nodes: globals},
+      {icon: 'enum', alt: 'Enums', nodes: enums},
+      {icon: 'bitfield', alt: 'Bitfields', nodes: bitfields}
+    );
+    return {
+      tabs: objects,
+      itemSize: this.responsiveService.isMobile() ? 47 : 35
+    };
+  });
+
   @ViewChild(MatTabGroup)
   readonly group?: MatTabGroup;
 
   @ViewChildren(CdkVirtualScrollViewport)
   readonly viewports?: QueryList<CdkVirtualScrollViewport>;
-
-  readonly data$: Observable<ViewData>;
 
   readonly ignoreDuplicate: FormControl<boolean> = new FormControl<boolean>(false, {nonNullable: true});
 
@@ -78,30 +114,15 @@ export class NDBTabsComponent implements AfterViewInit {
 
   private isResizing: boolean = false;
 
-  constructor(private readonly app: ApplicationRef,
-              private readonly renderer: Renderer2,
-              private readonly searchService: SearchService,
-              private readonly settingsService: SettingsService,
-              private readonly responsiveService: ResponsiveService,
-              private readonly dr: DestroyRef) {
-    this.settingsService.tabsWidth$.pipe(first(), takeUntilDestroyed()).subscribe(this.onWidthLoaded.bind(this));
-    this.settingsService.ignoreDuplicate$.pipe(
-      takeUntilDestroyed()
-    ).subscribe(this.onIgnoreDuplicate.bind(this));
+  constructor() {
+    const settings = this.settingsService.settings();
+
+    this.ignoreDuplicate.setValue(settings.ignoreDuplicate, {emitEvent: false});
+    this.width = `${settings.tabsWidth}px`;
+
     this.ignoreDuplicate.valueChanges.pipe(
       takeUntilDestroyed(this.dr)
     ).subscribe(this.onIgnoreDuplicateUpdated.bind(this));
-    this.data$ = combineLatest([
-      this.getTabs(),
-      this.responsiveService.mobile$
-    ]).pipe(
-      map(([tabs, isMobile]: [TabItem[], boolean]) => {
-        return <ViewData>{
-          tabs: tabs,
-          itemSize: isMobile ? 47 : 35
-        };
-      })
-    );
   }
 
   ngAfterViewInit(): void {
@@ -112,9 +133,9 @@ export class NDBTabsComponent implements AfterViewInit {
     ).subscribe(this.updateViewport.bind(this));
   }
 
-  // NOTE: Fix issue where viewport isn't filling its parent's height on first
-  //       session. Used on desktop and mobile. Issue only seems to arise when
-  //       project is build in production.
+  // NOTE: Fix an issue where viewport isn't filling its parent's height on the
+  //       first session. Used on desktop and mobile. Issue only seems to arise
+  //       when the project is built in production.
   updateViewport(): void {
     const viewports: CdkVirtualScrollViewport[] = this.viewports?.toArray() ?? [];
 
@@ -157,58 +178,8 @@ export class NDBTabsComponent implements AfterViewInit {
     this.settingsService.updateTabsWidth(320);
   }
 
-  private onWidthLoaded(width: number): void {
-    this.width = `${width}px`;
-  }
-
-  private onIgnoreDuplicate(ignore: boolean) {
-    this.ignoreDuplicate.setValue(ignore, {emitEvent: false});
-  }
-
   private onIgnoreDuplicateUpdated(value: boolean) {
     this.settingsService.updateIgnoreDuplicate(value);
-  }
-
-  private getTabs(): Observable<TabItem[]> {
-    return combineLatest([
-      this.searchService.enums$,
-      this.searchService.bitfields$,
-      this.searchService.classes$,
-      this.searchService.structs$,
-      this.searchService.functions$,
-      this.settingsService.mergeObject$,
-    ]).pipe(
-      map(([
-             enums,
-             bitfields,
-             classes,
-             structs,
-             functions,
-             merge
-           ]) => {
-        const objects: TabItem[] = [];
-
-        if (!merge) {
-          objects.push(
-            {icon: 'class', alt: 'Classes', nodes: classes},
-            {icon: 'struct', alt: 'Structs', nodes: structs}
-          );
-        } else {
-          const nodes: TabItemNode[] = [...classes, ...structs];
-
-          nodes.sort((a, b) => a.name.localeCompare(b.name));
-          objects.push(
-            {icon: '', alt: 'Classes & structs', nodes: nodes},
-          );
-        }
-        return [
-          ...objects,
-          {icon: 'function', alt: 'Global functions', nodes: functions},
-          {icon: 'enum', alt: 'Enums', nodes: enums},
-          {icon: 'bitfield', alt: 'Bitfields', nodes: bitfields},
-        ];
-      })
-    );
   }
 
 }

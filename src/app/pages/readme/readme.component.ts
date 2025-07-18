@@ -1,11 +1,8 @@
-import {ChangeDetectionStrategy, Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, inject, OnInit} from '@angular/core';
 import {MatIconModule} from "@angular/material/icon";
 import {MatDividerModule} from "@angular/material/divider";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
-import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
-import {map, Observable, OperatorFunction, pipe} from "rxjs";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
-import {AsyncPipe} from "@angular/common";
 import {MatButtonModule} from "@angular/material/button";
 import {RouterLink} from "@angular/router";
 import {cyrb53} from "../../../shared/string";
@@ -17,7 +14,6 @@ import {MatTooltipModule} from "@angular/material/tooltip";
   selector: 'ndb-page-readme',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AsyncPipe,
     RouterLink,
     MatIconModule,
     MatChipsModule,
@@ -31,35 +27,21 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 })
 export class ReadmeComponent implements OnInit {
 
-  readonly getGameInstance$: Observable<RedFunctionAst | undefined>;
-  readonly addFact$: Observable<RedFunctionAst | undefined>;
-  readonly id: number = cyrb53('ScriptGameInstance');
+  private readonly dumpService: RedDumpService = inject(RedDumpService);
+  private readonly pageService: PageService = inject(PageService);
 
-  constructor(private readonly dumpService: RedDumpService,
-              private readonly pageService: PageService) {
-    this.getGameInstance$ = this.dumpService.functions$.pipe(this.getGameInstance());
-    this.addFact$ = this.dumpService.functions$.pipe(this.getAddFact());
-  }
+  readonly gameInstance = computed(() => {
+    return this.dumpService.functions().find((func) => func.name === 'GetGameInstance');
+  });
+  readonly addFact = computed(() => {
+    return this.dumpService.functions().find((func) => func.name === 'AddFact');
+  });
+
+  readonly id: number = cyrb53('ScriptGameInstance');
 
   ngOnInit(): void {
     this.pageService.restoreScroll();
     this.pageService.updateTitle('NativeDB');
-  }
-
-  private getGameInstance(): OperatorFunction<RedFunctionAst[], RedFunctionAst | undefined> {
-    return pipe(
-      map((functions) => {
-        return functions.find((func) => func.name === 'GetGameInstance');
-      })
-    );
-  }
-
-  private getAddFact(): OperatorFunction<RedFunctionAst[], RedFunctionAst | undefined> {
-    return pipe(
-      map((functions) => {
-        return functions.find((func) => func.name === 'AddFact');
-      })
-    );
   }
 
 }

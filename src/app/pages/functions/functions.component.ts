@@ -1,8 +1,6 @@
-import {ChangeDetectionStrategy, Component, DestroyRef} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit} from '@angular/core';
 import {RedDumpService} from "../../../shared/services/red-dump.service";
-import {combineLatest, map, Observable} from "rxjs";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
-import {AsyncPipe} from "@angular/common";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
 import {MatIconModule} from "@angular/material/icon";
 import {NDBTitleBarComponent} from "../../components/ndb-title-bar/ndb-title-bar.component";
@@ -12,7 +10,7 @@ import {MatTooltip} from "@angular/material/tooltip";
 import {MatSlideToggle} from "@angular/material/slide-toggle";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {SettingsService} from "../../../shared/services/settings.service";
-import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
+import {takeUntilDestroyed, toSignal} from "@angular/core/rxjs-interop";
 import {WikiService} from "../../../shared/services/wiki.service";
 import {WikiGlobalDto} from "../../../shared/dtos/wiki.dto";
 import {PageService} from "../../../shared/services/page.service";
@@ -31,7 +29,6 @@ interface FunctionsData {
   selector: 'ndb-page-functions',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    AsyncPipe,
     MatTooltip,
     MatSlideToggle,
     MatIconModule,
@@ -43,9 +40,27 @@ interface FunctionsData {
   templateUrl: './functions.component.html',
   styleUrl: './functions.component.scss'
 })
-export class FunctionsComponent {
+export class FunctionsComponent implements OnInit {
 
-  readonly data$: Observable<FunctionsData>;
+  private readonly dumpService: RedDumpService = inject(RedDumpService);
+  private readonly wikiService: WikiService = inject(WikiService);
+  private readonly pageService: PageService = inject(PageService);
+  private readonly settingsService: SettingsService = inject(SettingsService);
+  private readonly responsiveService: ResponsiveService = inject(ResponsiveService);
+  private readonly dr: DestroyRef = inject(DestroyRef);
+
+  readonly isMobile = this.responsiveService.isMobile;
+  readonly globalsDocumentation = toSignal(this.wikiService.getGlobals());
+
+  readonly globals = computed<FunctionData[]>(() => {
+    const globals = this.dumpService.functions();
+    const globalsDocumentation = this.globalsDocumentation() ?? [];
+
+    return globals.map((global) => <FunctionData>{
+      func: global,
+      documentation: globalsDocumentation.find((doc) => doc.id === global.id)
+    });
+  });
 
   readonly skeletons: string[] = [
     'AIInstantiateObject() → Void',
@@ -69,41 +84,13 @@ export class FunctionsComponent {
 
   readonly ignoreDuplicate: FormControl<boolean> = new FormControl<boolean>(false, {nonNullable: true});
 
-  constructor(private readonly dumpService: RedDumpService,
-              private readonly wikiService: WikiService,
-              private readonly settingsService: SettingsService,
-              private readonly pageService: PageService,
-              private readonly responsiveService: ResponsiveService,
-              private readonly dr: DestroyRef) {
-    this.data$ = combineLatest([
-      this.dumpService.functions$,
-      this.wikiService.getGlobals(),
-      this.responsiveService.mobile$
-    ]).pipe(
-      map(([functions, wikiGlobals, isMobile]) => {
-        return {
-          functions: functions.map((func) => {
-            return <FunctionData>{
-              func: func,
-              documentation: wikiGlobals.find((wikiGlobal) => wikiGlobal.id === func.id),
-            };
-          }),
-          isMobile: isMobile
-        };
-      })
-    );
-    this.settingsService.ignoreDuplicate$.pipe(
-      takeUntilDestroyed(this.dr)
-    ).subscribe(this.onIgnoreDuplicate.bind(this));
-    this.ignoreDuplicate.valueChanges.pipe(
-      takeUntilDestroyed(this.dr)
-    ).subscribe(this.onIgnoreDuplicateUpdated.bind(this));
-
+  ngOnInit(): void {
+    this.pageService.restoreScroll();
     this.pageService.updateTitle('NDB · Global functions');
-  }
-
-  private onIgnoreDuplicate(ignore: boolean) {
-    this.ignoreDuplicate.setValue(ignore, {emitEvent: false});
+    this.ignoreDuplicate.setValue(this.settingsService.ignoreDuplicate(), {emitEvent: false});
+    this.ignoreDuplicate.valueChanges
+      .pipe(takeUntilDestroyed(this.dr))
+      .subscribe(this.onIgnoreDuplicateUpdated.bind(this));
   }
 
   private onIgnoreDuplicateUpdated(value: boolean) {

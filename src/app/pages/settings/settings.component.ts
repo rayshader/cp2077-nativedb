@@ -1,9 +1,8 @@
-import {Component, DestroyRef, OnInit} from '@angular/core';
+import {Component, DestroyRef, inject, OnInit} from '@angular/core';
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatSelectModule} from "@angular/material/select";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
-import {combineLatest} from "rxjs";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {CodeSyntax, Settings, SettingsService} from "../../../shared/services/settings.service";
@@ -29,6 +28,10 @@ interface AItem<T> {
 })
 export class SettingsComponent implements OnInit {
 
+  private readonly settingsService: SettingsService = inject(SettingsService);
+  private readonly pageService = inject(PageService);
+  private readonly dr: DestroyRef = inject(DestroyRef);
+
   readonly clipboardOptions: AItem<CodeSyntax>[] = [
     {value: CodeSyntax.redscript, name: 'Redscript', disabled: false},
     {value: CodeSyntax.lua, name: 'Lua · CET', disabled: false},
@@ -53,18 +56,15 @@ export class SettingsComponent implements OnInit {
   readonly clipboardSyntax: FormControl<CodeSyntax | null> = new FormControl(CodeSyntax.lua);
   readonly codeSyntax: FormControl<CodeSyntax | null> = new FormControl(CodeSyntax.redscript);
 
-  constructor(private readonly settingsService: SettingsService,
-              private readonly pageService: PageService,
-              private readonly dr: DestroyRef) {
-  }
-
   ngOnInit(): void {
     this.pageService.updateTitle('NativeDB');
 
-    this.settingsService.settings$.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onSettingsLoaded.bind(this));
-    combineLatest([this.settingsService.clipboard$, this.settingsService.code$])
-      .pipe(takeUntilDestroyed(this.dr))
-      .subscribe(this.onSyntaxChanged.bind(this));
+    const settings = this.settingsService.settings();
+    this.onSettingsLoaded(settings);
+
+    const clipboard = this.settingsService.clipboard();
+    const code = this.settingsService.code();
+    this.onSyntaxChanged([clipboard, code]);
 
     this.ignoreDuplicate.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onIgnoreDuplicateChanged.bind(this));
     this.scriptOnly.valueChanges.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onScriptOnlyChanged.bind(this));

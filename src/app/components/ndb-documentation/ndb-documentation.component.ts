@@ -35,7 +35,7 @@ export class NDBDocumentationComponent {
   readonly object = input<RedClassAst | undefined>();
   readonly method = input<RedFunctionAst | undefined>();
 
-  readonly isMobile = toSignal(this.responsiveService.mobile$);
+  readonly isMobile = this.responsiveService.isMobile;
 
   onLinkClicked(event: Event): void {
     const $element: HTMLElement = event.target as HTMLElement;

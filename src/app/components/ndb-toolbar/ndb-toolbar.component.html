@@ -1,9 +1,11 @@
+@let _isTabsOpen = isTabsOpen();
+
 <mat-toolbar>
   <button mat-icon-button
           class="n-lg"
-          [matTooltip]="isTabsOpen ? 'Close menu' : 'Open menu'"
+          [matTooltip]="_isTabsOpen ? 'Close menu' : 'Open menu'"
           (click)="toggleTabs()">
-    @if (isTabsOpen) {
+    @if (_isTabsOpen) {
       <mat-icon>close</mat-icon>
     } @else {
       <mat-icon>menu</mat-icon>
