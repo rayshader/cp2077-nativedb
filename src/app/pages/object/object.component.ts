@@ -1,4 +1,14 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  Component,
+  computed, DestroyRef,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked
+} from '@angular/core';
 import {CdkAccordionModule} from "@angular/cdk/accordion";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
 import {MatIconModule} from "@angular/material/icon";
@@ -23,7 +33,7 @@ import {RecentVisitService} from "../../../shared/services/recent-visit.service"
 import {ResponsiveService} from "../../../shared/services/responsive.service";
 import {MatDividerModule} from "@angular/material/divider";
 import {cyrb53} from "../../../shared/string";
-import {toSignal} from "@angular/core/rxjs-interop";
+import {takeUntilDestroyed, toSignal} from "@angular/core/rxjs-interop";
 import {NDBHighlightDirective} from "../../directives/ndb-highlight.directive";
 import {NDBDocumentationComponent} from "../../components/ndb-documentation/ndb-documentation.component";
 import {MatTooltipModule} from "@angular/material/tooltip";
@@ -126,7 +136,7 @@ type PropertySort = 'name' | 'offset';
   templateUrl: './object.component.html',
   styleUrl: './object.component.scss'
 })
-export class ObjectComponent {
+export class ObjectComponent implements AfterViewInit {
 
   // Dependencies //
   private readonly dumpService: RedDumpService = inject(RedDumpService);
@@ -137,6 +147,7 @@ export class ObjectComponent {
   private readonly responsiveService: ResponsiveService = inject(ResponsiveService);
   private readonly recentVisitService: RecentVisitService = inject(RecentVisitService);
   private readonly route: ActivatedRoute = inject(ActivatedRoute);
+  private readonly dr: DestroyRef = inject(DestroyRef);
 
   // Inputs //
   readonly id = input.required<string>();
@@ -432,8 +443,7 @@ export class ObjectComponent {
       const id = +this.id();
       this.recentVisitService.pushLastVisit(+id);
 
-      // TODO: check for regression when fragment is set for functions
-      const fragment = untracked(this.fragment);
+      const fragment = untracked(this.fragment) as string | null;
       if (fragment === null) {
         this.pageService.restoreScroll();
       }
@@ -464,6 +474,13 @@ export class ObjectComponent {
       this.resetBadges();
       this.computeBadges(untracked(this.properties), untracked(this.functions));
     });
+  }
+
+  ngAfterViewInit(): void {
+    // TODO: check for regression when fragment is changed using documentation's link.
+    this.route.fragment.pipe(
+      takeUntilDestroyed(this.dr)
+    ).subscribe(this.scrollToFragment.bind(this));
   }
 
   areMembersVisible(parent: InheritData): boolean {
@@ -744,118 +761,29 @@ export class ObjectComponent {
     return (lost.length === 1) ? lost[0] : undefined;
   }
 
+  private scrollToFragment(fragment: string | null): void {
+    if (!fragment) {
+      return;
+    }
+
+    const $element: HTMLElement | null = document.getElementById(fragment);
+    if (!$element) {
+      return;
+    }
+
+    $element.scrollIntoView({block: 'center'});
+  }
+
   /*
   @Input()
   set id(id: string) {
-    if (this.route.fragment === null) {
-      this.pageService.restoreScroll();
-    }
     this.recentVisitService.pushLastVisit(+id);
     this.resetFilters();
     this.resetInherits();
-    const object$: Observable<RedClassAst> = this.loadObject(+id);
-    const documentation$: Observable<WikiClassDto | undefined> = object$.pipe(this.getDocumentation());
-    const inherits$: Observable<RedClassAst[]> = this.inherits$.pipe(this.getInherits());
-    const inheritsDocumentation$: Observable<WikiClassDto[]> = this.inherits$.pipe(this.getInheritsDocumentation());
-
     this.settingsService.showDocumentation$
       .pipe(take(1), takeUntilDestroyed(this.dr))
       .subscribe((show) => this.showDocumentationSubject.next(show));
 
-    this.settingsService.showMembers$
-      .pipe(
-        take(1),
-        takeUntilDestroyed(this.dr),
-        combineLatestWith(object$),
-      )
-      .subscribe(([show, object]) => {
-        this.showMembers.setValue(show, {emitEvent: false});
-        this.onShowMembersToggled(<any>{checked: show}, object.parents);
-      });
-
-    this.data$ = combineLatest([
-      object$,
-      documentation$,
-      inherits$,
-      inheritsDocumentation$,
-      this.showDocumentation$,
-      this.dumpService.badges$,
-      this.settingsService.settings$,
-      this.isMobile$,
-      this.searchService.query$,
-      this.filters$,
-      this.sort$
-    ]).pipe(
-      map(this.loadData.bind(this))
-    );
-  }
-
-  ngAfterViewInit(): void {
-    this.route.fragment.pipe(
-      takeUntilDestroyed(this.dr)
-    ).subscribe(this.onScrollToFragment.bind(this));
-  }
-
-  getFilterTooltip(badge: BadgeFilterItem<any>, isFiltered: boolean): string {
-    if (!badge.isEnabled) {
-      return `Filter by ${badge.title}`;
-    }
-    if (!isFiltered) {
-      return `Filter by ${badge.title}`;
-    }
-    return 'Reset filter';
-  }
-
-  computeFunctionFilters(functions: FunctionDocumentation[]): void {
-    this.badgesFunction.forEach((badge) => {
-      badge.isEmpty = true;
-    });
-    this.badgesFunction.forEach((badge) => {
-      for (const data of functions) {
-        if (data.function.visibility === RedVisibilityDef.public && badge.title === 'public') {
-          badge.isEmpty = false;
-          return;
-        } else if (data.function.visibility === RedVisibilityDef.protected && badge.title === 'protected') {
-          badge.isEmpty = false;
-          return;
-        } else if (data.function.visibility === RedVisibilityDef.private && badge.title === 'private') {
-          badge.isEmpty = false;
-          return;
-        } else if (data.function.isNative && badge.title === 'native') {
-          badge.isEmpty = false;
-          return;
-        } else if (data.function.isStatic && badge.title === 'static') {
-          badge.isEmpty = false;
-          return;
-        } else if (data.function.isFinal && badge.title === 'final') {
-          badge.isEmpty = false;
-          return;
-        } else if (data.function.isThreadSafe && badge.title === 'threadsafe') {
-          badge.isEmpty = false;
-          return;
-        } else if (data.function.isCallback && badge.title === 'callback') {
-          badge.isEmpty = false;
-          return;
-        } else if (data.function.isConst && badge.title === 'const') {
-          badge.isEmpty = false;
-          return;
-        } else if (data.function.isQuest && badge.title === 'quest') {
-          badge.isEmpty = false;
-          return;
-        } else if (data.function.isTimer && badge.title === 'timer') {
-          badge.isEmpty = false;
-          return;
-        }
-      }
-    });
-  }
-
-  getLostPropertyFilter(): BadgeFilterItem<RedPropertyAst> | undefined {
-    return this.badgesProperty.find((badge) => badge.isEnabled && !badge.isEmpty);
-  }
-
-  getLostFunctionFilter(): BadgeFilterItem<RedFunctionAst> | undefined {
-    return this.badgesFunction.find((badge) => badge.isEnabled && !badge.isEmpty);
   }
 
   togglePropertyFilter(badge: BadgeFilterItem<RedPropertyAst>, force: boolean = false): void {
@@ -877,32 +805,6 @@ export class ObjectComponent {
       this.propertySearchFilter = 'enable';
       this.disableBadges('property');
     }
-    this.filtersSubject.next();
-  }
-
-  toggleFunctionFilter(badge: BadgeFilterItem<RedFunctionAst>, force: boolean = false): void {
-    if (badge.isEmpty && !force) {
-      return;
-    }
-    let isEnabled: boolean = false;
-
-    if (!this.isFunctionsFiltered && badge.isEnabled) {
-      isEnabled = false;
-    } else if (this.isFunctionsFiltered && badge.isEnabled) {
-      isEnabled = true;
-    } else if (this.isFunctionsFiltered && !badge.isEnabled) {
-      badge.isEnabled = true;
-      isEnabled = false;
-    }
-    if (this.functionSearchFilter === 'enable') {
-      this.functionSearchFilter = 'disable';
-      badge.isEnabled = true;
-      isEnabled = false;
-    }
-    this.badgesFunction
-      .filter((item) => item !== badge)
-      .forEach((item) => item.isEnabled = isEnabled);
-    this.isFunctionsFiltered = this.badgesFunction.filter((badge) => badge.isEnabled).length === 1;
     this.filtersSubject.next();
   }
 
@@ -934,15 +836,6 @@ export class ObjectComponent {
     if (member === undefined || member === 'function') {
       this.badgesFunction.forEach((badge) => badge.isEnabled = true);
       this.isFunctionsFiltered = false;
-    }
-  }
-
-  private disableBadges(member?: 'property' | 'function'): void {
-    if (member === undefined || member === 'property') {
-      this.badgesProperty.forEach((badge) => badge.isEnabled = false);
-    }
-    if (member === undefined || member === 'function') {
-      this.badgesFunction.forEach((badge) => badge.isEnabled = false);
     }
   }
 
@@ -1078,61 +971,6 @@ export class ObjectComponent {
     return functions;
   }
 
-  private hasPropertyFlag(prop: RedPropertyAst): boolean {
-    const badges: BadgeFilterItem<RedPropertyAst>[] = this.badgesProperty.filter((badge) => badge.isEnabled);
-    let match: boolean = false;
-
-    for (const badge of badges) {
-      match ||= badge.filter(prop);
-    }
-    return match;
-  }
-
-  private hasFunctionFlag(data: FunctionDocumentation): boolean {
-    const badges: BadgeFilterItem<RedFunctionAst>[] = this.badgesFunction.filter((badge) => badge.isEnabled);
-    let match: boolean = false;
-
-    for (const badge of badges) {
-      match ||= badge.filter(data.function);
-    }
-    return match;
-  }
-
-  private hasInherit(parent: InheritData): InheritData | undefined {
-    return this.inheritsSubject.value.find((inherit) => inherit.id === parent.id);
-  }
-
-  private onScrollToFragment(): void {
-    const fragment: string | null = this.route.snapshot.fragment;
-
-    if (!fragment) {
-      return;
-    }
-    const $element: HTMLElement | null = document.getElementById(fragment);
-
-    if (!$element) {
-      return;
-    }
-    $element.scrollIntoView({block: 'center'});
-  }
-
-  private getInherits(): OperatorFunction<InheritData[], RedClassAst[]> {
-    return pipe(
-      switchMap((parents: InheritData[]) => {
-        if (parents.length === 0) {
-          return of([]);
-        }
-        const operations$: Observable<RedClassAst | undefined>[] = [];
-
-        for (const parent of parents) {
-          operations$.push(this.dumpService.getClassById(parent.id));
-        }
-        return combineLatest(operations$);
-      }),
-      map((parents) => parents.filter((parent) => !!parent))
-    );
-  }
-
   private getDocumentation(): OperatorFunction<RedClassAst | undefined, WikiClassDto | undefined> {
     return pipe(
       switchMap((object?: RedClassAst) => {
@@ -1158,21 +996,6 @@ export class ObjectComponent {
         return combineLatest(operations$);
       }),
       map((wikis) => wikis.filter((wiki) => !!wiki))
-    );
-  }
-
-  private loadObject(id: number): Observable<RedClassAst> {
-    return of(this.kind).pipe(
-      switchMap((kind: RedNodeKind) => {
-        if (kind === RedNodeKind.class) {
-          return this.dumpService.getClassById(+id);
-        } else if (kind === RedNodeKind.struct) {
-          return this.dumpService.getStructById(+id);
-        }
-        return EMPTY;
-      }),
-      switchMap((object?: RedClassAst) => (object) ? of(object) : EMPTY),
-      shareReplay(1)
     );
   }
   */
