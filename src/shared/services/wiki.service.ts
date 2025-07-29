@@ -206,6 +206,10 @@ export class WikiService {
   }
 
   private handleError(error: any): void {
+    if (error.name === 'ConstraintError') {
+      // NOTE: silence mutation error on first loading.
+      return;
+    }
     if (error instanceof GitHubRateLimitError) {
       this.showRateLimitError(error);
     } else if (error instanceof WikiParserError && error.code === WikiParserErrorCode.noTitle) {
