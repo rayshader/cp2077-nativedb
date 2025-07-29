@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, effect, inject, input} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, effect, inject, input, signal} from '@angular/core';
 import {MatIconModule} from "@angular/material/icon";
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
@@ -38,39 +38,23 @@ export class FunctionComponent {
   readonly global = computed<RedFunctionAst | undefined>(() => {
     return this.dumpService.getFunctionById(+this.id());
   });
-  readonly documentation = computed<WikiGlobalDto | undefined>(() => {
-    return undefined; // TODO: this.wikiService.getGlobal(+this.id());
-  });
+  readonly documentation = signal<WikiGlobalDto | undefined>(undefined);
 
   constructor() {
     effect(() => {
       const id = +this.id();
       this.pageService.restoreScroll();
       this.recentVisitService.pushLastVisit(id);
+
+      this.wikiService.getGlobal(id).then((global) => {
+        this.documentation.set(global);
+      });
+
+      const global = this.global();
+      if (global) {
+        this.pageService.updateTitle(`NDB · ${global.fullName}`);
+      }
     });
   }
-
-  /*
-  @Input()
-  set id(id: string) {
-    this.pageService.restoreScroll();
-    this.recentVisitService.pushLastVisit(+id);
-    this.data$ = combineLatest([
-      this.dumpService.getFunctionById(+id),
-      this.wikiService.getGlobal(+id)
-    ]).pipe(
-      filter(([func]) => !!func),
-      map(([func, documentation]) => {
-        if (func) {
-          this.pageService.updateTitle(`NDB · ${func.fullName}`);
-        }
-
-        return <FunctionData>{
-          function: func,
-          documentation: documentation
-        }
-      }));
-  }
-  */
 
 }

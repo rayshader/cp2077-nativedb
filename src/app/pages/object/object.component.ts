@@ -2,7 +2,8 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy,
   Component,
-  computed, DestroyRef,
+  computed,
+  DestroyRef,
   effect,
   inject,
   input,
@@ -42,6 +43,7 @@ import {WikiService} from "../../../shared/services/wiki.service";
 import {WikiClassDto} from "../../../shared/dtos/wiki.dto";
 import {MatSlideToggle, MatSlideToggleChange} from "@angular/material/slide-toggle";
 import {FormControl, ReactiveFormsModule} from "@angular/forms";
+import {derivedAsync} from "ngxtension/derived-async";
 
 export interface InheritData extends RedTypeAst {
   readonly isEmpty: boolean;
@@ -232,7 +234,7 @@ export class ObjectComponent implements AfterViewInit {
 
     return properties;
   });
-  readonly functions = computed<FunctionDocumentation[]>(() => {
+  readonly functions = derivedAsync<FunctionDocumentation[]>(async () => {
     const object = this.object();
     if (!object) {
       return [];
@@ -249,7 +251,8 @@ export class ObjectComponent implements AfterViewInit {
         continue;
       }
 
-      const wiki = undefined;// toSignal(this.wikiService.getClass(inherit.name))();
+      // TODO: try to keep current badge active when non-empty.
+      const wiki = await this.wikiService.getClass(inherit.name);
       for (const func of inherit.functions) {
         const index: number = functions.findIndex((item) => item.function.fullName === func.fullName);
 
@@ -275,7 +278,7 @@ export class ObjectComponent implements AfterViewInit {
     return properties;
   });
   readonly filteredFunctions = computed<FunctionDocumentation[]>(() => {
-    let functions = this.functions();
+    let functions = this.functions() ?? [];
 
     const badge = this.functionBadge();
     if (badge) {
@@ -284,9 +287,13 @@ export class ObjectComponent implements AfterViewInit {
 
     return functions;
   })
-  readonly documentation = computed<WikiClassDto | undefined>(() => {
+  readonly documentation = derivedAsync<WikiClassDto | undefined>(async () => {
     const object = this.object();
-    return undefined;// TODO: object ? this.wikiService.getClass(object.name) : undefined;
+    if (!object) {
+      return undefined;
+    }
+
+    return await this.wikiService.getClass(object.name);
   });
 
   readonly titleBar = computed<TitleBarData>(() => {
@@ -472,7 +479,7 @@ export class ObjectComponent implements AfterViewInit {
       }
 
       this.resetBadges();
-      this.computeBadges(untracked(this.properties), untracked(this.functions));
+      this.computeBadges(this.properties(), this.functions() ?? []);
     });
   }
 
@@ -523,7 +530,7 @@ export class ObjectComponent implements AfterViewInit {
     })
 
     this.resetBadges(true);
-    this.computeBadges(untracked(this.properties), untracked(this.functions));
+    this.computeBadges(untracked(this.properties), untracked(this.functions) ?? []);
   }
 
   toggleAllMembers(event: MatSlideToggleChange): void {
@@ -539,7 +546,7 @@ export class ObjectComponent implements AfterViewInit {
     });
 
     this.resetBadges(true);
-    this.computeBadges(untracked(this.properties), untracked(this.functions));
+    this.computeBadges(untracked(this.properties), untracked(this.functions) ?? []);
   }
 
   togglePropertyBadge(badge: BadgeFilterItem<RedPropertyAst>, force: boolean = false): void {

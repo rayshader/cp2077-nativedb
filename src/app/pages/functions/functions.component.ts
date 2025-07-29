@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, Component, computed, DestroyRef, effect, inject, OnInit, signal} from '@angular/core';
 import {RedDumpService} from "../../../shared/services/red-dump.service";
 import {RedFunctionAst} from "../../../shared/red-ast/red-function.ast";
 import {FunctionSpanComponent} from "../../components/spans/function-span/function-span.component";
@@ -50,15 +50,15 @@ export class FunctionsComponent implements OnInit {
   private readonly dr: DestroyRef = inject(DestroyRef);
 
   readonly isMobile = this.responsiveService.isMobile;
-  readonly globalsDocumentation = toSignal(this.wikiService.getGlobals());
+  readonly wikis = signal<WikiGlobalDto[]>([]);
 
   readonly globals = computed<FunctionData[]>(() => {
     const globals = this.dumpService.functions();
-    const globalsDocumentation = this.globalsDocumentation() ?? [];
+    const wikis = this.wikis();
 
     return globals.map((global) => <FunctionData>{
       func: global,
-      documentation: globalsDocumentation.find((doc) => doc.id === global.id)
+      documentation: wikis.find((doc) => doc.id === global.id)
     });
   });
 
@@ -91,6 +91,8 @@ export class FunctionsComponent implements OnInit {
     this.ignoreDuplicate.valueChanges
       .pipe(takeUntilDestroyed(this.dr))
       .subscribe(this.onIgnoreDuplicateUpdated.bind(this));
+
+    this.wikiService.getGlobals().then((globals) => this.wikis.set(globals));
   }
 
   private onIgnoreDuplicateUpdated(value: boolean) {

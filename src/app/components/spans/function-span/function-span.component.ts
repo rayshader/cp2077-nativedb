@@ -52,7 +52,16 @@ export class FunctionSpanComponent {
   readonly useMarkdown = computed<boolean>(() => this.settingsService.formatShareLink());
   readonly hasDocumentation = computed<boolean>(() => {
     const documentation = this.documentation();
-    return !!documentation && documentation.comment.length > 0;
+    if (!documentation) {
+      return false;
+    }
+
+    if (!('functions' in documentation)) {
+      return documentation.comment.length > 0;
+    }
+
+    const wiki = this.wiki();
+    return !!wiki;
   })
   readonly scope = computed<string>(() => {
     const node = this.node();
@@ -95,6 +104,8 @@ export class FunctionSpanComponent {
 
   constructor() {
     effect(() => {
+      this.isVisible = this.settingsService.showDocumentation();
+
       const documentation = this.documentation();
       if (!documentation) {
         this.isVisible = false;
@@ -102,17 +113,18 @@ export class FunctionSpanComponent {
         return;
       }
 
-      if (documentation.comment.length > 0) {
-        this.isVisible = this.settingsService.showDocumentation();
+      if (!('functions' in documentation)) {
+        this.wiki.set(documentation as WikiGlobalDto);
+        this.isVisible &&= true;
+        return;
       }
 
-      if ('functions' in documentation) {
-        const node = this.node()!;
-        const klass = documentation as WikiClassDto;
-        this.wiki.set(klass.functions.find((method) => method.id === node.id));
-      } else {
-        this.wiki.set(documentation as WikiGlobalDto);
-      }
+      const node = this.node()!;
+      const klass = documentation as WikiClassDto;
+      const wiki = klass.functions.find((method) => method.id === node.id);
+
+      this.wiki.set(wiki);
+      this.isVisible &&= !!wiki;
     });
   }
 

@@ -4,10 +4,11 @@
   @let _memberOf = memberOf();
   @let _hasFullname = hasFullname();
   @let _canDocument = canDocument();
+  @let _hasDocumentation = hasDocumentation();
   @let _documentation = wiki();
   @let _scope = scope();
 
-  @if (_canDocument && isVisible) {
+  @if (_canDocument && _hasDocumentation && isVisible) {
     <ndb-documentation [body]="_documentation?.comment ?? ''"
                        [object]="_memberOf"
                        [method]="_node"></ndb-documentation>
@@ -64,9 +65,9 @@
       @if (_canDocument) {
         <button mat-icon-button
                 class="badge"
+                [class.stx-doc]="_hasDocumentation"
                 [matTooltip]="_documentation === undefined ? 'Copy GitBook signature' : 'Documentation'"
                 matTooltipShowDelay="1500"
-                [class.stx-doc]="hasDocumentation()"
                 (click)="toggleDocumentation()">
           <mat-icon>info_outline</mat-icon>
         </button>
