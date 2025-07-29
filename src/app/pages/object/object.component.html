@@ -44,6 +44,7 @@
   }
 
   <cdk-accordion multi="true">
+    <!-- Parents -->
     @if (showParents()) {
       @let _parents = parents();
       @let _parentsCount = _parents.length;
@@ -86,6 +87,7 @@
       </ndb-accordion-item>
     }
 
+    <!-- Children -->
     @if (showChildren()) {
       @let _children = children();
       @let _childrenCount = _children.length;
@@ -114,6 +116,7 @@
       </ndb-accordion-item>
     }
 
+    <!-- Properties -->
     @if (showProperties()) {
       @let _properties = filteredProperties();
       @let _showOffset = showOffset();
@@ -172,6 +175,7 @@
       </ndb-accordion-item>
     }
 
+    <!-- Functions -->
     @if (showFunctions()) {
       @let _functions = filteredFunctions();
       @let _badges = functionBadges();
