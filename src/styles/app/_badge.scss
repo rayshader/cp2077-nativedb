@@ -12,7 +12,7 @@
     }
 
     &.empty {
-      color: color.change(map.get($badges, primary), $lightness: 33%, $saturation: 33%, $alpha: 0.25);
+      color: transparent;
     }
 
     &[data-scope="protected"] {
@@ -23,7 +23,7 @@
       }
 
       &.empty {
-        color: color.change(map.get($badges, protected), $lightness: 33%, $saturation: 33%, $alpha: 0.25);
+        color: transparent;
       }
     }
 
@@ -35,7 +35,7 @@
       }
 
       &.empty {
-        color: color.change(map.get($badges, private), $lightness: 33%, $saturation: 33%, $alpha: 0.25);
+        color: transparent;
       }
     }
 
