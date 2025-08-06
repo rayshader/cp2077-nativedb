@@ -10,7 +10,6 @@ import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
 import {ResponsiveService} from "../../../shared/services/responsive.service";
-import {toSignal} from "@angular/core/rxjs-interop";
 
 @Component({
   selector: 'ndb-documentation',
@@ -28,8 +27,8 @@ import {toSignal} from "@angular/core/rxjs-interop";
 })
 export class NDBDocumentationComponent {
 
-  private readonly responsiveService: ResponsiveService = inject(ResponsiveService);
-  private readonly router: Router = inject(Router);
+  private readonly responsiveService = inject(ResponsiveService);
+  private readonly router = inject(Router);
 
   readonly body = input.required<string>();
   readonly object = input<RedClassAst | undefined>();

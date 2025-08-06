@@ -13,7 +13,7 @@ import {CodeSyntax, SettingsService} from "../../../../shared/services/settings.
 })
 export class ArgumentSpanComponent {
 
-  private readonly settingsService: SettingsService = inject(SettingsService);
+  private readonly settingsService = inject(SettingsService);
 
   readonly node = input<RedArgumentAst>();
 

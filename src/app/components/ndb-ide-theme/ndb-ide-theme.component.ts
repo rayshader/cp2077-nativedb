@@ -3,7 +3,6 @@ import {MatButtonModule} from "@angular/material/button";
 import {MatIconModule} from "@angular/material/icon";
 import {MatMenuModule} from "@angular/material/menu";
 import {IDETheme, IDEThemeChanged, IDEThemeService} from "../../../shared/services/ide-theme.service";
-import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {MatTooltipModule} from "@angular/material/tooltip";
 
 interface ThemeItem {
@@ -26,8 +25,8 @@ interface ThemeItem {
 })
 export class NDBIdeThemeComponent {
 
-  private readonly themeService: IDEThemeService = inject(IDEThemeService);
-  private readonly renderer: Renderer2 = inject(Renderer2);
+  private readonly themeService = inject(IDEThemeService);
+  private readonly renderer = inject(Renderer2);
 
   readonly themes: ThemeItem[] = [
     {isSelected: true, value: IDETheme.legacy, name: 'Legacy'},

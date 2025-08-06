@@ -36,8 +36,8 @@ interface FilterItem {
 })
 export class NDBSearchComponent implements OnInit {
 
-  private readonly searchService: SearchService = inject(SearchService);
-  private readonly dr: DestroyRef = inject(DestroyRef);
+  private readonly searchService = inject(SearchService);
+  private readonly dr = inject(DestroyRef);
 
   readonly search = output<void>();
 

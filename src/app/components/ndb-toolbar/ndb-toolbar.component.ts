@@ -37,8 +37,8 @@ import {NDBMoreMenuComponent} from "../ndb-more-menu/ndb-more-menu.component";
 })
 export class NDBToolbarComponent {
 
-  private readonly responsiveService: ResponsiveService = inject(ResponsiveService);
-  private readonly router: Router = inject(Router);
+  private readonly responsiveService = inject(ResponsiveService);
+  private readonly router = inject(Router);
 
   readonly toggle = output<void>();
 

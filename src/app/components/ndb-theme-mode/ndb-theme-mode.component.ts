@@ -17,8 +17,8 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 })
 export class NDBThemeModeComponent {
 
-  private readonly themeService: ThemeService = inject(ThemeService);
-  private readonly renderer: Renderer2 = inject(Renderer2);
+  private readonly themeService = inject(ThemeService);
+  private readonly renderer = inject(Renderer2);
 
   private readonly theme = this.themeService.theme;
   readonly icon = computed(() => this.theme() === 'light-theme' ? 'dark_mode' : 'light_mode');

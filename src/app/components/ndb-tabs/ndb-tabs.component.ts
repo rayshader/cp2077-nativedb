@@ -64,12 +64,12 @@ interface ViewData {
 })
 export class NDBTabsComponent implements AfterViewInit {
 
-  private readonly searchService: SearchService = inject(SearchService);
-  private readonly settingsService: SettingsService = inject(SettingsService);
-  private readonly responsiveService: ResponsiveService = inject(ResponsiveService);
-  private readonly renderer: Renderer2 = inject(Renderer2);
-  private readonly app: ApplicationRef = inject(ApplicationRef);
-  private readonly dr: DestroyRef = inject(DestroyRef);
+  private readonly searchService = inject(SearchService);
+  private readonly settingsService = inject(SettingsService);
+  private readonly responsiveService = inject(ResponsiveService);
+  private readonly renderer = inject(Renderer2);
+  private readonly app = inject(ApplicationRef);
+  private readonly dr = inject(DestroyRef);
 
   readonly data = computed<ViewData>(() => {
     const enums = this.searchService.enums();

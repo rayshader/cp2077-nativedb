@@ -35,8 +35,8 @@ import {WikiClassDto, WikiFunctionDto, WikiGlobalDto} from "../../../../shared/d
 })
 export class FunctionSpanComponent {
 
-  private readonly fmtService: CodeFormatterService = inject(CodeFormatterService);
-  private readonly settingsService: SettingsService = inject(SettingsService);
+  private readonly fmtService = inject(CodeFormatterService);
+  private readonly settingsService = inject(SettingsService);
 
   readonly node = input<RedFunctionAst>();
   readonly memberOf = input<RedClassAst>();

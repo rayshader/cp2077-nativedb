@@ -31,9 +31,9 @@ import {hostBinding} from "ngxtension/host-binding";
 })
 export class NDBTitleBarComponent {
 
-  private readonly settingsService: SettingsService = inject(SettingsService);
-  private readonly bookmarkService: BookmarkService = inject(BookmarkService);
-  private readonly searchService: SearchService = inject(SearchService);
+  private readonly settingsService = inject(SettingsService);
+  private readonly bookmarkService = inject(BookmarkService);
+  private readonly searchService = inject(SearchService);
 
   readonly node = input<RedNodeAst | undefined>();
   readonly title = input.required<string>();

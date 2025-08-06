@@ -16,9 +16,9 @@ import {ShortcutService} from "../../../../shared/services/shortcut.service";
 })
 export class TypeSpanComponent {
 
-  private readonly routerService: RouterService = inject(RouterService);
-  private readonly shortcutService: ShortcutService = inject(ShortcutService);
-  private readonly settingsService: SettingsService = inject(SettingsService);
+  private readonly routerService = inject(RouterService);
+  private readonly shortcutService = inject(ShortcutService);
+  private readonly settingsService = inject(SettingsService);
 
   readonly node = input<RedTypeAst>();
   readonly isEmpty = input<boolean>(false);

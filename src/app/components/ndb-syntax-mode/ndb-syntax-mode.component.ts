@@ -34,8 +34,8 @@ interface SyntaxData {
 })
 export class NDBSyntaxModeComponent {
 
-  private readonly settingsService: SettingsService = inject(SettingsService);
-  private readonly responsiveService: ResponsiveService = inject(ResponsiveService);
+  private readonly settingsService = inject(SettingsService);
+  private readonly responsiveService = inject(ResponsiveService);
 
   private readonly clipboard = this.settingsService.clipboard;
   private readonly code = this.settingsService.code;
