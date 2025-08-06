@@ -60,12 +60,13 @@ export class EnumComponent {
   constructor() {
     effect(() => {
       const id = +this.id();
-      const node = this.enum();
       this.pageService.restoreScroll();
-      if (data) {
+      this.recentVisitService.pushLastVisit(id);
+
+      const node = this.enum();
+      if (node) {
         this.pageService.updateTitle(`NDB · ${node.name}`);
       }
-      this.recentVisitService.pushLastVisit(id);
     });
   }
 

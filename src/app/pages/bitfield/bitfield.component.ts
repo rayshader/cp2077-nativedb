@@ -60,12 +60,13 @@ export class BitfieldComponent {
   constructor() {
     effect(() => {
       const id = +this.id();
-      const bitfield = this.bitfield();
       this.pageService.restoreScroll();
+      this.recentVisitService.pushLastVisit(id);
+
+      const bitfield = this.bitfield();
       if (bitfield) {
         this.pageService.updateTitle(`NDB · ${bitfield.name}`);
       }
-      this.recentVisitService.pushLastVisit(id);
     });
   }
 
