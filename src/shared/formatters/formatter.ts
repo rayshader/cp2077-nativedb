@@ -101,7 +101,11 @@ export abstract class CodeFormatter {
     if (offset !== -1) {
       name = fnName.substring(offset);
     }
-    name = `${name[0].toLowerCase()}${name.substring(1)}`;
+    if (name.length === 0) {
+      name = 'result';
+    } else {
+      name = `${name[0].toLowerCase()}${name.substring(1)}`;
+    }
     const isPresent = func.arguments.findIndex((argument) => argument.name === name);
 
     if (isPresent !== -1) {

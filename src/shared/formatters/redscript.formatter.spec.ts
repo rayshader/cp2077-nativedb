@@ -123,6 +123,37 @@ describe('RedscriptFormatter', () => {
         'vehicleobject.TriggerExitBehavior(maxDelayOverride);\n');
     });
 
+    it('should format member function when name is only Get/Has/FindBy (#231)', () => {
+      // GIVEN
+      const vehicleObj: RedClassAst = AstHelper.buildClass('gameBlackboardSystem', 'BlackboardSystem');
+      const memberFn: RedFunctionAst = AstHelper.buildFunction('Get',
+        AstHelper.buildRef('gameIBlackboard', 'IBlackboard'),
+        false,
+        RedVisibilityDef.public,
+        [
+          AstHelper.buildArg(
+            'definition',
+            AstHelper.buildRef(
+              'gamebbScriptDefinition',
+              'BlackboardDefinition'
+            )
+          ),
+        ],
+        undefined,
+        {isNative: true}
+      );
+
+      // WHEN
+      const code: string = fmt.formatCall(memberFn, vehicleObj);
+
+      // THEN
+      expect(code).toBe('let blackboardsystem: BlackboardSystem;\n' +
+        'let definition: ref<BlackboardDefinition>;\n' +
+        'let result: ref<IBlackboard>;\n' +
+        '\n' +
+        'result = blackboardsystem.Get(definition);\n');
+    });
+
     it('should format global function with an alias', () => {
       // GIVEN
       const gameInstanceObj: RedClassAst = AstHelper.buildClass('ScriptGameInstance', 'GameInstance');
