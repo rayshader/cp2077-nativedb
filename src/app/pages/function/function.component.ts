@@ -50,6 +50,10 @@ export class FunctionComponent {
     ]).pipe(
       filter(([func]) => !!func),
       map(([func, documentation]) => {
+        if (func) {
+          this.pageService.updateTitle(`NDB · ${func.fullName}`);
+        }
+
         return <FunctionData>{
           function: func,
           documentation: documentation

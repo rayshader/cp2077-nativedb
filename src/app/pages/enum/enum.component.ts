@@ -62,6 +62,9 @@ export class EnumComponent {
           name = node!.aliasName;
           altName = node!.name;
         }
+
+        this.pageService.updateTitle(`NDB · ${name}`);
+
         return <EnumData>{
           node: node,
           name: name,

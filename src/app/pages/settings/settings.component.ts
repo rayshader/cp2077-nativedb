@@ -7,7 +7,7 @@ import {combineLatest} from "rxjs";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {CodeSyntax, Settings, SettingsService} from "../../../shared/services/settings.service";
-import {PageScrollBehavior} from "../../../shared/services/page.service";
+import {PageScrollBehavior, PageService} from "../../../shared/services/page.service";
 
 interface AItem<T> {
   readonly value: T;
@@ -54,10 +54,13 @@ export class SettingsComponent implements OnInit {
   readonly codeSyntax: FormControl<CodeSyntax | null> = new FormControl(CodeSyntax.redscript);
 
   constructor(private readonly settingsService: SettingsService,
+              private readonly pageService: PageService,
               private readonly dr: DestroyRef) {
   }
 
   ngOnInit(): void {
+    this.pageService.updateTitle('NativeDB');
+
     this.settingsService.settings$.pipe(takeUntilDestroyed(this.dr)).subscribe(this.onSettingsLoaded.bind(this));
     combineLatest([this.settingsService.clipboard$, this.settingsService.code$])
       .pipe(takeUntilDestroyed(this.dr))

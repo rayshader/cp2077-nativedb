@@ -43,6 +43,7 @@ export class ReadmeComponent implements OnInit {
 
   ngOnInit(): void {
     this.pageService.restoreScroll();
+    this.pageService.updateTitle('NativeDB');
   }
 
   private getGameInstance(): OperatorFunction<RedFunctionAst[], RedFunctionAst | undefined> {

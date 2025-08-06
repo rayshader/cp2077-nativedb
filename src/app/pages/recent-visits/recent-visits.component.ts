@@ -9,6 +9,7 @@ import {RecentVisitItem, RecentVisitService} from "../../../shared/services/rece
 import {MatButtonModule} from "@angular/material/button";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {PageService} from "../../../shared/services/page.service";
 
 interface RecentVisitData {
   readonly node: RedNodeAst;
@@ -36,10 +37,13 @@ export class RecentVisitsComponent implements OnInit {
   cannotClearAll$: Observable<boolean> = of(true);
 
   constructor(private readonly dumpService: RedDumpService,
+              private readonly pageService: PageService,
               private readonly recentVisitService: RecentVisitService) {
   }
 
   ngOnInit(): void {
+    this.pageService.updateTitle('NativeDB');
+
     const items: RecentVisitItem[] = this.recentVisitService.getAll();
 
     items.sort((a, b) => b.visitedAt - a.visitedAt);

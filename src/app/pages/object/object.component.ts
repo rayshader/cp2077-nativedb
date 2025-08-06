@@ -595,10 +595,14 @@ export class ObjectComponent implements AfterViewInit {
       name = object.aliasName;
       altName = object.name;
     }
+
     of(true).pipe(
       delay(1),
       takeUntilDestroyed(this.dr)
     ).subscribe(this.onScrollToFragment.bind(this));
+
+    this.pageService.updateTitle(`NDB · ${name}`);
+
     return <ObjectData>{
       object: object,
       name: name,
