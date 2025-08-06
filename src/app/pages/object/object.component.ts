@@ -487,6 +487,9 @@ export class ObjectComponent implements AfterViewInit {
         return;
       }
 
+      const titleBar = this.titleBar();
+      this.pageService.updateTitle(`NDB · ${titleBar.name}`);
+
       this.resetBadges();
       this.computeBadges(this.properties(), this.functions() ?? []);
     });
