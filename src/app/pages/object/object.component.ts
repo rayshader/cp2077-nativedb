@@ -112,6 +112,7 @@ interface BadgeFilterItem<T> {
 }
 
 type MemberFilter = 'empty' | 'disable' | 'enable';
+type SearchFilter = 'empty' | 'disable' | 'enable';
 
 type PropertySort = 'name' | 'offset';
 
@@ -252,6 +253,7 @@ export class ObjectComponent implements AfterViewInit {
       }
 
       // TODO: try to keep current badge active when non-empty.
+      // TODO: implement search filter feature back!
       const wiki = await this.wikiService.getClass(inherit.name);
       for (const func of inherit.functions) {
         const index: number = functions.findIndex((item) => item.function.fullName === func.fullName);
@@ -273,6 +275,12 @@ export class ObjectComponent implements AfterViewInit {
     const badge = this.propertyBadge();
     if (badge) {
       properties = properties.filter((property) => badge.filter(property));
+    }
+
+    const request = this.searchService.query();
+    const propertySearch = this.propertySearch();
+    if (propertySearch === 'enable') {
+      properties = SearchService.filterProperties(properties, request);
     }
 
     return properties;
@@ -394,6 +402,8 @@ export class ObjectComponent implements AfterViewInit {
     return isFiltered ? badges.find((badge) => badge.isEnabled) : undefined;
   });
 
+  readonly propertySearch = signal<SearchFilter>('empty');
+
   readonly functionBadges = signal<BadgeFilterItem<RedFunctionAst>[]>([
     {
       isEnabled: true,
@@ -439,7 +449,6 @@ export class ObjectComponent implements AfterViewInit {
 
   readonly cyrb53 = cyrb53;
 
-  propertySearchFilter: MemberFilter = 'empty';
   functionSearchFilter: MemberFilter = 'empty';
 
   constructor() {
@@ -481,10 +490,38 @@ export class ObjectComponent implements AfterViewInit {
       this.resetBadges();
       this.computeBadges(this.properties(), this.functions() ?? []);
     });
+
+    effect(() => {
+      const request = this.searchService.query();
+      const propertySearch = untracked(this.propertySearch);
+
+      if (!SearchService.isPropertyOrUsage(request) && propertySearch !== 'empty') {
+        this.propertySearch.set('empty');
+        //this.resetBadges();
+      } else if (SearchService.isPropertyOrUsage(request) && propertySearch !== 'disable') {
+        this.propertySearch.set('enable');
+        //this.resetBadges();
+      }
+
+      /*
+      if (!SearchService.isPropertyOrUsage(request) && this.propertySearchFilter !== 'empty') {
+        this.propertySearchFilter = 'empty';
+        this.enableBadges('property');
+      }
+      if (SearchService.isPropertyOrUsage(request) && this.propertySearchFilter !== 'disable') {
+        this.isPropertiesFiltered = true;
+        this.disableBadges('property');
+        properties = SearchService.filterProperties(properties, request);
+        this.propertySearchFilter = 'enable';
+      } else if (this.isPropertiesFiltered) {
+        properties = properties.filter(this.hasPropertyFlag.bind(this));
+      }
+      */
+
+    });
   }
 
   ngAfterViewInit(): void {
-    // TODO: check for regression when fragment is changed using documentation's link.
     this.route.fragment.pipe(
       takeUntilDestroyed(this.dr)
     ).subscribe(this.scrollToFragment.bind(this));
@@ -570,8 +607,19 @@ export class ObjectComponent implements AfterViewInit {
     this.sortProperty.set(this.sortProperty() === 'offset' ? 'name' : 'offset');
   }
 
-  togglePropertySearchFilter(): void {
+  togglePropertySearch(): void {
+    const propertySearch = this.propertySearch();
+    if (propertySearch === 'empty') {
+      return;
+    }
 
+    if (propertySearch === 'enable') {
+      this.resetBadges(true);
+      this.propertySearch.set('disable');
+    } else {
+      this.resetBadges(true);
+      this.propertySearch.set('enable');
+    }
   }
 
   toggleFunctionBadge(badge: BadgeFilterItem<RedFunctionAst>, force: boolean = false): void {

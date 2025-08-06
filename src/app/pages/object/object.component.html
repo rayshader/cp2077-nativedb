@@ -122,6 +122,7 @@
       @let _showOffset = showOffset();
       @let _badges = propertyBadges();
       @let _isFiltered = propertyBadge() !== undefined;
+      @let _propertySearch = propertySearch();
 
       <ndb-accordion-item [class.sticky]="_isPinned"
                           [expanded]="_properties.length > 0"
@@ -155,11 +156,11 @@
           }
 
           <mat-icon class="badge search"
-                    [matTooltip]="propertySearchFilter === 'enable' ? 'Reset filter' : 'Filter by query'"
-                    [matTooltipDisabled]="propertySearchFilter === 'empty'"
-                    [class.disabled]="propertySearchFilter === 'disable'"
-                    [class.empty]="propertySearchFilter === 'empty'"
-                    (click)="togglePropertySearchFilter()">search</mat-icon>
+                    [matTooltip]="_propertySearch === 'enable' ? 'Reset filter' : 'Filter by query'"
+                    [matTooltipDisabled]="_propertySearch === 'empty'"
+                    [class.disabled]="_propertySearch === 'disable'"
+                    [class.empty]="_propertySearch === 'empty'"
+                    (click)="togglePropertySearch()">search</mat-icon>
         </div>
 
         @for (prop of _properties; track prop.name) {
