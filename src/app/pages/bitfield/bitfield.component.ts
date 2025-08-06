@@ -62,6 +62,9 @@ export class BitfieldComponent {
           name = node!.aliasName;
           altName = node!.name;
         }
+
+        this.pageService.updateTitle(`NDB · ${name}`);
+
         return <BitfieldData>{
           node: node,
           name: name,

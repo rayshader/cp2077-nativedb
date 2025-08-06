@@ -26,6 +26,11 @@ export class PageService {
     this.scrollSubject.next(this.scrollBehavior);
   }
 
+  updateTitle(title: string): void {
+    const $title = document.querySelector('head title')! as HTMLTitleElement;
+    $title.textContent = title;
+  }
+
   private onScrollBehaviorChanged(behavior: PageScrollBehavior): void {
     this.scrollBehavior = behavior;
   }

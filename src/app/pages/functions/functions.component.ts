@@ -15,6 +15,7 @@ import {SettingsService} from "../../../shared/services/settings.service";
 import {takeUntilDestroyed} from "@angular/core/rxjs-interop";
 import {WikiService} from "../../../shared/services/wiki.service";
 import {WikiGlobalDto} from "../../../shared/dtos/wiki.dto";
+import {PageService} from "../../../shared/services/page.service";
 
 interface FunctionData {
   readonly func: RedFunctionAst;
@@ -71,6 +72,7 @@ export class FunctionsComponent {
   constructor(private readonly dumpService: RedDumpService,
               private readonly wikiService: WikiService,
               private readonly settingsService: SettingsService,
+              private readonly pageService: PageService,
               private readonly responsiveService: ResponsiveService,
               private readonly dr: DestroyRef) {
     this.data$ = combineLatest([
@@ -96,6 +98,8 @@ export class FunctionsComponent {
     this.ignoreDuplicate.valueChanges.pipe(
       takeUntilDestroyed(this.dr)
     ).subscribe(this.onIgnoreDuplicateUpdated.bind(this));
+
+    this.pageService.updateTitle('NDB · Global functions');
   }
 
   private onIgnoreDuplicate(ignore: boolean) {

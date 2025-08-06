@@ -8,6 +8,7 @@ import {MatIconModule} from "@angular/material/icon";
 import {TypeSpanComponent} from "../../components/spans/type-span/type-span.component";
 import {MatDividerModule} from "@angular/material/divider";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import {PageService} from "../../../shared/services/page.service";
 
 interface BookmarkItem {
   readonly node: RedNodeAst;
@@ -33,10 +34,13 @@ export class BookmarksComponent implements OnInit {
   bookmarks$: Observable<BookmarkItem[]> = of([]);
 
   constructor(private readonly dumpService: RedDumpService,
+              private readonly pageService: PageService,
               private readonly bookmarkService: BookmarkService) {
   }
 
   ngOnInit(): void {
+    this.pageService.updateTitle(`NativeDB`);
+
     const bookmarks: number[] = this.bookmarkService.getAll();
     const bookmarks$ = bookmarks.map((id) => this.dumpService.getById(id));
 
