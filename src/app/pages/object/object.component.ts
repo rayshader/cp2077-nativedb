@@ -51,36 +51,6 @@ export interface InheritData extends RedTypeAst {
   visible: boolean;
 }
 
-interface ObjectData {
-  readonly object: RedClassAst;
-  readonly name: string;
-  readonly altName?: string;
-
-  readonly scope: string;
-  readonly isAbstract: boolean;
-  readonly isFinal: boolean;
-  readonly parents: InheritData[];
-  readonly children: InheritData[];
-  readonly properties: RedPropertyAst[];
-  readonly functions: FunctionDocumentation[];
-  readonly badges: number;
-  readonly align: string;
-
-  readonly documentation?: WikiClassDto;
-  readonly showComment: boolean;
-  readonly hasComment: boolean;
-
-  readonly isMobile: boolean;
-  readonly isPinned: boolean;
-
-  readonly highlightEmpty: boolean;
-
-  readonly showParents: boolean;
-  readonly showChildren: boolean;
-  readonly showProperties: boolean;
-  readonly showFunctions: boolean;
-}
-
 interface TitleBarData {
   readonly name: string;
   readonly altName?: string;
@@ -91,11 +61,6 @@ interface FunctionDocumentation {
   readonly memberOf: RedClassAst;
   readonly function: RedFunctionAst;
   readonly documentation?: WikiClassDto;
-}
-
-interface MemberVisibility {
-  readonly id: string;
-  readonly visible: boolean;
 }
 
 interface BadgeFilterItem<T> {
@@ -111,7 +76,6 @@ interface BadgeFilterItem<T> {
   readonly filter: (node: T) => boolean;
 }
 
-type MemberFilter = 'empty' | 'disable' | 'enable';
 type SearchFilter = 'empty' | 'disable' | 'enable';
 
 type PropertySort = 'name' | 'offset';
