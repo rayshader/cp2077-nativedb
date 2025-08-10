@@ -324,7 +324,7 @@ export class ObjectComponent implements AfterViewInit {
       return false;
     }
 
-    return this.filteredProperties().length > 0 || this.settingsService.showEmptyAccordion();
+    return this.properties().length > 0 || this.settingsService.showEmptyAccordion();
   });
   readonly showFunctions = computed(() => {
     const object = this.object();
@@ -332,7 +332,7 @@ export class ObjectComponent implements AfterViewInit {
       return false;
     }
 
-    return this.filteredFunctions().length > 0 || this.settingsService.showEmptyAccordion();
+    return (this.functions() ?? []).length > 0 || this.settingsService.showEmptyAccordion();
   });
   readonly showOffset = computed(() => {
     return this.settingsService.code() === CodeSyntax.pseudocode && !this.responsiveService.isMobile();
