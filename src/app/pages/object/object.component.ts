@@ -273,13 +273,13 @@ export class ObjectComponent implements AfterViewInit {
     let properties = this.properties();
 
     const badge = this.propertyBadge();
-    if (badge) {
+    const search = this.propertySearch();
+    if (search !== 'enable' && badge) {
       properties = properties.filter((property) => badge.filter(property));
     }
 
     const request = this.searchService.query();
-    const propertySearch = this.propertySearch();
-    if (propertySearch === 'enable') {
+    if (search === 'enable') {
       properties = SearchService.filterProperties(properties, request);
     }
 
@@ -289,8 +289,14 @@ export class ObjectComponent implements AfterViewInit {
     let functions = this.functions() ?? [];
 
     const badge = this.functionBadge();
-    if (badge) {
+    const search = this.functionSearch();
+    if (search !== 'enable' && badge) {
       functions = functions.filter((func) => badge.filter(func.function));
+    }
+
+    const request = this.searchService.query();
+    if (search === 'enable') {
+      functions = SearchService.filterFunctions(functions, request, (d) => d.function);
     }
 
     return functions;
@@ -403,6 +409,7 @@ export class ObjectComponent implements AfterViewInit {
   });
 
   readonly propertySearch = signal<SearchFilter>('empty');
+  readonly functionSearch = signal<SearchFilter>('empty');
 
   readonly functionBadges = signal<BadgeFilterItem<RedFunctionAst>[]>([
     {
@@ -449,7 +456,6 @@ export class ObjectComponent implements AfterViewInit {
 
   readonly cyrb53 = cyrb53;
 
-  functionSearchFilter: MemberFilter = 'empty';
 
   constructor() {
     const showDocumentation = this.settingsService.showDocumentation();
@@ -500,27 +506,20 @@ export class ObjectComponent implements AfterViewInit {
 
       if (!SearchService.isPropertyOrUsage(request) && propertySearch !== 'empty') {
         this.propertySearch.set('empty');
-        //this.resetBadges();
       } else if (SearchService.isPropertyOrUsage(request) && propertySearch !== 'disable') {
         this.propertySearch.set('enable');
-        //this.resetBadges();
       }
+    });
 
-      /*
-      if (!SearchService.isPropertyOrUsage(request) && this.propertySearchFilter !== 'empty') {
-        this.propertySearchFilter = 'empty';
-        this.enableBadges('property');
-      }
-      if (SearchService.isPropertyOrUsage(request) && this.propertySearchFilter !== 'disable') {
-        this.isPropertiesFiltered = true;
-        this.disableBadges('property');
-        properties = SearchService.filterProperties(properties, request);
-        this.propertySearchFilter = 'enable';
-      } else if (this.isPropertiesFiltered) {
-        properties = properties.filter(this.hasPropertyFlag.bind(this));
-      }
-      */
+    effect(() => {
+      const request = this.searchService.query();
+      const functionSearch = untracked(this.functionSearch);
 
+      if (!SearchService.isFunctionOrUsage(request) && functionSearch !== 'empty') {
+        this.functionSearch.set('empty');
+      } else if (SearchService.isFunctionOrUsage(request) && functionSearch !== 'disable') {
+        this.functionSearch.set('enable');
+      }
     });
   }
 
@@ -593,6 +592,12 @@ export class ObjectComponent implements AfterViewInit {
     if (badge.isEmpty && !force) {
       return;
     }
+
+    const propertySearch = this.propertySearch();
+    if (propertySearch === 'enable') {
+      this.propertySearch.set('disable');
+    }
+
     this.propertyBadges.update((badges) => {
       const enabledBadges = badges.filter((item) => item.isEnabled);
       const isOnlyBadgeEnabled = enabledBadges.length === 1 && enabledBadges[0] === badge;
@@ -617,10 +622,8 @@ export class ObjectComponent implements AfterViewInit {
     }
 
     if (propertySearch === 'enable') {
-      this.resetBadges(true);
       this.propertySearch.set('disable');
     } else {
-      this.resetBadges(true);
       this.propertySearch.set('enable');
     }
   }
@@ -629,6 +632,12 @@ export class ObjectComponent implements AfterViewInit {
     if (badge.isEmpty && !force) {
       return;
     }
+
+    const functionSearch = this.functionSearch();
+    if (functionSearch === 'enable') {
+      this.functionSearch.set('disable');
+    }
+
     this.functionBadges.update((badges) => {
       const enabledBadges = badges.filter((item) => item.isEnabled);
       const isOnlyBadgeEnabled = enabledBadges.length === 1 && enabledBadges[0] === badge;
@@ -643,175 +652,196 @@ export class ObjectComponent implements AfterViewInit {
   }
 
   toggleFunctionSearchFilter(): void {
+    const functionSearch = this.functionSearch();
+    if (functionSearch === 'empty') {
+      return;
+    }
 
+    if (functionSearch === 'enable') {
+      this.functionSearch.set('disable');
+    } else {
+      this.functionSearch.set('enable');
+    }
   }
 
-  private resetBadges(onlyEmptiness: boolean = false): void {
-    this.propertyBadges.update((badges) => {
-      for (const badge of badges) {
-        badge.isEmpty = true;
-        if (!onlyEmptiness) {
-          badge.isEnabled = true;
+  private resetBadges(onlyEmptiness: boolean = false,
+                      type: 'property' | 'function' | 'both' = 'both'): void {
+    if (type === 'property' || type === 'both') {
+      this.propertyBadges.update((badges) => {
+        for (const badge of badges) {
+          badge.isEmpty = true;
+          if (!onlyEmptiness) {
+            badge.isEnabled = true;
+          }
         }
-      }
-      return [...badges];
-    });
-    this.functionBadges.update((badges) => {
-      for (const badge of badges) {
-        badge.isEmpty = true;
-        if (!onlyEmptiness) {
-          badge.isEnabled = true;
+        return [...badges];
+      });
+    }
+
+    if (type === 'function' || type === 'both') {
+      this.functionBadges.update((badges) => {
+        for (const badge of badges) {
+          badge.isEmpty = true;
+          if (!onlyEmptiness) {
+            badge.isEnabled = true;
+          }
         }
-      }
-      return [...badges];
-    });
+        return [...badges];
+      });
+    }
   }
 
   private computeBadges(properties: RedPropertyAst[],
-                        functions: FunctionDocumentation[]): void {
-    this.propertyBadges.update((badges) => {
-      for (const badge of badges) {
+                        functions: FunctionDocumentation[],
+                        type: 'property' | 'function' | 'both' = 'both'): void {
+    if (type === 'property' || type === 'both') {
+      this.propertyBadges.update((badges) => {
+        for (const badge of badges) {
+          const hasEnabled = badges.filter((item) => item.isEnabled).length === 1;
+
+          for (const prop of properties) {
+            if (prop.visibility === RedVisibilityDef.public && badge.title === 'public') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+            if (prop.visibility === RedVisibilityDef.protected && badge.title === 'protected') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+            if (prop.visibility === RedVisibilityDef.private && badge.title === 'private') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+            if (prop.isPersistent && badge.title === 'persistent') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+          }
+        }
+
+        // Reset lost badge when filters changed and enables back non-empty badges.
+        const badgeLost = this.findLostBadge(badges);
+        if (badgeLost) {
+          for (const badge of badges) {
+            if (!badge.isEmpty && !badge.isEnabled) {
+              badge.isEnabled = true;
+            }
+          }
+        }
+        return [...badges];
+      });
+    }
+
+    if (type === 'function' || type === 'both') {
+      this.functionBadges.update((badges) => {
         const hasEnabled = badges.filter((item) => item.isEnabled).length === 1;
 
-        for (const prop of properties) {
-          if (prop.visibility === RedVisibilityDef.public && badge.title === 'public') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
-          }
-          if (prop.visibility === RedVisibilityDef.protected && badge.title === 'protected') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
-          }
-          if (prop.visibility === RedVisibilityDef.private && badge.title === 'private') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
-          }
-          if (prop.isPersistent && badge.title === 'persistent') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
-          }
-        }
-      }
-
-      // Reset lost badge when filters changed and enables back non-empty badges.
-      const badgeLost = this.findLostBadge(badges);
-      if (badgeLost) {
         for (const badge of badges) {
-          if (!badge.isEmpty && !badge.isEnabled) {
-            badge.isEnabled = true;
+          for (const item of functions) {
+            if (item.function.visibility === RedVisibilityDef.public && badge.title === 'public') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+            if (item.function.visibility === RedVisibilityDef.protected && badge.title === 'protected') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+            if (item.function.visibility === RedVisibilityDef.private && badge.title === 'private') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+            if (item.function.isNative && badge.title === 'native') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+            if (item.function.isStatic && badge.title === 'static') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+            if (item.function.isFinal && badge.title === 'final') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+            if (item.function.isThreadSafe && badge.title === 'threadsafe') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+            if (item.function.isCallback && badge.title === 'callback') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+            if (item.function.isConst && badge.title === 'const') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+            if (item.function.isQuest && badge.title === 'quest') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
+            if (item.function.isTimer && badge.title === 'timer') {
+              badge.isEmpty = false;
+              if (!hasEnabled) {
+                badge.isEnabled = true;
+              }
+              break;
+            }
           }
         }
-      }
-      return [...badges];
-    });
-    this.functionBadges.update((badges) => {
-      const hasEnabled = badges.filter((item) => item.isEnabled).length === 1;
 
-      for (const badge of badges) {
-        for (const item of functions) {
-          if (item.function.visibility === RedVisibilityDef.public && badge.title === 'public') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
+        // Reset lost badge when filters changed and enables back non-empty badges.
+        const badgeLost = this.findLostBadge(badges);
+        if (badgeLost) {
+          for (const badge of badges) {
+            if (!badge.isEmpty && !badge.isEnabled) {
               badge.isEnabled = true;
             }
-            break;
-          }
-          if (item.function.visibility === RedVisibilityDef.protected && badge.title === 'protected') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
-          }
-          if (item.function.visibility === RedVisibilityDef.private && badge.title === 'private') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
-          }
-          if (item.function.isNative && badge.title === 'native') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
-          }
-          if (item.function.isStatic && badge.title === 'static') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
-          }
-          if (item.function.isFinal && badge.title === 'final') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
-          }
-          if (item.function.isThreadSafe && badge.title === 'threadsafe') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
-          }
-          if (item.function.isCallback && badge.title === 'callback') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
-          }
-          if (item.function.isConst && badge.title === 'const') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
-          }
-          if (item.function.isQuest && badge.title === 'quest') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
-          }
-          if (item.function.isTimer && badge.title === 'timer') {
-            badge.isEmpty = false;
-            if (!hasEnabled) {
-              badge.isEnabled = true;
-            }
-            break;
           }
         }
-      }
-
-      // Reset lost badge when filters changed and enables back non-empty badges.
-      const badgeLost = this.findLostBadge(badges);
-      if (badgeLost) {
-        for (const badge of badges) {
-          if (!badge.isEmpty && !badge.isEnabled) {
-            badge.isEnabled = true;
-          }
-        }
-      }
-      return [...badges];
-    });
+        return [...badges];
+      });
+    }
   }
 
   private findLostBadge(badges: BadgeFilterItem<any>[]): BadgeFilterItem<any> | undefined {
@@ -831,231 +861,5 @@ export class ObjectComponent implements AfterViewInit {
 
     $element.scrollIntoView({block: 'center'});
   }
-
-  /*
-  @Input()
-  set id(id: string) {
-    this.recentVisitService.pushLastVisit(+id);
-    this.resetFilters();
-    this.resetInherits();
-    this.settingsService.showDocumentation$
-      .pipe(take(1), takeUntilDestroyed(this.dr))
-      .subscribe((show) => this.showDocumentationSubject.next(show));
-
-  }
-
-  togglePropertyFilter(badge: BadgeFilterItem<RedPropertyAst>, force: boolean = false): void {
-    if (this.propertySearchFilter === 'enable') {
-      this.propertySearchFilter = 'disable';
-      badge.isEnabled = true;
-      isEnabled = false;
-    }
-  }
-
-  togglePropertySearchFilter(): void {
-    if (this.propertySearchFilter === 'empty') {
-      return;
-    }
-    if (this.propertySearchFilter === 'enable') {
-      this.propertySearchFilter = 'disable';
-      this.enableBadges('property');
-    } else {
-      this.propertySearchFilter = 'enable';
-      this.disableBadges('property');
-    }
-    this.filtersSubject.next();
-  }
-
-  toggleFunctionSearchFilter(): void {
-    if (this.functionSearchFilter === 'empty') {
-      return;
-    }
-    if (this.functionSearchFilter === 'enable') {
-      this.functionSearchFilter = 'disable';
-      this.enableBadges('function');
-    } else {
-      this.functionSearchFilter = 'enable';
-      this.disableBadges('function');
-    }
-    this.filtersSubject.next();
-  }
-
-  resetFilters(): void {
-    this.enableBadges();
-    this.propertySearchFilter = 'empty';
-    this.functionSearchFilter = 'empty';
-  }
-
-  private enableBadges(member?: 'property' | 'function'): void {
-    if (member === undefined || member === 'property') {
-      this.badgesProperty.forEach((badge) => badge.isEnabled = true);
-      this.isPropertiesFiltered = false;
-    }
-    if (member === undefined || member === 'function') {
-      this.badgesFunction.forEach((badge) => badge.isEnabled = true);
-      this.isFunctionsFiltered = false;
-    }
-  }
-
-  private loadData([
-                     object,
-                     documentation,
-                     inherits,
-                     inheritsDocumentation,
-                     showDocumentation,
-                     badges,
-                     settings,
-                     isMobile,
-                     request,
-                     _filter,
-                     sort
-                   ]: [RedClassAst, WikiClassDto | undefined, RedClassAst[], WikiClassDto[], boolean, number, Settings, boolean, SearchRequest, void, PropertySort]) {
-    let properties: RedPropertyAst[] = [...object.properties];
-    let functions: FunctionDocumentation[] = object.functions.map((func) => {
-      return {memberOf: object, function: func, documentation: documentation};
-    });
-    let sortProperty: (a: RedPropertyAst, b: RedPropertyAst) => number;
-
-    this.canShowOffset = settings.codeSyntax === CodeSyntax.pseudocode && !isMobile;
-    if (!this.canShowOffset) {
-      sort = 'name';
-    }
-    if (sort === 'name') {
-      sortProperty = RedPropertyAst.sort;
-    } else {
-      sortProperty = RedPropertyAst.sortByOffset;
-    }
-    if (inherits.length > 0) {
-      for (const inherit of inherits) {
-        properties.push(...inherit.properties);
-        for (const func of inherit.functions) {
-          const duplicate: boolean = functions.findIndex((item) => item.function.fullName === func.fullName) !== -1;
-
-          if (!duplicate) {
-            const wiki: WikiClassDto | undefined = inheritsDocumentation.find((item) => item.id === inherit.id);
-
-            functions.push({memberOf: inherit, function: func, documentation: wiki});
-          }
-        }
-      }
-      functions.sort((a, b) => RedFunctionAst.sort(a.function, b.function));
-    }
-    properties = this.filterProperties(properties, request);
-    functions = this.filterFunctions(functions, request);
-    properties.sort(sortProperty);
-    const showEmptyAccordion: boolean = settings.showEmptyAccordion;
-    let altName: string | undefined = object.aliasName;
-    let name: string = object.name;
-
-    if (settings.codeSyntax === CodeSyntax.redscript && object.aliasName) {
-      name = object.aliasName;
-      altName = object.name;
-    }
-
-    of(true).pipe(
-      delay(1),
-      takeUntilDestroyed(this.dr)
-    ).subscribe(this.onScrollToFragment.bind(this));
-
-    this.pageService.updateTitle(`NDB · ${name}`);
-
-    return <ObjectData>{
-      object: object,
-      name: name,
-      altName: altName,
-      scope: RedVisibilityDef[object.visibility],
-      isAbstract: object.isAbstract,
-      parents: object.parents,
-      children: object.children,
-      properties: properties,
-      functions: functions,
-      badges: badges,
-      align: `${104 + (badges - 2) * 24}px`,
-      documentation: documentation,
-      showComment: showDocumentation,
-      hasComment: documentation && documentation.comment.length > 0,
-      isMobile: isMobile,
-      isPinned: settings.isBarPinned,
-      highlightEmpty: settings.highlightEmptyObject,
-      showParents: object.parents.length > 0 || showEmptyAccordion,
-      showChildren: object.children.length > 0 || showEmptyAccordion,
-      showProperties: properties.length > 0 || showEmptyAccordion || this.isPropertiesFiltered,
-      showFunctions: functions.length > 0 || showEmptyAccordion || this.isFunctionsFiltered,
-    };
-  }
-
-  private filterProperties(properties: RedPropertyAst[], request: SearchRequest): RedPropertyAst[] {
-    const lostBadge = this.getLostPropertyFilter();
-
-    this.computePropertyFilters(properties);
-    if (lostBadge && lostBadge.isEmpty) {
-      this.togglePropertyFilter(lostBadge, true);
-      this.isPropertiesFiltered = false;
-    }
-    if (!SearchService.isPropertyOrUsage(request) && this.propertySearchFilter !== 'empty') {
-      this.propertySearchFilter = 'empty';
-      this.enableBadges('property');
-    }
-    if (SearchService.isPropertyOrUsage(request) && this.propertySearchFilter !== 'disable') {
-      this.isPropertiesFiltered = true;
-      this.disableBadges('property');
-      properties = SearchService.filterProperties(properties, request);
-      this.propertySearchFilter = 'enable';
-    } else if (this.isPropertiesFiltered) {
-      properties = properties.filter(this.hasPropertyFlag.bind(this));
-    }
-    return properties;
-  }
-
-  private filterFunctions(functions: FunctionDocumentation[], request: SearchRequest): FunctionDocumentation[] {
-    const lostBadge = this.getLostFunctionFilter();
-
-    this.computeFunctionFilters(functions);
-    if (lostBadge && lostBadge.isEmpty) {
-      this.toggleFunctionFilter(lostBadge, true);
-    }
-    if (!SearchService.isFunctionOrUsage(request) && this.functionSearchFilter !== 'empty') {
-      this.functionSearchFilter = 'empty';
-      this.enableBadges('function');
-    }
-    if (SearchService.isFunctionOrUsage(request) && this.functionSearchFilter !== 'disable') {
-      this.isFunctionsFiltered = true;
-      this.disableBadges('function');
-      functions = SearchService.filterFunctions(functions, request, (data) => data.function);
-      this.functionSearchFilter = 'enable';
-    } else if (this.isFunctionsFiltered) {
-      functions = functions.filter(this.hasFunctionFlag.bind(this));
-    }
-    return functions;
-  }
-
-  private getDocumentation(): OperatorFunction<RedClassAst | undefined, WikiClassDto | undefined> {
-    return pipe(
-      switchMap((object?: RedClassAst) => {
-        if (!object) {
-          return EMPTY;
-        }
-        return this.wikiService.getClass(object.name);
-      })
-    );
-  }
-
-  private getInheritsDocumentation(): OperatorFunction<InheritData[], WikiClassDto[]> {
-    return pipe(
-      switchMap((inherits: InheritData[]) => {
-        if (inherits.length === 0) {
-          return of([]);
-        }
-        const operations$: Observable<WikiClassDto | undefined>[] = [];
-
-        for (const inherit of inherits) {
-          operations$.push(this.wikiService.getClass(inherit.name));
-        }
-        return combineLatest(operations$);
-      }),
-      map((wikis) => wikis.filter((wiki) => !!wiki))
-    );
-  }
-  */
 
 }

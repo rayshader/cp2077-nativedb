@@ -181,6 +181,7 @@
       @let _functions = filteredFunctions();
       @let _badges = functionBadges();
       @let _isFiltered = functionBadge() !== undefined;
+      @let _functionSearch = functionSearch();
 
       <ndb-accordion-item [class.sticky]="_isPinned"
                           [expanded]="_functions.length > 0"
@@ -204,10 +205,10 @@
                       (click)="toggleFunctionBadge(badge)"></mat-icon>
           }
           <mat-icon class="badge search"
-                    [matTooltip]="functionSearchFilter === 'enable' ? 'Reset filter' : 'Filter by query'"
-                    [matTooltipDisabled]="functionSearchFilter === 'empty'"
-                    [class.disabled]="functionSearchFilter === 'disable'"
-                    [class.empty]="functionSearchFilter === 'empty'"
+                    [matTooltip]="_functionSearch === 'enable' ? 'Reset filter' : 'Filter by query'"
+                    [matTooltipDisabled]="_functionSearch === 'empty'"
+                    [class.disabled]="_functionSearch === 'disable'"
+                    [class.empty]="_functionSearch === 'empty'"
                     (click)="toggleFunctionSearchFilter()">search</mat-icon>
         </div>
 
