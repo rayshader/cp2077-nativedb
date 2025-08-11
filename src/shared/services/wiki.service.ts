@@ -134,10 +134,10 @@ export class WikiService {
       if (global.sha === cache?.sha) {
         return cache;
       } else if (!cache) {
-        await this.globalsRepository.create(global);
+        await firstValueFrom(this.globalsRepository.create(global));
         return global;
       } else if (global.sha !== cache.sha) {
-        await this.globalsRepository.update(global);
+        await firstValueFrom(this.globalsRepository.update(global));
         return global;
       }
       return global;
