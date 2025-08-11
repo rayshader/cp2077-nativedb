@@ -1,11 +1,20 @@
 import {CodeSyntax, Settings, SettingsService} from "./settings.service";
 import {StorageMock} from "../../../tests/storage.mock";
-import {combineLatest, firstValueFrom, map} from "rxjs";
+import {Injector} from "@angular/core";
 
 describe('SettingsService', () => {
   let service: SettingsService;
 
   let storageMock: any;
+
+  const createService = (): SettingsService => {
+    const injector = Injector.create({
+      providers: [
+        { provide: SettingsService, useClass: SettingsService, deps: [] },
+      ]
+    });
+    return injector.get(SettingsService);
+  };
 
   beforeEach(() => {
     storageMock = StorageMock;
@@ -15,15 +24,15 @@ describe('SettingsService', () => {
     storageMock.mockResetAll();
   });
 
-  it('should use default settings when storage is empty', async () => {
+  it('should use default settings when storage is empty', () => {
     // GIVEN
     storageMock.getItem.mockReturnValue(null);
 
     // WHEN
-    service = new SettingsService();
+    service = createService();
 
     // THEN
-    const settings: Settings = await firstValueFrom(service.settings$);
+    const settings: Settings = service.settings();
 
     expect(service.isFirstUsage).toBeTruthy();
     expect(settings).toEqual(<Settings>{
@@ -43,7 +52,7 @@ describe('SettingsService', () => {
     });
   });
 
-  it('should load settings from storage', async () => {
+  it('should load settings from storage', () => {
     // GIVEN
     storageMock.mockItems({
       'first-usage': false,
@@ -63,10 +72,10 @@ describe('SettingsService', () => {
     });
 
     // WHEN
-    service = new SettingsService();
+    service = createService();
 
     // THEN
-    const settings: Settings = await firstValueFrom(service.settings$);
+    const settings: Settings = service.settings();
 
     expect(service.isFirstUsage).toBeFalsy();
     expect(settings).toEqual(<Settings>{
@@ -86,7 +95,7 @@ describe('SettingsService', () => {
     });
   });
 
-  it('should emit individual settings from storage', async () => {
+  it('should read individual settings from storage', () => {
     // GIVEN
     storageMock.mockItems({
       'ignore-duplicate': true,
@@ -105,42 +114,24 @@ describe('SettingsService', () => {
     });
 
     // WHEN
-    service = new SettingsService();
+    service = createService();
 
     // THEN
-    const settings = await firstValueFrom(combineLatest([
-      service.ignoreDuplicate$,
-      service.scriptOnly$,
-      service.scrollBehavior$,
-      service.showDocumentation$,
-      service.showMembers$,
-      service.formatShareLink$,
-      service.highlightEmptyObject$,
-      service.showEmptyAccordion$,
-      service.mergeObject$,
-      service.tabsWidth$,
-      service.isBarPinned$,
-      service.clipboard$,
-      service.code$,
-    ]).pipe(
-      map((data) => {
-        return {
-          ignoreDuplicate: data[0],
-          scriptOnly: data[1],
-          scrollBehavior: data[2],
-          showDocumentation: data[3],
-          showMembers: data[4],
-          formatShareLink: data[5],
-          highlightEmptyObject: data[6],
-          showEmptyAccordion: data[7],
-          mergeObject: data[8],
-          tabsWidth: data[9],
-          isBarPinned: data[10],
-          clipboardSyntax: data[11],
-          codeSyntax: data[12]
-        };
-      })
-    ));
+    const settings = {
+      ignoreDuplicate: service.ignoreDuplicate(),
+      scriptOnly: service.scriptOnly(),
+      scrollBehavior: service.scrollBehavior(),
+      showDocumentation: service.showDocumentation(),
+      showMembers: service.showMembers(),
+      formatShareLink: service.formatShareLink(),
+      highlightEmptyObject: service.highlightEmptyObject(),
+      showEmptyAccordion: service.showEmptyAccordion(),
+      mergeObject: service.mergeObject(),
+      tabsWidth: service.tabsWidth(),
+      isBarPinned: service.isBarPinned(),
+      clipboardSyntax: service.clipboard(),
+      codeSyntax: service.code(),
+    };
 
     expect(settings).toEqual({
       ignoreDuplicate: true,
@@ -177,25 +168,23 @@ describe('SettingsService', () => {
     ];
 
     beforeAll(() => {
-      service = new SettingsService();
+      service = createService();
     });
 
     for (const update of updates) {
-      it(`should save and emit value of '${update.name}' when updated`, async () => {
+      it(`should save and emit value of '${update.name}' when updated`, () => {
         // GIVEN
         storageMock.getItem.mockReturnValue(null);
 
         // WHEN
         const fn: string = `update${update.name[0].toUpperCase()}${update.name.substring(1)}`;
-
         // @ts-ignore
         service[fn](update.change);
 
         // THEN
-        const emitter: string = `${update.name}$`;
-
+        const getter: string = `${update.name}`;
         // @ts-ignore
-        const value: any = await firstValueFrom(service[emitter]);
+        const value: any = service[getter]();
 
         expect(value).toEqual(update.change);
         expect(storageMock.setItem).toHaveBeenCalledWith(update.key, update.expect);

@@ -1,14 +1,12 @@
-import {EMPTY, of} from "rxjs";
+import {signal} from "@angular/core";
 
 export const RedDumpServiceMock = {
-  isReady$: EMPTY,
+  isReady: signal<boolean>(false),
 
   getById: jest.fn(),
 
   mockIsReady(value: boolean): void {
-    Object.defineProperty(this, 'isReady$', {
-      get: () => of(value)
-    });
+    this.isReady.set(value);
   },
 
   mockResetAll() {

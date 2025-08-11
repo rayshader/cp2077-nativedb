@@ -1,15 +1,16 @@
 import {RouterService} from "./router.service";
 import {RedDumpServiceMock} from "../../../tests/services/red-dump.service.mock";
 import {RouterMock} from "../../../tests/angular/router.mock";
-import {Observable, of} from "rxjs";
-import {RedNodeAst} from "../red-ast/red-node.ast";
 import {AstHelper} from "../../../tests/ast.helper";
 import {cyrb53} from "../string";
 import {mockWindowOpen} from "../../../tests/window.mock";
 import {SearchServiceMock} from "../../../tests/services/search.service.mock";
-import {FilterBy} from "./search.service";
+import {FilterBy, SearchService} from "./search.service";
+import {Router} from "@angular/router";
+import {RedDumpService} from "./red-dump.service";
+import {Injector} from "@angular/core";
 
-jest.mock("./red-dump.service");
+jest.mock("../../shared/services/red-dump.service");
 
 describe('RouterService', () => {
   let dumpMock: any;
@@ -23,7 +24,16 @@ describe('RouterService', () => {
     searchMock = SearchServiceMock;
     routerMock = RouterMock;
 
-    service = new RouterService(dumpMock, searchMock, routerMock);
+    const injector = Injector.create({
+      providers: [
+        { provide: RedDumpService, useValue: dumpMock },
+        { provide: SearchService, useValue: searchMock },
+        { provide: Router, useValue: routerMock },
+        { provide: RouterService, useClass: RouterService, deps: [RedDumpService, SearchService, Router] },
+      ]
+    });
+
+    service = injector.get(RouterService);
   });
 
   afterEach(() => {
@@ -35,9 +45,7 @@ describe('RouterService', () => {
   describe('navigateTo(id)', () => {
     it('given unknown id then don\'t change current route', async () => {
       // GIVEN
-      const observer: Observable<RedNodeAst | undefined> = of(undefined);
-
-      dumpMock.getById.mockReturnValue(observer);
+      dumpMock.getById.mockReturnValue(undefined);
 
       // WHEN
       await service.navigateTo(0);
@@ -49,9 +57,7 @@ describe('RouterService', () => {
     it('given id of an enum then navigate to /e/:id', async () => {
       // GIVEN
       const id: number = cyrb53('Test');
-      const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildEnum('Test'));
-
-      dumpMock.getById.mockReturnValue(observer);
+      dumpMock.getById.mockReturnValue(AstHelper.buildEnum('Test'));
 
       // WHEN
       await service.navigateTo(id);
@@ -63,9 +69,7 @@ describe('RouterService', () => {
     it('given id of a bitfield then navigate to /b/:id', async () => {
       // GIVEN
       const id: number = cyrb53('Test');
-      const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildBitfield('Test'));
-
-      dumpMock.getById.mockReturnValue(observer);
+      dumpMock.getById.mockReturnValue(AstHelper.buildBitfield('Test'));
 
       // WHEN
       await service.navigateTo(id);
@@ -77,9 +81,7 @@ describe('RouterService', () => {
     it('given id of a class then navigate to /c/:id', async () => {
       // GIVEN
       const id: number = cyrb53('Test');
-      const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildClass('Test'));
-
-      dumpMock.getById.mockReturnValue(observer);
+      dumpMock.getById.mockReturnValue(AstHelper.buildClass('Test'));
 
       // WHEN
       await service.navigateTo(id);
@@ -91,9 +93,7 @@ describe('RouterService', () => {
     it('given id of a struct then navigate to /s/:id', async () => {
       // GIVEN
       const id: number = cyrb53('Test');
-      const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildStruct('Test'));
-
-      dumpMock.getById.mockReturnValue(observer);
+      dumpMock.getById.mockReturnValue(AstHelper.buildStruct('Test'));
 
       // WHEN
       await service.navigateTo(id);
@@ -112,9 +112,7 @@ describe('RouterService', () => {
 
     it('given unknown id then don\'t change current route', async () => {
       // GIVEN
-      const observer: Observable<RedNodeAst | undefined> = of(undefined);
-
-      dumpMock.getById.mockReturnValue(observer);
+      dumpMock.getById.mockReturnValue(undefined);
 
       // WHEN
       await service.navigateTo(0, true);
@@ -126,9 +124,7 @@ describe('RouterService', () => {
     it('given id of an enum then navigate to /e/:id', async () => {
       // GIVEN
       const id: number = cyrb53('Test');
-      const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildEnum('Test'));
-
-      dumpMock.getById.mockReturnValue(observer);
+      dumpMock.getById.mockReturnValue(AstHelper.buildEnum('Test'));
       routerMock.serializeUrl.mockReturnValue(`/e/${id}`);
 
       // WHEN
@@ -141,9 +137,7 @@ describe('RouterService', () => {
     it('given id of a bitfield then navigate to /b/:id', async () => {
       // GIVEN
       const id: number = cyrb53('Test');
-      const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildBitfield('Test'));
-
-      dumpMock.getById.mockReturnValue(observer);
+      dumpMock.getById.mockReturnValue(AstHelper.buildBitfield('Test'));
       routerMock.serializeUrl.mockReturnValue(`/b/${id}`);
 
       // WHEN
@@ -156,9 +150,7 @@ describe('RouterService', () => {
     it('given id of a class then navigate to /c/:id', async () => {
       // GIVEN
       const id: number = cyrb53('Test');
-      const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildClass('Test'));
-
-      dumpMock.getById.mockReturnValue(observer);
+      dumpMock.getById.mockReturnValue(AstHelper.buildClass('Test'));
       routerMock.serializeUrl.mockReturnValue(`/c/${id}`);
 
       // WHEN
@@ -171,9 +163,7 @@ describe('RouterService', () => {
     it('given id of a struct then navigate to /s/:id', async () => {
       // GIVEN
       const id: number = cyrb53('Test');
-      const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildStruct('Test'));
-
-      dumpMock.getById.mockReturnValue(observer);
+      dumpMock.getById.mockReturnValue(AstHelper.buildStruct('Test'));
       routerMock.serializeUrl.mockReturnValue(`/s/${id}`);
 
       // WHEN

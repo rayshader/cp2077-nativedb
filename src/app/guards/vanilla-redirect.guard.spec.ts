@@ -38,10 +38,8 @@ describe('vanillaRedirectGuard', () => {
 
   it('given route /Test when node is not found then redirect to route /', async () => {
     // GIVEN
-    const observer: Observable<RedNodeAst | undefined> = of(undefined);
-
     dumpMock.mockIsReady(true);
-    dumpMock.getById.mockReturnValue(observer);
+    dumpMock.getById.mockReturnValue(undefined);
 
     // WHEN
     const harness: RouterTestingHarness = await RouterTestingHarness.create();
@@ -55,10 +53,8 @@ describe('vanillaRedirectGuard', () => {
 
   it('given route /Test when node is found then redirect to route /c/:id', async () => {
     // GIVEN
-    const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildClass('Test'));
-
     dumpMock.mockIsReady(true);
-    dumpMock.getById.mockReturnValue(observer);
+    dumpMock.getById.mockReturnValue(AstHelper.buildClass('Test'));
 
     // WHEN
     const harness: RouterTestingHarness = await RouterTestingHarness.create();
@@ -72,10 +68,8 @@ describe('vanillaRedirectGuard', () => {
 
   it('given route /Test?name=only then get node by id and name only', async () => {
     // GIVEN
-    const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildClass('Test'));
-
     dumpMock.mockIsReady(true);
-    dumpMock.getById.mockReturnValue(observer);
+    dumpMock.getById.mockReturnValue(AstHelper.buildClass('Test'));
 
     // WHEN
     const harness: RouterTestingHarness = await RouterTestingHarness.create();
@@ -91,10 +85,8 @@ describe('vanillaRedirectGuard', () => {
 
   it('given route /Test#Function when node is found then redirect to route /c/:id#:fragment', async () => {
     // GIVEN
-    const observer: Observable<RedNodeAst | undefined> = of(AstHelper.buildClass('Test'));
-
     dumpMock.mockIsReady(true);
-    dumpMock.getById.mockReturnValue(observer);
+    dumpMock.getById.mockReturnValue(AstHelper.buildClass('Test'));
 
     // WHEN
     const harness: RouterTestingHarness = await RouterTestingHarness.create();

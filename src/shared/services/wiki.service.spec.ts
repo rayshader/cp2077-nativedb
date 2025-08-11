@@ -3,12 +3,13 @@ import {WikiClassesRepository} from "../repositories/wiki-classes.repository";
 import {WikiClient} from "../clients/wiki.client";
 import {WikiParser, WikiParserError, WikiParserErrorCode} from "../parsers/wiki.parser";
 import {MatSnackBar} from "@angular/material/snack-bar";
-import {firstValueFrom, of, throwError} from "rxjs";
+import {of, throwError} from "rxjs";
 import {WikiClassDto, WikiFileDto, WikiFileEntryDto, WikiGlobalDto} from "../dtos/wiki.dto";
 import {cyrb53} from "../string";
 import {GitHubRateLimit, GitHubRateLimitError} from "../clients/github.client";
 import {HttpHeaders, HttpResponse} from "@angular/common/http";
 import {WikiGlobalsRepository} from "../repositories/wiki-globals.repository";
+import {Injector} from "@angular/core";
 import SpyInstance = jest.SpyInstance;
 
 /**
@@ -75,15 +76,26 @@ describe('WikiService', () => {
     mockToast.open.mockReset();
   });
 
-  const setup = () => {
+  const setup = async () => {
     jest.setSystemTime(new Date('2024-11-16 14:00:00'));
-    service = new WikiService(
-      mockClassesRepository as unknown as WikiClassesRepository,
-      mockGlobalsRepository as unknown as WikiGlobalsRepository,
-      mockClient as unknown as WikiClient,
-      parser,
-      mockToast as unknown as MatSnackBar
-    );
+
+    const injector = Injector.create({
+      providers: [
+        { provide: WikiClassesRepository, useValue: mockClassesRepository },
+        { provide: WikiGlobalsRepository, useValue: mockGlobalsRepository },
+        { provide: WikiClient, useValue: mockClient },
+        { provide: WikiParser, useValue: parser },
+        { provide: MatSnackBar, useValue: mockToast },
+        { provide: WikiService, useClass: WikiService, deps: [WikiClassesRepository, WikiGlobalsRepository, WikiClient, WikiParser, MatSnackBar] },
+      ]
+    });
+
+    service = injector.get(WikiService);
+    jest.useFakeTimers();
+    await service.getGlobals();
+    jest.runOnlyPendingTimers();
+
+    jest.useRealTimers();
     jest.setSystemTime(new Date('2024-11-16 15:00:00'));
   };
 
@@ -122,10 +134,10 @@ describe('WikiService', () => {
       ]));
       mockClient.getClass.mockReturnValueOnce(throwError(() => error));
       mockClassesRepository.findByName.mockReturnValueOnce(of(undefined));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiClassDto | undefined> = firstValueFrom(service.getClass('ScriptGameInstance'));
+      const promise: Promise<WikiClassDto | undefined> = service.getClass('ScriptGameInstance');
 
       // THEN
       await expect(promise).resolves.toEqual(undefined);
@@ -147,10 +159,10 @@ describe('WikiService', () => {
       ]));
       mockClient.getClass.mockReturnValueOnce(throwError(() => error));
       mockClassesRepository.findByName.mockReturnValueOnce(of(undefined));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiClassDto | undefined> = firstValueFrom(service.getClass('ScriptGameInstance'));
+      const promise: Promise<WikiClassDto | undefined> = service.getClass('ScriptGameInstance');
 
       // THEN
       await expect(promise).resolves.toEqual(undefined);
@@ -172,10 +184,10 @@ describe('WikiService', () => {
       ]));
       mockClient.getClass.mockReturnValueOnce(throwError(() => error));
       mockClassesRepository.findByName.mockReturnValueOnce(of(undefined));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiClassDto | undefined> = firstValueFrom(service.getClass('ScriptGameInstance'));
+      const promise: Promise<WikiClassDto | undefined> = service.getClass('ScriptGameInstance');
 
       // THEN
       await expect(promise).resolves.toEqual(undefined);
@@ -197,10 +209,10 @@ describe('WikiService', () => {
       ]));
       mockClient.getClass.mockReturnValueOnce(throwError(() => error));
       mockClassesRepository.findByName.mockReturnValueOnce(of(undefined));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiClassDto | undefined> = firstValueFrom(service.getClass('ScriptGameInstance'));
+      const promise: Promise<WikiClassDto | undefined> = service.getClass('ScriptGameInstance');
 
       // THEN
       await expect(promise).resolves.toEqual(undefined);
@@ -216,10 +228,10 @@ describe('WikiService', () => {
       // GIVEN
       mockClient.getClasses.mockReturnValueOnce(of([]));
       mockClassesRepository.findByName.mockReturnValueOnce(of(undefined));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiClassDto | undefined> = firstValueFrom(service.getClass('ScriptGameInstance'));
+      const promise: Promise<WikiClassDto | undefined> = service.getClass('ScriptGameInstance');
 
       // THEN
       await expect(promise).resolves.toEqual(undefined);
@@ -243,10 +255,10 @@ Parsing Markdown is already tested in WikiParser...`,
       }));
       mockClassesRepository.findByName.mockReturnValueOnce(of(undefined));
       mockClassesRepository.create.mockReturnValueOnce(of(42));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiClassDto | undefined> = firstValueFrom(service.getClass('ScriptGameInstance'));
+      const promise: Promise<WikiClassDto | undefined> = service.getClass('ScriptGameInstance');
 
       // THEN
       await expect(promise).resolves.toEqual(expect.objectContaining<WikiClassDto>({
@@ -286,10 +298,10 @@ Data is different between GitHub and cache...`,
         functions: []
       }));
       mockClassesRepository.update.mockReturnValueOnce(of(42));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiClassDto | undefined> = firstValueFrom(service.getClass('ScriptGameInstance'));
+      const promise: Promise<WikiClassDto | undefined> = service.getClass('ScriptGameInstance');
 
       // THEN
       await expect(promise).resolves.toEqual(expect.objectContaining<WikiClassDto>({
@@ -328,10 +340,10 @@ Data was not changed between GitHub and cache...`,
         comment: 'Data was not changed between GitHub and cache...',
         functions: []
       }));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiClassDto | undefined> = firstValueFrom(service.getClass('ScriptGameInstance'));
+      const promise: Promise<WikiClassDto | undefined> = service.getClass('ScriptGameInstance');
 
       // THEN
       await expect(promise).resolves.toEqual(expect.objectContaining<WikiClassDto>({
@@ -359,10 +371,10 @@ Data was not changed between GitHub and cache...`,
         functions: []
       }));
       mockClassesRepository.delete.mockReturnValueOnce(of(undefined));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiClassDto | undefined> = firstValueFrom(service.getClass('ScriptGameInstance'));
+      const promise: Promise<WikiClassDto | undefined> = service.getClass('ScriptGameInstance');
 
       // THEN
       await expect(promise).resolves.toEqual(undefined);
@@ -395,11 +407,11 @@ Data was not changed between GitHub and cache...`,
       // GIVEN
       const error: Error = new GitHubRateLimitError(createRateLimit());
 
-      mockClient.getGlobals.mockReturnValueOnce(throwError(() => error));
-      setup();
+      mockClient.getGlobals.mockReturnValue(throwError(() => error));
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiGlobalDto | undefined> = firstValueFrom(service.getGlobal(id));
+      const promise: Promise<WikiGlobalDto | undefined> = service.getGlobal(id);
 
       // THEN
       await expect(promise).resolves.toEqual(undefined);
@@ -417,10 +429,10 @@ Data was not changed between GitHub and cache...`,
       const error: Error = new WikiParserError('GLOBALS', WikiParserErrorCode.noTitle);
 
       mockClient.getGlobals.mockReturnValueOnce(throwError(() => error));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiGlobalDto | undefined> = firstValueFrom(service.getGlobal(id));
+      const promise: Promise<WikiGlobalDto | undefined> = service.getGlobal(id);
 
       // THEN
       await expect(promise).resolves.toEqual(undefined);
@@ -438,10 +450,10 @@ Data was not changed between GitHub and cache...`,
       const error: Error = new Error();
 
       mockClient.getGlobals.mockReturnValueOnce(throwError(() => error));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiGlobalDto | undefined> = firstValueFrom(service.getGlobal(id));
+      const promise: Promise<WikiGlobalDto | undefined> = service.getGlobal(id);
 
       // THEN
       await expect(promise).resolves.toEqual(undefined);
@@ -459,10 +471,10 @@ Data was not changed between GitHub and cache...`,
 
       mockClient.getGlobals.mockReturnValueOnce(throwError(() => error));
       mockGlobalsRepository.findAll.mockReturnValueOnce(of([]));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiGlobalDto | undefined> = firstValueFrom(service.getGlobal(id));
+      const promise: Promise<WikiGlobalDto | undefined> = service.getGlobal(id);
 
       // THEN
       await expect(promise).resolves.toEqual(undefined);
@@ -471,7 +483,7 @@ Data was not changed between GitHub and cache...`,
 
     it('should emit and create global in cache when page is requested for the first time', async () => {
       // GIVEN
-      mockClient.getGlobals.mockReturnValueOnce(of(<WikiFileDto>{
+      mockClient.getGlobals.mockReturnValue(of(<WikiFileDto>{
         sha: '<SHA>',
         fileName: 'globals.md',
         className: 'GLOBALS',
@@ -482,12 +494,12 @@ Data was not changed between GitHub and cache...`,
 
 Parsing Markdown is already tested in WikiParser...`
       }));
-      mockGlobalsRepository.findAll.mockReturnValueOnce(of([]));
-      mockGlobalsRepository.create.mockReturnValueOnce(of(42));
-      setup();
+      mockGlobalsRepository.findAll.mockReturnValue(of([]));
+      mockGlobalsRepository.create.mockReturnValue(of(42));
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiGlobalDto | undefined> = firstValueFrom(service.getGlobal(id));
+      const promise: Promise<WikiGlobalDto | undefined> = service.getGlobal(id);
 
       // THEN
       await expect(promise).resolves.toEqual(expect.objectContaining<WikiGlobalDto>({
@@ -504,7 +516,7 @@ Parsing Markdown is already tested in WikiParser...`
 
     it('should emit and update global in cache when page is found but request is newer', async () => {
       // GIVEN
-      mockClient.getGlobals.mockReturnValueOnce(of(<WikiFileDto>{
+      mockClient.getGlobals.mockReturnValue(of(<WikiFileDto>{
         sha: '<SHA-UPDATE>',
         fileName: 'globals.md',
         className: 'GLOBALS',
@@ -515,7 +527,7 @@ Parsing Markdown is already tested in WikiParser...`
 
 Documentation has changed :)`
       }));
-      mockGlobalsRepository.findAll.mockReturnValueOnce(of(<WikiGlobalDto[]>[
+      mockGlobalsRepository.findAll.mockReturnValue(of(<WikiGlobalDto[]>[
         {
           id: cyrb53('GetGameInstanceScriptGameInstance'),
           name: 'GetGameInstance',
@@ -523,11 +535,11 @@ Documentation has changed :)`
           sha: '<SHA>'
         }
       ]));
-      mockGlobalsRepository.update.mockReturnValueOnce(of(42));
-      setup();
+      mockGlobalsRepository.update.mockReturnValue(of(42));
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiGlobalDto | undefined> = firstValueFrom(service.getGlobal(id));
+      const promise: Promise<WikiGlobalDto | undefined> = service.getGlobal(id);
 
       // THEN
       await expect(promise).resolves.toEqual(expect.objectContaining<WikiGlobalDto>({
@@ -544,7 +556,7 @@ Documentation has changed :)`
 
     it('should emit global from cache when page is found and is not changed', async () => {
       // GIVEN
-      mockClient.getGlobals.mockReturnValueOnce(of(<WikiFileDto>{
+      mockClient.getGlobals.mockReturnValue(of(<WikiFileDto>{
         sha: '<SHA-CACHE>',
         fileName: 'globals.md',
         className: 'GLOBALS',
@@ -555,7 +567,7 @@ Documentation has changed :)`
 
 Parsing Markdown is already tested in WikiParser...`
       }));
-      mockGlobalsRepository.findAll.mockReturnValueOnce(of(<WikiGlobalDto[]>[
+      mockGlobalsRepository.findAll.mockReturnValue(of(<WikiGlobalDto[]>[
         {
           id: cyrb53('GetGameInstanceScriptGameInstance'),
           name: 'GetGameInstance',
@@ -563,10 +575,10 @@ Parsing Markdown is already tested in WikiParser...`
           sha: '<SHA-CACHE>'
         }
       ]));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiGlobalDto | undefined> = firstValueFrom(service.getGlobal(id));
+      const promise: Promise<WikiGlobalDto | undefined> = service.getGlobal(id);
 
       // THEN
       await expect(promise).resolves.toEqual(expect.objectContaining<WikiGlobalDto>({
@@ -598,10 +610,10 @@ Parsing Markdown is already tested in WikiParser...`
           sha: '<SHA>'
         }
       ]));
-      setup();
+      await setup();
 
       // WHEN
-      const promise: Promise<WikiGlobalDto | undefined> = firstValueFrom(service.getGlobal(id));
+      const promise: Promise<WikiGlobalDto | undefined> = service.getGlobal(id);
 
       // THEN
       await expect(promise).resolves.toEqual(undefined);
