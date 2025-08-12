@@ -40,6 +40,12 @@ export class RedClassAst {
     const flags: number = json.d;
     const name: string = json.b;
 
+    // NOTE: workaround because RTTI declaration is wrong on the CDPR side.
+    //       - TweakDBInterface is declared without a static qualifier in RTTI, but implementation and script import
+    //         expect a static qualifier.
+    //       - structs can't have member functions. Therefore, the static qualifier of functions is always set.
+    const isStaticFix: boolean = json.g === true || name === 'gamedataTweakDBInterface';
+
     return {
       id: cyrb53(name),
       kind: (json.g === true) ? RedNodeKind.struct : RedNodeKind.class,
@@ -51,7 +57,7 @@ export class RedClassAst {
       isStruct: json.g === true,
       parent: json.a,
       properties: json.e?.map(RedPropertyAst.fromJson) ?? [],
-      functions: json.f?.map(RedFunctionAst.fromJson) ?? [],
+      functions: json.f?.map((json) => RedFunctionAst.fromJson(json, isStaticFix)) ?? [],
       parents: [],
       children: [],
       isInheritanceLoaded: false

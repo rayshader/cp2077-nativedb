@@ -82,7 +82,7 @@ export class RedFunctionAst {
     return badges;
   }
 
-  static fromJson(json: RedFunctionJson): RedFunctionAst {
+  static fromJson(json: RedFunctionJson, isStaticFix?: boolean): RedFunctionAst {
     const flags: number = json.d;
     const name: string = json.b ?? json.a;
     const args: RedArgumentAst[] = json.e?.map(RedArgumentAst.fromJson) ?? [];
@@ -96,7 +96,7 @@ export class RedFunctionAst {
       kind: RedNodeKind.function,
       visibility: getVisibilityFromFunctionFlags(flags),
       isNative: ((flags >> RedFunctionFlags.isNative) & 1) !== 0,
-      isStatic: ((flags >> RedFunctionFlags.isStatic) & 1) !== 0,
+      isStatic: ((flags >> RedFunctionFlags.isStatic) & 1) !== 0 || isStaticFix === true,
       isFinal: ((flags >> RedFunctionFlags.isFinal) & 1) !== 0,
       isThreadSafe: ((flags >> RedFunctionFlags.isThreadSafe) & 1) !== 0,
       isCallback: ((flags >> RedFunctionFlags.isEvent) & 1) !== 0,

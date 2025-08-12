@@ -228,7 +228,7 @@ async function loadBitfields(): Promise<RedBitfieldAst[]> {
 
 async function loadFunctions(): Promise<RedFunctionAst[]> {
   const json: any[] = await getJson('./assets/reddump/globals.json');
-  const functions: RedFunctionAst[] = json.map(RedFunctionAst.fromJson);
+  const functions: RedFunctionAst[] = json.map((json) => RedFunctionAst.fromJson(json));
 
   functions.sort(RedFunctionAst.sort);
   return functions;
