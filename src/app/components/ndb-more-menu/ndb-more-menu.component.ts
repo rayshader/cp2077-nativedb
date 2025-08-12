@@ -23,6 +23,10 @@ import {MatDivider} from "@angular/material/divider";
 })
 export class NDBMoreMenuComponent {
 
+  openDump(type: 'json' | 'text'): void {
+    window.open(`/assets/reddump/cp2077_dump_${type}.zip`, '_blank');
+  }
+
   openGitHub(): void {
     window.open('https://github.com/rayshader/cp2077-nativedb', '_blank');
   }

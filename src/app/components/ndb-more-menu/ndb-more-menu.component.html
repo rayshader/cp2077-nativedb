@@ -17,6 +17,18 @@
 
   <mat-divider></mat-divider>
 
+  <button mat-menu-item (click)="openDump('json')">
+    <mat-icon>download</mat-icon>
+    JSON dump
+  </button>
+
+  <button mat-menu-item (click)="openDump('text')">
+    <mat-icon>download</mat-icon>
+    Text dump
+  </button>
+
+  <mat-divider></mat-divider>
+
   <button mat-menu-item (click)="openGitHub()">
     <mat-icon [svgIcon]="'github'"></mat-icon>
     Repository
