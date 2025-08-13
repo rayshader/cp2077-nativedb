@@ -1,11 +1,11 @@
 <ndb-toolbar (toggle)="toggleTabs()"></ndb-toolbar>
 
 <section>
-  <ndb-tabs [style.display]="displayTabs"></ndb-tabs>
+  <ndb-tabs [style.display]="displayTabs()"></ndb-tabs>
 
   <div #page
        class="page"
-       [style.display]="displayPage">
+       [style.display]="displayPage()">
     <router-outlet></router-outlet>
   </div>
 </section>
