@@ -1,13 +1,16 @@
 import {
-  ApplicationRef,
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
-  DestroyRef, effect,
+  computed,
+  DestroyRef,
+  effect,
   ElementRef,
   HostListener,
   inject,
   OnInit,
-  ViewChild
+  signal,
+  viewChild
 } from '@angular/core';
 
 import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
@@ -26,7 +29,7 @@ import {MAT_FORM_FIELD_DEFAULT_OPTIONS} from "@angular/material/form-field";
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {NDBToolbarComponent} from "./components/ndb-toolbar/ndb-toolbar.component";
 import {NDBBottomBarComponent} from "./components/ndb-bottom-bar/ndb-bottom-bar.component";
-import {filter, first} from "rxjs";
+import {filter} from "rxjs";
 import {ResponsiveService} from "../shared/services/responsive.service";
 import {ShortcutService} from "../shared/services/shortcut.service";
 
@@ -55,26 +58,35 @@ export interface AppData {
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
 
-  private readonly iconsService: IconsService = inject(IconsService);
-  private readonly pageService: PageService = inject(PageService);
-  private readonly responsiveService: ResponsiveService = inject(ResponsiveService);
-  private readonly shortcutService: ShortcutService = inject(ShortcutService);
-  private readonly app: ApplicationRef = inject(ApplicationRef);
-  private readonly dialog: MatDialog = inject(MatDialog);
-  private readonly router: Router = inject(Router);
-  private readonly swService: SwUpdate = inject(SwUpdate);
-  private readonly dr: DestroyRef = inject(DestroyRef);
+  private readonly iconsService = inject(IconsService);
+  private readonly pageService = inject(PageService);
+  private readonly responsiveService = inject(ResponsiveService);
+  private readonly shortcutService = inject(ShortcutService);
+  private readonly dialog = inject(MatDialog);
+  private readonly router = inject(Router);
+  private readonly swService = inject(SwUpdate);
+  private readonly dr = inject(DestroyRef);
 
-  @ViewChild(NDBTabsComponent)
-  readonly tabs?: NDBTabsComponent;
+  readonly tabs = viewChild(NDBTabsComponent);
+  readonly page = viewChild<ElementRef>('page');
 
-  @ViewChild('page')
-  readonly page?: ElementRef;
+  readonly showTabs = signal<boolean>(true);
+  readonly isMobile = signal<boolean>(false);
 
-  showTabs: boolean = true;
-  isMobile: boolean = false;
+  readonly displayTabs = computed<string>(() => {
+    if (!this.isMobile()) {
+      return '';
+    }
+    return (!this.showTabs()) ? 'none' : '';
+  })
+  readonly displayPage = computed<string>(() => {
+    if (!this.isMobile()) {
+      return '';
+    }
+    return (this.showTabs()) ? 'none' : '';
+  })
 
   constructor() {
     effect(() => {
@@ -83,27 +95,8 @@ export class AppComponent implements OnInit {
     });
   }
 
-  get displayTabs(): string {
-    if (!this.isMobile) {
-      return '';
-    }
-    return (!this.showTabs) ? 'none' : '';
-  }
-
-  get displayPage(): string {
-    if (!this.isMobile) {
-      return '';
-    }
-    return (this.showTabs) ? 'none' : '';
-  }
-
   ngOnInit(): void {
     this.iconsService.load();
-
-    this.app.isStable.pipe(
-      filter((stable: boolean) => stable),
-      first()
-    ).subscribe(this.onReady.bind(this));
 
     this.router.events.pipe(
       filter((event) => event instanceof NavigationEnd),
@@ -114,6 +107,13 @@ export class AppComponent implements OnInit {
       this.swService.versionUpdates
         .pipe(takeUntilDestroyed(this.dr))
         .subscribe(this.onUpdate.bind(this));
+    }
+  }
+
+  ngAfterViewInit(): void {
+    this.isMobile.set(this.responsiveService.isMobile());
+    if (this.isMobile()) {
+      this.showTabs.set(false);
     }
   }
 
@@ -128,13 +128,13 @@ export class AppComponent implements OnInit {
   }
 
   toggleTabs(): void {
-    if (!this.isMobile) {
+    if (!this.isMobile()) {
       return;
     }
-    this.showTabs = !this.showTabs;
-    if (this.showTabs) {
+    this.showTabs.set(!this.showTabs());
+    if (this.showTabs()) {
       setTimeout(() => {
-        this.tabs?.updateViewport();
+        this.tabs()?.updateViewport();
       });
     }
   }
@@ -144,23 +144,16 @@ export class AppComponent implements OnInit {
       return;
     }
     setTimeout(() => {
-      this.page?.nativeElement.scrollTo({top: 0, behavior: behavior});
+      this.page()?.nativeElement.scrollTo({top: 0, behavior: behavior});
     });
   }
 
   private onRouteChanged(): void {
-    if (!this.isMobile) {
+    if (!this.isMobile()) {
       return;
     }
 
-    this.showTabs = false;
-  }
-
-  private onReady(): void {
-    this.isMobile = this.responsiveService.isMobile();
-    if (this.isMobile) {
-      this.showTabs = false;
-    }
+    this.showTabs.set(false);
   }
 
   private onUpdate(event: VersionEvent): void {
