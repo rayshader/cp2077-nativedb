@@ -31,7 +31,8 @@
   }
 
   @media (max-width: 599px) {
-    margin: 0 2px;
+    width: calc(100vw - 48px - 2px);
+    margin: 0 0 0 2px;
   }
 }
 
