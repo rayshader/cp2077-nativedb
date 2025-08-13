@@ -230,22 +230,17 @@
     }
   </cdk-accordion>
 } @else {
-  @let _isMobile = isMobile();
-
-  <div class="actions">
+  <div class="skt-actions">
     <span class="skt-circle"></span>
-    @if (_isMobile) {
-    } @else {
-      <span class="skt-circle"></span>
-    }
+    <span class="skt-circle"></span>
     <span class="skt-circle"></span>
     <span class="skt-circle"></span>
     <span class="skt-circle"></span>
   </div>
 
-  <div class="title">
+  <div class="skt-title">
     <h1 class="stx stx-type">Loading...</h1>
-    <div class="prototype">
+    <div class="skt-prototype">
       <span class="skt-circle skt-scope"></span>
       <span class="skt-circle skt-scope"></span>
       @if (isClass()) {

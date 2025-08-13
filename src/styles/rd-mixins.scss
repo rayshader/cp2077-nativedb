@@ -18,6 +18,7 @@
 @use './app/documentation' as *;
 @use './app/highlight' as *;
 @use './app/core' as *;
+@use './app/skeleton' as *;
 
 @mixin mat-component-themes($theme) {
   //@include mat.all-component-themes($theme);
@@ -78,6 +79,7 @@
   @include highlight-theme($theme);
   @include tooltip-theme($theme);
   @include suffix-theme($theme);
+  @include skeleton-theme($theme);
 
   @include virtual-scroll-theme($theme);
 }
@@ -95,4 +97,5 @@
   @include highlight-color($theme);
   @include tooltip-color($theme);
   @include suffix-color($theme);
+  @include skeleton-color($theme);
 }
