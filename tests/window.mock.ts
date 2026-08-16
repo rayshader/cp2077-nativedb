@@ -1,12 +1,5 @@
 import Mock = jest.Mock;
 
-export function mockLocation(path: string): void {
-  // @ts-ignore
-  delete window.location;
-  // @ts-ignore
-  window.location = new URL(`https://nativedb.com${path}`);
-}
-
 export function mockWindowOpen(): any {
   return jest.spyOn(window, 'open').mockImplementation();
 }
