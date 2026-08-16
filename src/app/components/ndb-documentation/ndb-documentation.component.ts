@@ -1,4 +1,4 @@
-import {Component, inject, input} from '@angular/core';
+import {Component, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {NDBFormatDocumentationPipe} from "../../pipes/ndb-format-documentation.pipe";
 import {Router} from "@angular/router";
 import {MatTooltipModule} from "@angular/material/tooltip";
@@ -23,6 +23,7 @@ import {ResponsiveService} from "../../../shared/services/responsive.service";
     NDBFormatDocumentationPipe
   ],
   templateUrl: './ndb-documentation.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './ndb-documentation.component.scss'
 })
 export class NDBDocumentationComponent {

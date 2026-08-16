@@ -1,4 +1,4 @@
-import {Component, computed, inject} from '@angular/core';
+import {Component, computed, inject, ChangeDetectionStrategy} from '@angular/core';
 import {MatIconModule} from "@angular/material/icon";
 import {MatButtonModule} from "@angular/material/button";
 import {MatMenuModule} from "@angular/material/menu";
@@ -30,6 +30,7 @@ interface SyntaxData {
     MatTooltipModule,
   ],
   templateUrl: './ndb-syntax-mode.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './ndb-syntax-mode.component.scss'
 })
 export class NDBSyntaxModeComponent {

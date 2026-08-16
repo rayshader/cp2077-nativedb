@@ -1,4 +1,4 @@
-import {Component, computed, inject, input} from '@angular/core';
+import {Component, computed, inject, input, ChangeDetectionStrategy} from '@angular/core';
 import {TypeSpanComponent} from "../type-span/type-span.component";
 import {RedArgumentAst} from "../../../../shared/red-ast/red-argument.ast";
 import {CodeSyntax, SettingsService} from "../../../../shared/services/settings.service";
@@ -9,6 +9,7 @@ import {CodeSyntax, SettingsService} from "../../../../shared/services/settings.
     TypeSpanComponent
   ],
   templateUrl: './argument-span.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './argument-span.component.scss'
 })
 export class ArgumentSpanComponent {
