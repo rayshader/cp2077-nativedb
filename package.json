@@ -1,6 +1,9 @@
 {
   "name": "cp2077-nativedb",
   "version": "2.0.2",
+  "author": "Louis Poirier",
+  "license": "MIT",
+  "private": true,
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
