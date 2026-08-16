@@ -153,15 +153,14 @@ export class ObjectComponent implements AfterViewInit {
         break;
       case RedNodeKind.struct:
         node = this.dumpService.getStructById(+id);
+        // NOTE: re-compute when inheritance is finally loaded.
+        this.dumpService.inheritance();
         break;
       default:
         node = undefined;
         break;
     }
 
-    if (kind === RedNodeKind.struct && node) {
-      return node;
-    }
     return node?.isInheritanceLoaded ? node : undefined;
   });
   readonly parents = computed<InheritData[]>(() => {
@@ -189,7 +188,7 @@ export class ObjectComponent implements AfterViewInit {
     let properties = [...object.properties];
     properties.push(
       ...this.inherits()
-        .map((id) => this.dumpService.getClassById(id))
+        .map((id) => object.isStruct ? this.dumpService.getStructById(id) : this.dumpService.getClassById(id))
         .filter((inherit) => !!inherit)
         .flatMap((inherit) => inherit.properties ?? [])
     );

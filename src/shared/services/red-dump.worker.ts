@@ -105,27 +105,29 @@ async function load(port?: MessagePort): Promise<void> {
   isReady = true;
 }
 
-function onLoadInheritance(request: {token: string, id: number}, port?: MessagePort): void {
-  const klass: RedClassAst | undefined = data.objects.find((klass) => klass.id === request.id);
-
-  if (!klass) {
+function onLoadInheritance(request: { token: string, id: number }, port?: MessagePort): void {
+  const object: RedClassAst | undefined = data.objects.find((object) => object.id === request.id);
+  if (!object) {
     return;
   }
-  if (klass.isInheritanceLoaded) {
+
+  if (object.isInheritanceLoaded) {
     send(NDBCommand.rd_load_inheritance, port, <RedDumpWorkerLoadInheritance>{
       token: request.token,
-      id: klass.id,
-      klass: klass
+      id: object.id,
+      klass: object
     });
     return;
   }
-  loadParents(data.objects, klass);
-  loadChildren(data.objects, klass);
-  klass.isInheritanceLoaded = true;
+
+  loadParents(data.objects, object);
+  loadChildren(data.objects, object);
+  object.isInheritanceLoaded = true;
+
   send(NDBCommand.rd_load_inheritance, port, <RedDumpWorkerLoadInheritance>{
     token: request.token,
-    id: klass.id,
-    klass: klass
+    id: object.id,
+    klass: object
   });
 }
 
@@ -157,7 +159,6 @@ function getMax(a: number, b: number): number {
 
 function loadParents(objects: RedClassAst[], object: RedClassAst): void {
   let parent = objects.find((item) => item.name === object.parent);
-
   if (parent) {
     object.parents.push(<InheritData>{
       id: parent.id,
@@ -168,6 +169,7 @@ function loadParents(objects: RedClassAst[], object: RedClassAst): void {
       size: -1
     });
   }
+
   while (parent && parent.parent) {
     parent = objects.find((item) => item.name === parent!.parent);
     if (parent) {

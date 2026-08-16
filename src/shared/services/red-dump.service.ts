@@ -115,15 +115,20 @@ export class RedDumpService {
 
   getClassById(id: number): RedClassAst | undefined {
     const klass: RedClassAst | undefined = this.classes().find((item) => item.id === id);
-
     if (!klass) {
       return undefined;
     }
+
     return this.loadInheritance(klass);
   }
 
   getStructById(id: number): RedClassAst | undefined {
-    return this.structs().find((item) => item.id === id);
+    const struct: RedClassAst | undefined = this.structs().find((item) => item.id === id);
+    if (!struct) {
+      return undefined;
+    }
+
+    return this.loadInheritance(struct);
   }
 
   getFunctionById(id: number): RedFunctionAst | undefined {
@@ -191,21 +196,27 @@ export class RedDumpService {
   }
 
   private async onWorkerLoadInheritance(data: RedDumpWorkerLoadInheritance): Promise<void> {
-    this._classes.update((classes) => {
-      const index: number = classes.findIndex((klass) => klass.id === data.id);
+    const load = (objects: RedClassAst[]) => {
+      const index: number = objects.findIndex((object) => object.id === data.id);
       if (index === -1) {
-        return classes;
+        return objects;
       }
 
-      const klass = classes[index];
-      if (klass.isInheritanceLoaded) {
-        return classes;
+      const object = objects[index];
+      if (object.isInheritanceLoaded) {
+        return objects;
       }
 
-      classes = [...classes];
-      classes[index] = data.klass;
-      return classes;
-    });
+      objects = [...objects];
+      objects[index] = data.klass;
+      return objects;
+    };
+
+    if (data.klass.isStruct) {
+      this._structs.update(load);
+    } else {
+      this._classes.update(load);
+    }
     this._inheritance.set(data.token);
   }
 
