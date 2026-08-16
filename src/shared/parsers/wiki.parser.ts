@@ -217,9 +217,15 @@ export class WikiTokenStream {
   }
 
   public nextHeading(level: number, shallow: boolean = false): Tokens.Heading | undefined {
+    // Skip newlines
+    while (this.hasNext() && this.next(true).type === 'space') {
+      this.next();
+    }
+
     if (!this.hasNext()) {
       return undefined;
     }
+
     const token: Tokens.Heading = this.next<Tokens.Heading>(shallow);
 
     if (token.type !== 'heading') {
