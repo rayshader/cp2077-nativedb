@@ -1,5 +1,6 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {DomSanitizer, SafeHtml} from "@angular/platform-browser";
+import {Location} from "@angular/common";
 import {RedPrimitiveDef, RedTemplateDef} from "../../shared/red-ast/red-definitions.ast";
 import {cyrb53} from "../../shared/string";
 
@@ -25,7 +26,8 @@ export class NDBFormatDocumentationPipe implements PipeTransform {
     {regex: NDBFormatDocumentationPipe.CODE_RULE, format: this.formatCodeRule.bind(this)},
   ];
 
-  constructor(private readonly sanitizer: DomSanitizer) {
+  constructor(private readonly sanitizer: DomSanitizer,
+              private readonly location: Location) {
     if (NDBFormatDocumentationPipe.PRIMITIVES.length === 0) {
       for (let i = RedPrimitiveDef.Void; i <= RedTemplateDef.multiChannelCurve; i++) {
         if (i <= RedPrimitiveDef.Variant) {
@@ -94,7 +96,7 @@ export class NDBFormatDocumentationPipe implements PipeTransform {
   }
 
   private createLocalLink(type: string): string {
-    const uri: string = `${window.location.pathname}#${cyrb53(type)}`;
+    const uri: string = `${this.location.path(false)}#${cyrb53(type)}`;
 
     return `<a class="stx-type" title="Navigate to ${type}" data-route="${uri}">${type}</a>`;
   }

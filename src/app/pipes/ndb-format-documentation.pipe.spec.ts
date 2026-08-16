@@ -3,7 +3,8 @@ import {TestBed} from "@angular/core/testing";
 import {SafeHtml} from "@angular/platform-browser";
 import {BrowserTestingModule} from "@angular/platform-browser/testing";
 import {cyrb53} from "../../shared/string";
-import {mockLocation} from "../../../tests/window.mock";
+import {provideRouter, Router} from "@angular/router";
+import {DummyComponent} from "../../../tests/angular/dummy.component";
 
 describe('NDBFormatDocumentationPipe', () => {
   let pipe: NDBFormatDocumentationPipe;
@@ -11,9 +12,10 @@ describe('NDBFormatDocumentationPipe', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        BrowserTestingModule
+        BrowserTestingModule,
       ],
       providers: [
+        provideRouter([{path: '', component: DummyComponent}, {path: 'Test', component: DummyComponent}]),
         NDBFormatDocumentationPipe
       ]
     });
@@ -62,11 +64,10 @@ describe('NDBFormatDocumentationPipe', () => {
       ' type.');
   });
 
-  it('should format [this.IsValid] with a relative anchor and a fragment', () => {
+  it('should format [this.IsValid] with a relative anchor and a fragment', async () => {
     // GIVEN
     const documentation: string = 'This test should link my relative [this.IsValid] member.';
-
-    mockLocation('/Test');
+    await TestBed.inject(Router).navigateByUrl('/Test');
 
     // WHEN
     const html: string = getSafeHtml(pipe.transform(documentation));

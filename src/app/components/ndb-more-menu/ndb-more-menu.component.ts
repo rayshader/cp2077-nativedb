@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, ChangeDetectionStrategy} from '@angular/core';
 import {MatIconButton} from "@angular/material/button";
 import {MatIcon} from "@angular/material/icon";
 import {MatMenu, MatMenuItem, MatMenuTrigger} from "@angular/material/menu";
@@ -19,6 +19,7 @@ import {MatDivider} from "@angular/material/divider";
     MatTooltip
   ],
   templateUrl: './ndb-more-menu.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './ndb-more-menu.component.scss'
 })
 export class NDBMoreMenuComponent {

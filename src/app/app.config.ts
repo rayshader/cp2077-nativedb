@@ -2,7 +2,6 @@ import {ApplicationConfig, isDevMode} from '@angular/core';
 import {PreloadAllModules, provideRouter, withComponentInputBinding, withPreloading} from '@angular/router';
 import {provideHttpClient} from "@angular/common/http";
 import {provideServiceWorker} from '@angular/service-worker';
-import {provideAnimationsAsync} from "@angular/platform-browser/animations/async";
 import {MAT_SNACK_BAR_DEFAULT_OPTIONS} from "@angular/material/snack-bar";
 
 import {routes} from './app.routes';
@@ -15,7 +14,6 @@ export const appConfig: ApplicationConfig = {
       withComponentInputBinding(),
       withPreloading(PreloadAllModules)
     ),
-    provideAnimationsAsync(),
     provideHttpClient(),
     provideServiceWorker('ngsw-worker.js', {
       enabled: !isDevMode(),
