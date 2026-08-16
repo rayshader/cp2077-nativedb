@@ -77,6 +77,7 @@ describe('WikiService', () => {
   });
 
   const setup = async () => {
+    jest.useFakeTimers();
     jest.setSystemTime(new Date('2024-11-16 14:00:00'));
 
     const injector = Injector.create({
@@ -96,7 +97,6 @@ describe('WikiService', () => {
     jest.runOnlyPendingTimers();
 
     jest.useRealTimers();
-    jest.setSystemTime(new Date('2024-11-16 15:00:00'));
   };
 
   const createRateLimit = (limit: number = 60, remaining: number = 50, reset: Date = new Date()) => {
