@@ -1,6 +1,6 @@
 # NativeDB
 ![license - MIT](https://img.shields.io/badge/license-MIT-orange)
-![version - 2.1.0](https://img.shields.io/badge/version-2.1.0-green)
+![version - 2.1.1](https://img.shields.io/badge/version-2.1.1-green)
 ![game - 2.5](https://img.shields.io/badge/game-2.5-blue)
 
 A web application to explore RTTI database of Cyberpunk 2077. It supports
