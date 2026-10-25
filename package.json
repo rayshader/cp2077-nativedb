@@ -1,10 +1,10 @@
 {
   "name": "cp2077-nativedb",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "author": "Louis Poirier",
   "license": "MIT",
   "private": true,
-  "packageManager": "pnpm@11.17.0",
+  "packageManager": "pnpm@12.15.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -15,17 +15,17 @@
     "test": "jest"
   },
   "dependencies": {
-    "@angular/animations": "^22.1.2",
-    "@angular/cdk": "^22.1.2",
-    "@angular/common": "^22.1.2",
-    "@angular/compiler": "^22.1.2",
-    "@angular/core": "^22.1.2",
-    "@angular/forms": "^22.1.2",
-    "@angular/material": "^22.1.2",
-    "@angular/platform-browser": "^22.1.2",
-    "@angular/platform-browser-dynamic": "^22.1.2",
-    "@angular/router": "^22.1.2",
-    "@angular/service-worker": "^22.1.2",
+    "@angular/animations": "^22.2.3",
+    "@angular/cdk": "^22.2.4",
+    "@angular/common": "^22.2.3",
+    "@angular/compiler": "^22.2.3",
+    "@angular/core": "^22.2.3",
+    "@angular/forms": "^22.2.3",
+    "@angular/material": "^22.2.4",
+    "@angular/platform-browser": "^22.2.3",
+    "@angular/platform-browser-dynamic": "^22.2.3",
+    "@angular/router": "^22.2.3",
+    "@angular/service-worker": "^22.2.3",
     "dexie": "^4.4.5",
     "marked": "^18.0.9",
     "ngxtension": "^7.3.0",
@@ -35,9 +35,9 @@
     "zone.js": "^0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "^22.1.4",
-    "@angular/cli": "^22.1.4",
-    "@angular/compiler-cli": "^22.1.2",
+    "@angular/build": "^22.2.4",
+    "@angular/cli": "^22.2.4",
+    "@angular/compiler-cli": "^22.2.3",
     "@types/jest": "^30.0.0",
     "gulp": "^5.0.1",
     "gulp-brotli": "^3.0.0",
@@ -45,7 +45,7 @@
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "jest-preset-angular": "^17.0.0",
-    "ngxtension-plugin": "^7.3.0",
+    "ngxtension-plugin": "^7.3.1",
     "ts-node": "^10.9.2",
     "typescript": "~6.0.3"
   }
