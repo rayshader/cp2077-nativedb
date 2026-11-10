@@ -94,7 +94,7 @@ export class RedTypeAst {
     let name: string = type.name;
     let str: string = '';
 
-    if ((syntax === CodeSyntax.lua || syntax === CodeSyntax.redscript) && type.aliasName) {
+    if ((syntax === CodeSyntax.lua || syntax === CodeSyntax.redscript || syntax === CodeSyntax.redmod) && type.aliasName) {
       name = type.aliasName;
     }
     if (type.innerType !== undefined) {
@@ -109,19 +109,37 @@ export class RedTypeAst {
         } else {
           str += `[${type.size}]`;
         }
-      } else {
+      } else if (syntax !== CodeSyntax.redmod) {
         if (type.size === undefined) {
           str += `${name}<`;
         } else {
           str += '[';
         }
+      } else if (syntax === CodeSyntax.redmod) {
+        if (name === 'wref') {
+          str += 'weak<';
+        } else if (name === 'script_ref') {
+          str += 'ref<';
+        } else if (name === 'array') {
+          str += 'array<';
+        }
       }
       str += RedTypeAst.toString(type.innerType, syntax);
-      if (type.size !== undefined && syntax !== CodeSyntax.pseudocode) {
-        str += `; ${type.size}`;
+      if (type.size !== undefined) {
+        if (syntax === CodeSyntax.redmod) {
+          str += '[';
+        } else if (syntax !== CodeSyntax.pseudocode) {
+          str += `; ${type.size}`;
+        }
       }
-      if (syntax !== CodeSyntax.pseudocode) {
+      if (syntax !== CodeSyntax.pseudocode && syntax !== CodeSyntax.redmod) {
         str += (type.size === undefined) ? '>' : ']';
+      }
+      if (type.size !== undefined && syntax === CodeSyntax.redmod) {
+        str += ']';
+      }
+      if (type.size === undefined && syntax == CodeSyntax.redmod && (name === 'wref' || name === 'script_ref' || name === 'array')) {
+        str += '>';
       }
     } else {
       str = name;

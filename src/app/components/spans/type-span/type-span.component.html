@@ -30,6 +30,23 @@
           <span class="stx-parenthesis">]</span>
         }
       }
+      @case (redmod) {
+        @if (_node.size === undefined) {
+          @if (_node.flag === RedTemplateDef.ref) {
+            <type-span [node]="_node.innerType"></type-span>
+          } @else {
+            <span class="stx-lang">{{ _node | ndbFormatCode:_syntax }}</span>
+            <span class="stx-type"><</span>
+            <type-span [node]="_node.innerType"></type-span>
+            <span class="stx-type">></span>
+          }
+        } @else {
+          <type-span [node]="_node.innerType"></type-span>
+          <span class="stx-parenthesis">[</span>
+          <span class="stx-number">{{ _node.size }}</span>
+          <span class="stx-parenthesis">]</span>
+        }
+      }
       @case (cpp) {
         <span class="stx-lang">{{ _node | ndbFormatCode:_syntax }}</span>
         <span class="stx-type"><</span>
@@ -47,7 +64,8 @@
     @let _isEmpty = isEmpty();
 
     @switch (_syntax) {
-      @case (redscript) {
+      @case (redscript)
+      @case (redmod) {
         <span class="stx-type redirect"
               [class.disabled]="_isEmpty"
               (mousedown)="disableScrolling($event)"

@@ -30,7 +30,11 @@
           <span class="stx-lang">out&nbsp;</span>
         }
         @if (_node.isOptional) {
-          <span class="stx-lang">opt&nbsp;</span>
+          @if (redmod) {
+            <span class="stx-lang">optional&nbsp;</span>
+          } @else {
+            <span class="stx-lang">opt&nbsp;</span>
+          }
         }
         <span class="stx-arg">{{_node.name}}</span>
         <span class="stx-text">:&nbsp;</span>

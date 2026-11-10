@@ -4,6 +4,7 @@ import {RedTypeAst} from "../../../../shared/red-ast/red-type.ast";
 import {CodeSyntax, SettingsService} from "../../../../shared/services/settings.service";
 import {NDBFormatCodePipe} from "../../../pipes/ndb-format-code.pipe";
 import {ShortcutService} from "../../../../shared/services/shortcut.service";
+import {RedTemplateDef} from "../../../../shared/red-ast/red-definitions.ast";
 
 @Component({
   selector: 'type-span',
@@ -31,7 +32,10 @@ export class TypeSpanComponent {
 
   readonly vanilla: number = CodeSyntax.pseudocode + 1;
   readonly redscript: number = CodeSyntax.redscript + 1;
+  readonly redmod: number = CodeSyntax.redmod + 1;
   readonly cpp: number = CodeSyntax.cppRED4ext + 1;
+
+  readonly RedTemplateDef = RedTemplateDef;
 
   /**
    * Navigate to node's page on a simple click.
@@ -60,5 +64,4 @@ export class TypeSpanComponent {
     event.preventDefault();
     return false;
   }
-
 }

@@ -14,11 +14,11 @@
                        [method]="_node"></ndb-documentation>
   }
 
+  @let _syntax = syntax();
+
   <div class="content">
     <div class="badges">
       @if (canCopy()) {
-        @let _syntax = syntax();
-
         <button mat-icon-button
                 class="badge clipboard"
                 matTooltip="Copy code to clipboard"
@@ -36,6 +36,20 @@
                       [matTooltipDisabled]="!_node.isNative"
                       (click)="copySpecial('replaceGlobal')">Copy replaceGlobal</button>
             } @else {
+              <button mat-menu-item
+                      [disabled]="_node.isNative"
+                      matTooltip="You cannot wrap a native method."
+                      [matTooltipDisabled]="!_node.isNative"
+                      (click)="copySpecial('wrapMethod')">Copy wrapMethod</button>
+              <button mat-menu-item
+                      [disabled]="_node.isNative"
+                      matTooltip="You cannot replace a native method."
+                      [matTooltipDisabled]="!_node.isNative"
+                      (click)="copySpecial('replaceMethod')">Copy replaceMethod</button>
+            }
+          } @else if (_syntax === CodeSyntax.redmod) {
+            <mat-divider></mat-divider>
+            @if (_memberOf) {
               <button mat-menu-item
                       [disabled]="_node.isNative"
                       matTooltip="You cannot wrap a native method."
@@ -132,7 +146,11 @@
 
       <div class="group">
         <span class="stx-parenthesis">)</span>
-        <span class="stx-text">&nbsp;→&nbsp;</span>
+        @if (_syntax === CodeSyntax.redmod) {
+          <span class="stx-text">&nbsp;:&nbsp;</span>
+        } @else {
+          <span class="stx-text">&nbsp;→&nbsp;</span>
+        }
         <type-span [node]="_node.returnType"></type-span>
       </div>
     </div>

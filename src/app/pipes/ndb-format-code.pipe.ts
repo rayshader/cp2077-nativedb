@@ -31,6 +31,17 @@ export class NDBFormatCodePipe implements PipeTransform {
           return 'ResourceAsyncRef';
         }
         return type.name;
+      case CodeSyntax.redmod:
+        if (type.flag === RedTemplateDef.wref) {
+          return 'weak';
+        } else if (type.flag === RedTemplateDef.script_ref) {
+          return 'ref';
+        } else if (type.flag === RedTemplateDef.ResRef) {
+          return 'redResourceRefWrapper';
+        } else if (type.flag === RedTemplateDef.ResAsyncRef) {
+          return 'redResourceAsyncRefWrapper';
+        }
+        return type.name;
       case CodeSyntax.cppRED4ext:
       case CodeSyntax.cppRedLib:
         if (type.flag === RedTemplateDef.ref) {

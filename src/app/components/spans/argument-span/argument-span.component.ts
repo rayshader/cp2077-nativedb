@@ -20,5 +20,6 @@ export class ArgumentSpanComponent {
 
   readonly syntax = computed(() => this.settingsService.code() + 1);
   readonly cpp: number = CodeSyntax.cppRED4ext + 1;
+  readonly redmod: number = CodeSyntax.redmod + 1;
 
 }

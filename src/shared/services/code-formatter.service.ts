@@ -6,6 +6,7 @@ import {LuaFormatter} from "../formatters/lua.formatter";
 import {CppRedLibFormatter} from "../formatters/cpp-redlib.formatter";
 import {RedFunctionAst} from "../red-ast/red-function.ast";
 import {RedClassAst} from "../red-ast/red-class.ast";
+import {RedmodFormatter} from "../formatters/redmod.formatter";
 
 interface CodeFormatterItem {
   readonly syntax: CodeSyntax;
@@ -21,6 +22,7 @@ export class CodeFormatterService {
 
   private readonly formatters: CodeFormatterItem[] = [
     {syntax: CodeSyntax.redscript, fmt: new RedscriptFormatter()},
+    {syntax: CodeSyntax.redmod, fmt: new RedmodFormatter()},
     {syntax: CodeSyntax.lua, fmt: new LuaFormatter()},
     {syntax: CodeSyntax.cppRedLib, fmt: new CppRedLibFormatter()},
   ];
