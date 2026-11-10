@@ -6,6 +6,8 @@
 A web application to explore RTTI database of Cyberpunk 2077. It supports
 [documentation] of classes and functions.
 
+![Showcase of the application](screenshots/showcase.png)
+
 [documentation]: https://wiki.redmodding.org/nativedb-documentation
 
 ## Setup
