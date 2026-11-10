@@ -19,7 +19,7 @@ export class RedArgumentAst {
     } else if (argument.isOut) {
       flag = 'out ';
     } else if (argument.isOptional) {
-      flag = 'opt ';
+      flag = syntax === CodeSyntax.redmod ? 'optional ' : 'opt ';
     }
     return `${flag}${argument.name}: ${RedTypeAst.toString(argument.type, syntax)}`;
   }

@@ -44,12 +44,14 @@ export class NDBSyntaxModeComponent {
 
   readonly clipboardOptions: SyntaxOption[] = [
     {value: CodeSyntax.redscript, name: 'Redscript', disabled: false},
+    {value: CodeSyntax.redmod, name: 'REDmod', disabled: false},
     {value: CodeSyntax.lua, name: 'Lua · CET', disabled: false},
     {value: CodeSyntax.cppRedLib, name: 'C++ · RedLib', disabled: false},
   ];
   readonly codeOptions: SyntaxOption[] = [
     {value: CodeSyntax.pseudocode, name: 'Pseudocode · Legacy', disabled: false},
     {value: CodeSyntax.redscript, name: 'Redscript', disabled: false},
+    {value: CodeSyntax.redmod, name: 'REDmod', disabled: false},
   ];
 
   readonly data = computed<SyntaxData | undefined>(() => {
