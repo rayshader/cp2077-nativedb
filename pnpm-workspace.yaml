@@ -5,3 +5,5 @@ allowBuilds:
   msgpackr-extract: true
   nx: true
   unrs-resolver: true
+minimumReleaseAgeExclude:
+  - marked@18.2.0
